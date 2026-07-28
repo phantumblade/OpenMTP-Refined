@@ -52,12 +52,12 @@ export class Kalam {
   }
 
   /**
-   * description - Initialize Kalam MTP
+   * description - Single attempt to initialize Kalam MTP
    *
    * @return {Promise<object>}
-   * @constructor
+   * @private
    */
-  async initialize() {
+  _singleInitialize() {
     return new Promise((resolve) => {
       try {
         const onDonePtr = this.callbackDictionary.onCbResult;
@@ -84,6 +84,56 @@ export class Kalam {
         return resolve(this._getNapiError(err));
       }
     });
+  }
+
+  /**
+   * description - Initialize Kalam MTP with automatic retry for transient USB errors
+   *
+   * @return {Promise<object>}
+   * @constructor
+   */
+  async initialize() {
+    const maxAttempts = 3;
+    let attempt = 0;
+    let res = null;
+
+    while (attempt < maxAttempts) {
+      attempt += 1;
+      // eslint-disable-next-line no-await-in-loop
+      res = await this._singleInitialize();
+
+      if (!res?.error && !res?.stderr) {
+        return res;
+      }
+
+      const errString = String(res?.error || res?.stderr || '');
+      const isTransientUsbError =
+        errString.includes('LIBUSB_ERROR') ||
+        errString.includes('OpenSession') ||
+        errString.includes('device initialized failed') ||
+        errString.includes('attempting reset') ||
+        errString.includes('EOF') ||
+        errString.includes('BUSY') ||
+        errString.includes('ErrorDeviceSetup') ||
+        errString.includes('ErrorMtpDetectFailed') ||
+        errString.includes('ErrorDeviceLocked');
+
+      if (isTransientUsbError && attempt < maxAttempts) {
+        log.info(
+          `Kalam initialize transient USB error (attempt ${attempt}/${maxAttempts}): ${errString}. Retrying in ${
+            attempt * 400
+          }ms...`
+        );
+        const delay = attempt * 400;
+
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      } else {
+        break;
+      }
+    }
+
+    return res;
   }
 
   /**
@@ -382,50 +432,72 @@ export class Kalam {
     checkIf(onCompleted, 'function');
 
     return new Promise((resolve) => {
+      let settled = false;
+
+      const failTransfer = ({ error, stderr = null, data = null }) => {
+        if (settled) {
+          return;
+        }
+
+        settled = true;
+        onError({ error, stderr, data });
+        resolve({ error, stderr, data });
+      };
+
       try {
         const onFfiPreprocessPtr = this.callbackDictionary.onCbResult;
         const rawOnFfiPreprocessPtr = koffi.register((result) => {
           const json = JSON.parse(result);
           const { error, data, stderr } = this._getData(json);
 
-          if (!undefinedOrNull(error)) {
-            onError({ error, data: null, stderr });
-
-            return resolve({ error, stderr, data: null });
+          if (!undefinedOrNull(error) || !undefinedOrNull(stderr)) {
+            return failTransfer({ error, data: null, stderr });
           }
 
-          if (onPreprocess && data) {
+          if (!settled && onPreprocess && data) {
             const { fullPath, size, name } = data;
 
             onPreprocess({ fullPath, size, name });
           }
         }, koffi.pointer(onFfiPreprocessPtr));
 
+        let lastProgressTime = 0;
         const onFfiProgressPtr = this.callbackDictionary.onCbResult;
         const rawOnFfiProgressPtr = koffi.register((result) => {
           const json = JSON.parse(result);
           const { error, data, stderr } = this._getData(json);
 
-          if (!undefinedOrNull(error)) {
-            onError({ error, data: null, stderr });
-
-            return resolve({ error, stderr, data: null });
+          if (!undefinedOrNull(error) || !undefinedOrNull(stderr)) {
+            return failTransfer({ error, data: null, stderr });
           }
 
-          if (onProgress && data) {
-            onProgress({ ...data });
+          if (!settled && onProgress && data) {
+            const now = Date.now();
+            const isCompleted =
+              data?.bulkFileSize?.progress === 100 ||
+              data?.activeFileSize?.progress === 100;
+
+            if (now - lastProgressTime >= 100 || isCompleted) {
+              lastProgressTime = now;
+              onProgress({ ...data });
+            }
           }
         }, koffi.pointer(onFfiProgressPtr));
 
         const onDonePtr = this.callbackDictionary.onCbResult;
         const rawOnDonePtr = koffi.register((result) => {
           const json = JSON.parse(result);
+          const response = this._getData(json);
 
-          if (onCompleted) {
-            onCompleted();
+          if (response.error || response.stderr) {
+            return failTransfer(response);
           }
 
-          return resolve(this._getData(json));
+          if (!settled) {
+            settled = true;
+            onCompleted();
+            resolve(response);
+          }
         }, koffi.pointer(onDonePtr));
 
         let TransferFiles;
@@ -474,7 +546,7 @@ export class Kalam {
                 `Kalam.transferFiles.async - Transfer type: ${direction}`
               );
 
-              return resolve(this._getNapiError(err));
+              return failTransfer(this._getNapiError(err));
             }
           }
         );
@@ -484,7 +556,7 @@ export class Kalam {
           `Kalam.transferFiles.catch - Transfer type: ${direction}`
         );
 
-        return resolve(this._getNapiError(err));
+        return failTransfer(this._getNapiError(err));
       }
     });
   }

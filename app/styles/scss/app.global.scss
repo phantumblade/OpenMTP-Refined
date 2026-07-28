@@ -1,3 +1,20 @@
 @import './themes/fonts';
 @import './base/base';
 @import './themes/reset';
+
+/* Stable inline values used by counters and transfer status. */
+.slot-text {
+  display: inline-flex;
+  align-items: baseline;
+  vertical-align: baseline;
+  white-space: pre;
+}
+
+/* Number slot wrapper helper */
+.slot-text-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0.7em;
+  vertical-align: baseline;
+}

@@ -15,6 +15,7 @@ import {
 import { FILE_EXPLORER_DEFAULT_FOCUSSED_DEVICE_TYPE } from '../../../constants';
 import { FILE_EXPLORER_BODY_WRAPPER_ID } from '../../../constants/dom';
 import { DEVICE_TYPE } from '../../../enums';
+import FileExplorerSearchBar from './FileExplorerSearchBar';
 
 class FileExplorerBodyRender extends PureComponent {
   constructor(props) {
@@ -110,6 +111,12 @@ class FileExplorerBodyRender extends PureComponent {
           return null;
         }
 
+        if (
+          event.target?.matches?.('input, textarea, [contenteditable="true"]')
+        ) {
+          return null;
+        }
+
         return keymapActionsList[a](event, a);
       });
     });
@@ -141,7 +148,12 @@ class FileExplorerBodyRender extends PureComponent {
     });
   };
 
-  acceleratorFileExplorerTabSwitch = (event, type, toggle = true) => {
+  acceleratorFileExplorerTabSwitch = (
+    event,
+    type,
+    toggle = true,
+    preserveInteractiveFocus = false
+  ) => {
     const { onFocussedFileExplorerDeviceType, deviceType } = this.props;
     let _focussedFileExplorerDeviceType = null;
 
@@ -158,8 +170,9 @@ class FileExplorerBodyRender extends PureComponent {
     }
 
     if (
+      !preserveInteractiveFocus &&
       `${FILE_EXPLORER_BODY_WRAPPER_ID}-${_focussedFileExplorerDeviceType}` ===
-      this.fileExplorerBodyWrapperId
+        this.fileExplorerBodyWrapperId
     ) {
       document.getElementById(this.fileExplorerBodyWrapperId).focus();
     }
@@ -280,7 +293,14 @@ class FileExplorerBodyRender extends PureComponent {
       onBreadcrumbPathClick,
       isStatusBarEnabled,
       fileTransferClipboard,
+      fileTransferProgress,
       mtpDevice,
+      appLanguage,
+      appThemeMode,
+      searchStorageId,
+      searchIgnoreHidden,
+      onSearchResultOpen,
+      onPaste,
       ...parentProps
     } = this.props;
     const { directoryLists } = this.props;
@@ -289,13 +309,20 @@ class FileExplorerBodyRender extends PureComponent {
 
     return (
       <Paper
-        onClick={(event) =>
+        onClick={(event) => {
+          const preserveInteractiveFocus = Boolean(
+            event.target?.closest?.(
+              'input, textarea, button, [contenteditable="true"], [role="combobox"], [role="option"]'
+            )
+          );
+
           this.acceleratorFileExplorerTabSwitch(
             event,
             'fileExplorerTabSwitch',
-            false
-          )
-        }
+            false,
+            preserveInteractiveFocus
+          );
+        }}
         className={styles.root}
         elevation={0}
         square
@@ -315,12 +342,26 @@ class FileExplorerBodyRender extends PureComponent {
           onDrop={this._handleOnDrop}
           onDragLeave={this._handleExternalFileDragLeave}
         >
+          <FileExplorerSearchBar
+            rootPath={currentBrowsePath[deviceType]}
+            rootNodes={directoryLists[deviceType].nodes}
+            deviceType={deviceType}
+            storageId={searchStorageId}
+            ignoreHidden={searchIgnoreHidden}
+            mtpDevice={mtpDevice}
+            fileTransferProgress={fileTransferProgress}
+            appLanguage={appLanguage}
+            appThemeMode={appThemeMode}
+            onOpenResult={onSearchResultOpen}
+          />
           <FileExplorerTableBodyRender
-            tableData={this.tableData()}
+            getTableData={this.tableData}
+            scrollContainerId={this.fileExplorerBodyWrapperId}
             deviceType={deviceType}
             currentBrowsePath={currentBrowsePath}
             onContextMenuClick={onContextMenuClick}
             mtpDevice={mtpDevice}
+            appLanguage={appLanguage}
             {...parentProps}
           />
         </div>
@@ -331,7 +372,10 @@ class FileExplorerBodyRender extends PureComponent {
           isStatusBarEnabled={isStatusBarEnabled}
           directoryLists={directoryLists[deviceType]}
           fileTransferClipboard={fileTransferClipboard}
+          fileTransferProgress={fileTransferProgress}
           mtpDevice={mtpDevice}
+          appLanguage={appLanguage}
+          onPaste={onPaste}
         />
       </Paper>
     );

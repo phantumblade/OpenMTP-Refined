@@ -2,27 +2,26 @@ import React, { PureComponent } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-import Checkbox from '@material-ui/core/Checkbox';
 import Tooltip from '@material-ui/core/Tooltip';
 import classNames from 'classnames';
 import { niceBytes, springTruncate } from '../../../utils/funcs';
 import { FILE_EXPLORER_TABLE_TRUNCATE_MAX_CHARS } from '../../../constants';
 import { styles } from '../styles/FileExplorerTableBodyListRender';
-// eslint-disable-next-line import/no-relative-packages
-import prettyFileIcons from '../../../vendors/pretty-file-icons';
 import { imgsrc } from '../../../utils/imgsrc';
 import { appDateFormat } from '../../../utils/date';
+import { getFileIcon, getFolderIcon } from '../../../helpers/fileExplorerIcons';
+import SelectionCheckbox from '../../../components/SelectionCheckbox';
 
 class FileExplorerTableBodyListRender extends PureComponent {
   RenderFileIcon = () => {
-    const { classes: styles, item } = this.props;
+    const { classes: styles, item, appThemeMode } = this.props;
 
-    const fileIcon = prettyFileIcons.getIcon(item.name, 'svg');
+    const themedFileIcon = getFileIcon(item, appThemeMode);
 
     return (
       <div className={styles.fileTypeIconWrapper}>
         <img
-          src={imgsrc(`file-types/${fileIcon}`)}
+          src={imgsrc(themedFileIcon)}
           alt={item.name}
           className={classNames(styles.fileTypeIcon)}
         />
@@ -31,12 +30,25 @@ class FileExplorerTableBodyListRender extends PureComponent {
   };
 
   RenderFolderIcon = () => {
-    const { classes: styles, item } = this.props;
+    const {
+      classes: styles,
+      item,
+      deviceType,
+      currentBrowsePath,
+      appThemeMode,
+    } = this.props;
 
     return (
       <div className={styles.fileTypeIconWrapper}>
         <img
-          src={imgsrc(`FileExplorer/folder-blue.svg`)}
+          src={imgsrc(
+            getFolderIcon({
+              item,
+              deviceType,
+              currentBrowsePath,
+              appThemeMode,
+            })
+          )}
           alt={item.name}
           className={classNames(styles.fileTypeIcon)}
         />
@@ -51,14 +63,16 @@ class FileExplorerTableBodyListRender extends PureComponent {
       item,
       deviceType,
       _eventTarget,
-      tableData,
+      getTableData,
       hideColList,
       onContextMenuClick,
       onTableClick,
       onTableDoubleClick,
+      multiSelectMode,
     } = this.props;
 
     const { RenderFileIcon, RenderFolderIcon } = this;
+    const isMultiSelectMode = multiSelectMode[deviceType];
 
     const fileName = springTruncate(
       item.name,
@@ -67,6 +81,7 @@ class FileExplorerTableBodyListRender extends PureComponent {
 
     return (
       <TableRow
+        data-file-explorer-row="true"
         draggable
         hover
         role="checkbox"
@@ -78,37 +93,44 @@ class FileExplorerTableBodyListRender extends PureComponent {
         })}
         onDragStart={(event) => {
           if (!isSelected) {
-            onTableClick(item.path, deviceType, event);
+            onTableClick(item.path, deviceType, event, 'replace');
           }
         }}
       >
-        <TableCell
-          padding="none"
-          className={`${styles.tableCell} checkboxCell`}
-          onContextMenu={(event) =>
-            onContextMenuClick(
-              event,
-              { ...item },
-              { ...tableData },
-              _eventTarget
-            )
-          }
-        >
-          <Checkbox
-            checked={isSelected}
-            onClick={(event) => onTableClick(item.path, deviceType, event)}
-          />
-        </TableCell>
+        {isMultiSelectMode && (
+          <TableCell
+            padding="none"
+            className={`${styles.tableCell} checkboxCell`}
+            onContextMenu={(event) =>
+              onContextMenuClick(
+                event,
+                { ...item },
+                { ...getTableData() },
+                _eventTarget
+              )
+            }
+          >
+            <SelectionCheckbox
+              checked={isSelected}
+              inputProps={{ 'aria-label': `Select ${item.name}` }}
+              onClick={(event) =>
+                onTableClick(item.path, deviceType, event, 'toggle')
+              }
+            />
+          </TableCell>
+        )}
         {hideColList.indexOf('name') < 0 && (
           <TableCell
             padding="default"
-            onClick={(event) => onTableClick(item.path, deviceType, event)}
+            onClick={(event) =>
+              onTableClick(item.path, deviceType, event, 'row')
+            }
             className={`${styles.tableCell} nameCell`}
             onContextMenu={(event) =>
               onContextMenuClick(
                 event,
                 { ...item },
-                { ...tableData },
+                { ...getTableData() },
                 _eventTarget
               )
             }
@@ -130,13 +152,15 @@ class FileExplorerTableBodyListRender extends PureComponent {
         {hideColList.indexOf('size') < 0 && (
           <TableCell
             padding="none"
-            onClick={(event) => onTableClick(item.path, deviceType, event)}
+            onClick={(event) =>
+              onTableClick(item.path, deviceType, event, 'row')
+            }
             className={`${styles.tableCell} sizeCell`}
             onContextMenu={(event) =>
               onContextMenuClick(
                 event,
                 { ...item },
-                { ...tableData },
+                { ...getTableData() },
                 _eventTarget
               )
             }
@@ -150,13 +174,15 @@ class FileExplorerTableBodyListRender extends PureComponent {
         {hideColList.indexOf('dateAdded') < 0 && (
           <TableCell
             padding="none"
-            onClick={(event) => onTableClick(item.path, deviceType, event)}
+            onClick={(event) =>
+              onTableClick(item.path, deviceType, event, 'row')
+            }
             className={`${styles.tableCell} dateAddedCell`}
             onContextMenu={(event) =>
               onContextMenuClick(
                 event,
                 { ...item },
-                { ...tableData },
+                { ...getTableData() },
                 _eventTarget
               )
             }

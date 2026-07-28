@@ -10,13 +10,6 @@ import { styles } from '../styles/FileExplorerTableBodyRender';
 import { DEVICE_TYPE, FILE_EXPLORER_VIEW_TYPE } from '../../../enums';
 
 class FileExplorerTableBodyRender extends PureComponent {
-  isSelected = (path) => {
-    const { directoryLists, deviceType } = this.props;
-    const _directoryLists = directoryLists[deviceType].queue.selected;
-
-    return _directoryLists.indexOf(path) !== -1;
-  };
-
   ListingSwitcher = (type = FILE_EXPLORER_VIEW_TYPE.grid) => {
     const { deviceType, directoryLists, tableSort } = this.props;
     const { nodes, order, orderBy } = directoryLists[deviceType];
@@ -30,13 +23,14 @@ class FileExplorerTableBodyRender extends PureComponent {
         return (
           <FileExplorerTableBodyListWrapperRender
             {...parentProps}
+            orderBy={orderBy}
             tableSort={tableSort({
               nodes,
               order,
               orderBy,
             })}
             _eventTarget={_eventTarget}
-            isSelected={this.isSelected}
+            selectedPaths={directoryLists[deviceType].queue.selected}
           />
         );
 
@@ -45,13 +39,14 @@ class FileExplorerTableBodyRender extends PureComponent {
         return (
           <FileExplorerTableBodyGridWrapperRender
             {...parentProps}
+            orderBy={orderBy}
             tableSort={tableSort({
               nodes,
               order,
               orderBy,
             })}
             _eventTarget={_eventTarget}
-            isSelected={this.isSelected}
+            selectedPaths={directoryLists[deviceType].queue.selected}
           />
         );
     }
@@ -71,11 +66,15 @@ class FileExplorerTableBodyRender extends PureComponent {
       onContextMenuClick,
       onIsDraggable,
       onDragStart,
+      multiSelectMode,
+      onTryConnection,
+      appLanguage,
     } = this.props;
     const { nodes, order, orderBy, queue } = directoryLists[deviceType];
     const { selected } = queue;
     const emptyRows = nodes.length < 1;
     const isMtp = deviceType === DEVICE_TYPE.mtp;
+    const isMultiSelectMode = multiSelectMode[deviceType];
 
     return (
       <Table className={styles.table}>
@@ -87,6 +86,8 @@ class FileExplorerTableBodyRender extends PureComponent {
           onRequestSort={onRequestSort.bind(this, deviceType)}
           rowCount={nodes ? nodes.length : 0}
           hideColList={hideColList}
+          multiSelectMode={isMultiSelectMode}
+          appLanguage={appLanguage}
         />
         <TableBody
           draggable={onIsDraggable(deviceType)}
@@ -104,6 +105,8 @@ class FileExplorerTableBodyRender extends PureComponent {
               deviceType={deviceType}
               directoryLists={directoryLists}
               onContextMenuClick={onContextMenuClick}
+              onTryConnection={onTryConnection}
+              appLanguage={appLanguage}
             />
           ) : (
             this.ListingSwitcher(fileExplorerListingType[deviceType])

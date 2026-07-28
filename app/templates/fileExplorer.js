@@ -1,4 +1,4 @@
-export const helpPhoneNotConnecting = `FAQs - My phone is not connecting!`;
+export const helpPhoneNotConnecting = `Connection help`;
 
 export const buyMeACoffeeText = `Buy me a Coffee (UPI, PayPal, Credit/Debit Cards, Internet Banking)`;
 

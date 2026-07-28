@@ -91,7 +91,13 @@ export class FileExplorerRepository {
    * @param storageId
    * @return {Promise<{data: array|null, error: string|null, stderr: string|null}>}
    */
-  async listFiles({ deviceType, filePath, ignoreHidden, storageId }) {
+  async listFiles({
+    deviceType,
+    filePath,
+    ignoreHidden,
+    storageId,
+    isCancelled,
+  }) {
     if (deviceType === DEVICE_TYPE.mtp) {
       checkIf(storageId, 'number');
 
@@ -118,6 +124,7 @@ export class FileExplorerRepository {
     return this.localDataSource.listFiles({
       filePath,
       ignoreHidden,
+      isCancelled,
     });
   }
 

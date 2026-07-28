@@ -1,101 +1,163 @@
-import React, { PureComponent, Fragment } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMobile, faLaptop } from '@fortawesome/free-solid-svg-icons';
+import React, { PureComponent } from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
+import ComputerIcon from '@material-ui/icons/Computer';
+import PhoneAndroidIcon from '@material-ui/icons/PhoneAndroid';
+import FolderOutlinedIcon from '@material-ui/icons/FolderOutlined';
+import InsertDriveFileOutlinedIcon from '@material-ui/icons/InsertDriveFileOutlined';
+import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
+import SwapHorizIcon from '@material-ui/icons/SwapHoriz';
+import Button from '@material-ui/core/Button';
+import SlotText from '../../../components/SlotText';
 import { styles } from '../styles/FileExplorerTableFooterStatusBarRender';
-import { getPluralText } from '../../../utils/funcs';
 import { DEVICE_TYPE } from '../../../enums';
 import { DEVICES_LABEL } from '../../../constants';
+import { getDeviceBrand, translate } from '../../../i18n';
+import { isTransferPhaseActive } from '../../../helpers/fileTransfer';
 
 class FileExplorerTableFooterStatusBarRender extends PureComponent {
+  directoryStatsCache = {
+    nodes: null,
+    stats: { total: 0, directories: 0, files: 0 },
+  };
+
   getDirectoryListStats = () => {
     const { directoryLists } = this.props;
+    const nodes = directoryLists.nodes || [];
+
+    if (this.directoryStatsCache.nodes === nodes) {
+      return this.directoryStatsCache.stats;
+    }
 
     let directories = 0;
     let files = 0;
 
-    (directoryLists.nodes || []).map((a) => {
-      if (a.isFolder) {
+    nodes.forEach((item) => {
+      if (item.isFolder) {
         directories += 1;
       } else {
         files += 1;
       }
-
-      return a;
     });
 
     const total = directories + files;
+    const stats = { total, directories, files };
 
-    return { total, directories, files };
-  };
+    this.directoryStatsCache = { nodes, stats };
 
-  getSelectedDirectoryStats = () => {
-    const { directoryLists } = this.props;
-
-    const total = directoryLists.queue.selected.length;
-
-    return { total };
+    return stats;
   };
 
   RenderDeviceName = () => {
-    const { classes: styles, deviceType, mtpDevice } = this.props;
+    const { classes: styles, deviceType, mtpDevice, appLanguage } = this.props;
 
     if (deviceType === DEVICE_TYPE.local) {
       return (
-        <Fragment>
-          <FontAwesomeIcon icon={faLaptop} title={deviceType} />
-          <span className={styles.deviceTypeWrapper}>
-            {DEVICES_LABEL[deviceType]}
-            <span> - </span>
-          </span>
-        </Fragment>
+        <div className={styles.deviceBlock}>
+          <ComputerIcon />
+          <span>{translate(appLanguage, DEVICES_LABEL[deviceType])}</span>
+        </div>
       );
     }
 
     return (
-      <Fragment>
-        <FontAwesomeIcon icon={faMobile} title={deviceType} />
-        <span className={styles.deviceTypeWrapper}>
+      <div className={styles.deviceBlock}>
+        <PhoneAndroidIcon />
+        <span>
           {mtpDevice?.isAvailable && mtpDevice?.info?.mtpDeviceInfo
-            ? mtpDevice?.info?.mtpDeviceInfo?.Model
-            : DEVICES_LABEL[deviceType]}
-          <span> - </span>
+            ? `${getDeviceBrand(mtpDevice.info.mtpDeviceInfo.Manufacturer)} ${
+                mtpDevice.info.mtpDeviceInfo.Model
+              }`.trim()
+            : translate(appLanguage, DEVICES_LABEL[deviceType])}
         </span>
-      </Fragment>
+      </div>
     );
   };
 
   render() {
-    const { classes: styles, fileTransferClipboard } = this.props;
+    const {
+      appLanguage,
+      classes: styles,
+      deviceType,
+      fileTransferClipboard,
+      fileTransferProgress,
+      onPaste,
+    } = this.props;
 
     const { directories, files, total } = this.getDirectoryListStats();
-    const { total: selectedTotal } = this.getSelectedDirectoryStats();
     const fileTransferClipboardLength = fileTransferClipboard.queue.length;
+    const isTransferDestination =
+      fileTransferClipboard.source &&
+      fileTransferClipboard.source !== deviceType;
+    const transferActive = isTransferPhaseActive(fileTransferProgress?.phase);
     const { RenderDeviceName } = this;
 
     return (
       <div className={styles.root}>
-        <Typography variant="caption" className={styles.bodyWrapper}>
-          <RenderDeviceName />
-
-          {selectedTotal > 0 ? (
-            <Fragment>{`${selectedTotal} of ${total} selected`}</Fragment>
-          ) : (
-            <Fragment>{`${total} ${getPluralText(
-              'item',
-              total
-            )} (${directories} ${getPluralText(
-              'directory',
-              directories,
-              'directories'
-            )}, ${files} ${getPluralText('file', files)})`}</Fragment>
+        <RenderDeviceName />
+        <div className={styles.metricsBlock}>
+          <span className={styles.totalMetric}>
+            <span className={styles.slotWrapper}>
+              <SlotText text={String(total)} />
+            </span>{' '}
+            {translate(appLanguage, total === 1 ? 'item' : 'items')}
+          </span>
+          <span className={styles.metric}>
+            <FolderOutlinedIcon />
+            <span className={styles.slotWrapper}>
+              <SlotText text={String(directories)} />
+            </span>{' '}
+            {translate(appLanguage, directories === 1 ? 'folder' : 'folders')}
+          </span>
+          <span className={styles.metric}>
+            <InsertDriveFileOutlinedIcon />
+            <span className={styles.slotWrapper}>
+              <SlotText text={String(files)} />
+            </span>{' '}
+            {translate(appLanguage, files === 1 ? 'file' : 'files')}
+          </span>
+        </div>
+        <div className={styles.contextBlock}>
+          {fileTransferClipboardLength > 0 && (
+            <>
+              {isTransferDestination ? (
+                <Button
+                  className={styles.transferButton}
+                  color="secondary"
+                  size="small"
+                  variant="contained"
+                  disabled={transferActive}
+                  startIcon={<SwapHorizIcon />}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onPaste();
+                  }}
+                >
+                  {transferActive
+                    ? translate(appLanguage, 'Transfer in progress')
+                    : translate(appLanguage, 'Transfer here')}
+                  <span className={styles.transferCount}>
+                    <span className={styles.slotWrapper}>
+                      <SlotText text={String(fileTransferClipboardLength)} />
+                    </span>
+                  </span>
+                </Button>
+              ) : (
+                <span className={styles.clipboardMetric}>
+                  <AssignmentOutlinedIcon />
+                  <span className={styles.slotWrapper}>
+                    <SlotText text={String(fileTransferClipboardLength)} />
+                  </span>{' '}
+                  {translate(
+                    appLanguage,
+                    fileTransferClipboardLength === 1
+                      ? 'item ready'
+                      : 'items ready'
+                  )}
+                </span>
+              )}
+            </>
           )}
-          {`, ${fileTransferClipboardLength} ${getPluralText(
-            'item',
-            fileTransferClipboardLength
-          )} in clipboard`}
-        </Typography>
+        </div>
       </div>
     );
   }

@@ -24,6 +24,11 @@ export const APP_THEME_MODE_TYPE = {
   auto: 'auto',
 };
 
+export const APP_LANGUAGE_TYPE = {
+  english: 'en',
+  italian: 'it',
+};
+
 export const FILE_TRANSFER_DIRECTION = {
   upload: 'upload',
   download: 'download',

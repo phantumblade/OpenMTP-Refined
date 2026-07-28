@@ -1,13 +1,3 @@
-import { faTrashAlt } from '@fortawesome/free-regular-svg-icons';
-import {
-  faSync,
-  faSdCard,
-  faCog,
-  faPlug,
-  faArrowLeft,
-  faQuestionCircle,
-} from '@fortawesome/free-solid-svg-icons';
-import { faGithub, faPaypal } from '@fortawesome/free-brands-svg-icons';
 import { actionTypes } from './actions';
 import { PATHS } from '../../constants/paths';
 import {
@@ -15,11 +5,12 @@ import {
   FILE_EXPLORER_DEFAULT_FOCUSSED_DEVICE_TYPE,
 } from '../../constants';
 import { DEVICE_TYPE } from '../../enums';
-import {
-  buyMeACoffeeText,
-  supportUsingPayPal,
-} from '../../templates/fileExplorer';
 import { isKalamModeSupported } from '../../helpers/binaries';
+import {
+  initialFileTransferProgress,
+  resetTransferProgress,
+} from '../../helpers/fileTransfer';
+import { createDisconnectedMtpState } from '../../helpers/mtpSession';
 
 export const initialState = {
   focussedFileExplorerDeviceType: {
@@ -69,75 +60,82 @@ export const initialState = {
       up: {
         enabled: true,
         label: 'Folder Up',
-        icon: faArrowLeft,
+        icon: 'up',
+        group: 'navigation',
       },
       refresh: {
         enabled: true,
         label: 'Refresh',
-        icon: faSync,
+        icon: 'refresh',
+        group: 'navigation',
       },
       delete: {
         enabled: true,
         label: 'Delete',
-        icon: faTrashAlt,
+        icon: 'delete',
+        group: 'selection',
       },
-      gitHub: {
+      multiSelect: {
         enabled: true,
-        label: 'GitHub',
-        icon: faGithub,
+        label: 'Multiple selection',
+        icon: 'multiSelect',
+        group: 'selection',
       },
       settings: {
         enabled: true,
         label: 'Settings',
-        icon: faCog,
+        icon: 'settings',
+        group: 'application',
       },
       faqs: {
         enabled: true,
         label: 'Help - FAQs',
-        icon: faQuestionCircle,
+        icon: 'faqs',
+        group: 'application',
       },
     },
     [DEVICE_TYPE.mtp]: {
       up: {
         enabled: true,
         label: 'Folder Up',
-        icon: faArrowLeft,
+        icon: 'up',
+        group: 'navigation',
       },
       refresh: {
         enabled: true,
         label: 'Refresh',
-        icon: faSync,
+        icon: 'refresh',
+        group: 'navigation',
       },
       delete: {
         enabled: true,
         label: 'Delete',
-        icon: faTrashAlt,
+        icon: 'delete',
+        group: 'selection',
+      },
+      multiSelect: {
+        enabled: true,
+        label: 'Multiple selection',
+        icon: 'multiSelect',
+        group: 'selection',
       },
       storage: {
         enabled: true,
         label: 'Storage',
-        icon: faSdCard,
+        icon: 'storage',
+        group: 'device',
       },
       mtpMode: {
         enabled: isKalamModeSupported(),
         label: 'MTP Mode',
-        icon: faPlug,
-      },
-      paypal: {
-        enabled: true,
-        label: supportUsingPayPal,
-        icon: faPaypal,
-      },
-      buyMeACoffee: {
-        enabled: true,
-        label: buyMeACoffeeText,
-        image: 'toolbar/buymeacoffee.png',
-        icon: null,
+        icon: 'mtpMode',
+        group: 'device',
       },
       settings: {
         enabled: true,
         label: 'Settings',
-        icon: faCog,
+        icon: 'settings',
+        group: 'application',
       },
     },
   },
@@ -161,6 +159,11 @@ export const initialState = {
       nodes: [],
       isLoaded: false,
     },
+  },
+
+  multiSelectMode: {
+    [DEVICE_TYPE.local]: false,
+    [DEVICE_TYPE.mtp]: false,
   },
 
   currentBrowsePath: {
@@ -260,21 +263,11 @@ export const initialState = {
     clipboard: {
       queue: [],
       source: null,
+      sessionId: null,
+      preparedAt: null,
     },
     progress: {
-      toggle: false,
-      titleText: null,
-      bottomText: null,
-
-      /**
-       *  [{
-       *    percentage,
-       *    variant,
-       *    bodyText1,
-       *    bodyText2,
-       *  }]
-       */
-      values: [],
+      ...initialFileTransferProgress,
     },
   },
 
@@ -326,6 +319,15 @@ export default function Home(state = initialState, action) {
         },
       };
 
+    case actionTypes.SET_MULTI_SELECT_MODE:
+      return {
+        ...state,
+        multiSelectMode: {
+          ...state.multiSelectMode,
+          [deviceType]: payload,
+        },
+      };
+
     case actionTypes.SET_CURRENT_BROWSE_PATH:
       return {
         ...state,
@@ -343,6 +345,14 @@ export default function Home(state = initialState, action) {
           ...payload,
         },
       };
+
+    case actionTypes.RESET_MTP_SESSION:
+      return createDisconnectedMtpState(state, {
+        deviceType: DEVICE_TYPE.mtp,
+        defaultPath: DEVICES_DEFAULT_PATH[DEVICE_TYPE.mtp],
+        errorMessage: payload.errorMessage,
+        disconnectedAt: payload.disconnectedAt,
+      });
 
     case actionTypes.LIST_DIRECTORY:
       return {
@@ -383,9 +393,16 @@ export default function Home(state = initialState, action) {
         fileTransfer: {
           ...state.fileTransfer,
           progress: {
+            ...state.fileTransfer.progress,
             ...payload,
           },
         },
+      };
+
+    case actionTypes.CLEAR_FILE_TRANSFER_PROGRESS:
+      return {
+        ...state,
+        fileTransfer: resetTransferProgress(state.fileTransfer),
       };
 
     case actionTypes.CLEAR_FILE_TRANSFER:

@@ -204,36 +204,38 @@ export const diffObj = (obj1, obj2) => {
 };
 
 export const arrayEquality = (array1, array2) => {
-  return (
-    array1.length === array2.length &&
-    array1.sort().every((value, index) => {
-      return value === array2.sort()[index];
-    })
-  );
+  if (array1 === array2) {
+    return true;
+  }
+
+  if (!isArray(array1) || !isArray(array2) || array1.length !== array2.length) {
+    return false;
+  }
+
+  const sortedArray1 = [...array1].sort();
+  const sortedArray2 = [...array2].sort();
+
+  return sortedArray1.every((value, index) => value === sortedArray2[index]);
 };
 
 export const arrayIntersection = (array1, array2) => {
-  return array1.filter((element) => array2.includes(element));
+  const array2Set = new Set(array2);
+
+  return array1.filter((element) => array2Set.has(element));
 };
 
 export const keymapSearch = (keymap, keyedList) => {
-  let matchedWith = null;
+  const keymapKeys = Object.keys(keymap);
 
-  Object.keys(keymap).map((a) => {
-    const item = keymap[a];
+  for (let index = 0; index < keymapKeys.length; index += 1) {
+    const key = keymapKeys[index];
 
-    if (matchedWith !== null) {
-      return null;
+    if (arrayEquality(keymap[key], keyedList)) {
+      return key;
     }
+  }
 
-    if (arrayEquality(item, keyedList)) {
-      matchedWith = a;
-    }
-
-    return true;
-  });
-
-  return matchedWith;
+  return null;
 };
 
 export const toggleFileExplorerDeviceType = (
@@ -254,7 +256,7 @@ export const isString = (variable) => {
 };
 
 export const removeArrayDuplicates = (array) => {
-  return array.filter((v, i) => array.indexOf(v) === i);
+  return [...new Set(array)];
 };
 
 export const getPluralText = (string, count, customPluralString = null) => {

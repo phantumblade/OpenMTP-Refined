@@ -3,69 +3,104 @@ import { ipcRenderer } from 'electron';
 import { withStyles } from '@material-ui/core/styles';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-import Collapse from '@material-ui/core/Collapse';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ToggleOffIcon from '@material-ui/icons/ToggleOff';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import Divider from '@material-ui/core/Divider';
-import KeyboardIcon from '@material-ui/icons/Keyboard';
-import StarRateIcon from '@material-ui/icons/StarRate';
-import WarningIcon from '@material-ui/icons/Warning';
-import CloseIcon from '@material-ui/icons/Close';
-import LockOpenIcon from '@material-ui/icons/LockOpen';
-import UsbIcon from '@material-ui/icons/Usb';
-import TouchAppIcon from '@material-ui/icons/TouchApp';
-import RadioButtonCheckedIcon from '@material-ui/icons/RadioButtonChecked';
-import CachedIcon from '@material-ui/icons/Cached';
-import PermDeviceInformationIcon from '@material-ui/icons/PermDeviceInformation';
-import SettingsInputHdmiIcon from '@material-ui/icons/SettingsInputHdmi';
-import ExpandLessIcon from '@material-ui/icons/ExpandLess';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import PhoneAndroidIcon from '@material-ui/icons/PhoneAndroid';
+import UsbIcon from '@material-ui/icons/Usb';
+import LockOpenIcon from '@material-ui/icons/LockOpen';
+import TouchAppIcon from '@material-ui/icons/TouchApp';
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import RefreshIcon from '@material-ui/icons/Refresh';
+import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import { styles } from '../styles/FileExplorerTableBodyEmptyRender';
-import KeyboadShortcuts from '../../KeyboardShortcutsPage/components/KeyboadShortcuts';
-import Features from '../../Onboarding/components/Features';
-import { helpPhoneNotConnecting } from '../../../templates/fileExplorer';
 import { analyticsService } from '../../../services/analytics';
 import { EVENT_TYPE } from '../../../enums/events';
 import { IpcEvents } from '../../../services/ipc-events/IpcEventType';
-import { APP_NAME } from '../../../constants/meta';
-import { openExternalUrl } from '../../../utils/url';
+import { findUsbConflictingApps } from '../../../utils/process';
+import { translate } from '../../../i18n';
 
 class FileExplorerTableBodyEmptyRender extends PureComponent {
   constructor(props) {
     super(props);
 
     this.state = {
-      expansionPanel: {
-        noMtpInstructions: true,
-        keyboardNavigation: false,
-        features: false,
-      },
+      conflictingApps: [],
+      isCheckingConflicts: false,
     };
   }
 
-  _handleExpansionPanel = ({ key }) => {
-    this.setState((prevState) => {
-      return {
-        expansionPanel: {
-          ...prevState.expansionPanel,
-          [key]: !prevState.expansionPanel[key],
-        },
-      };
+  componentDidMount() {
+    this._handleCheckConflictingApps();
+  }
+
+  _handleCheckConflictingApps = async () => {
+    this.setState({ isCheckingConflicts: true });
+
+    const conflictingApps = await findUsbConflictingApps();
+
+    this.setState({
+      conflictingApps,
+      isCheckingConflicts: false,
     });
+  };
+
+  _handleTryConnection = async () => {
+    const { onTryConnection } = this.props;
+
+    await this._handleCheckConflictingApps();
+    onTryConnection();
   };
 
   _handleHelpPhoneNotRecognizedBtn = () => {
     ipcRenderer.send(IpcEvents.OPEN_HELP_PHONE_NOT_CONNECTING_WINDOW);
-
     analyticsService.sendEvent(
       EVENT_TYPE.MTP_HELP_PHONE_NOT_CONNECTED_DIALOG_OPEN,
       {}
     );
+  };
+
+  _connectionDetail = (t) => {
+    const { mtpDevice } = this.props;
+    const error = String(mtpDevice?.error || '');
+
+    if (!error) {
+      return null;
+    }
+
+    if (/LIBUSB_ERROR_NOT_FOUND/i.test(error)) {
+      return t(
+        'The USB device disappeared during connection. Check the cable and USB mode on the phone.'
+      );
+    }
+
+    if (/ErrorMtpDetectFailed/i.test(error)) {
+      return t(
+        'No MTP phone was detected. Check the USB mode and allow data access on Android.'
+      );
+    }
+
+    if (/ErrorDeviceSetup/i.test(error)) {
+      return t(
+        'An error occurred while initializing the device. Unlock the phone and reconnect the USB cable.'
+      );
+    }
+
+    if (/ErrorDeviceLocked/i.test(error)) {
+      return t('Unlock your Phone and refresh again');
+    }
+
+    if (/ErrorMtpLockExists/i.test(error)) {
+      return t(
+        'Operation in progress. Please wait for the current task to finish.'
+      );
+    }
+
+    if (/busy|claim|access|LIBUSB_ERROR_ACCESS/i.test(error)) {
+      return t('Another app may already be using the phone USB connection.');
+    }
+
+    return t(error);
   };
 
   render() {
@@ -77,233 +112,142 @@ class FileExplorerTableBodyEmptyRender extends PureComponent {
       deviceType,
       directoryLists,
       onContextMenuClick,
+      appLanguage,
     } = this.props;
-
-    const { expansionPanel } = this.state;
-
-    const _eventTarget = 'emptyRowTarget';
-
+    const { conflictingApps, isCheckingConflicts } = this.state;
+    const t = (key, values) => translate(appLanguage, key, values);
+    const connectionDetail = this._connectionDetail(t);
     const tableData = {
       path: currentBrowsePath[deviceType],
       directoryLists: directoryLists[deviceType],
     };
 
     if (isMtp && !mtpDevice.isAvailable) {
+      const conflictText =
+        conflictingApps.length > 0
+          ? t('Potential conflicts currently running: {apps}', {
+              apps: conflictingApps.map((appName) => t(appName)).join(', '),
+            })
+          : t('No known conflicting apps are currently running');
+
       return (
         <TableRow className={styles.emptyTableRowWrapper}>
           <TableCell colSpan={6} className={styles.tableCell}>
-            <Paper style={{ height: `100%` }} elevation={0}>
-              <Button
-                className={styles.helpPhoneNotRecognized}
-                onClick={() => {
-                  this._handleHelpPhoneNotRecognizedBtn();
-                }}
-              >
-                {helpPhoneNotConnecting}
-              </Button>
+            <div className={styles.emptyPaneContainer}>
+              <div className={styles.contentWrapper}>
+                <div className={styles.phoneIconBadge}>
+                  <PhoneAndroidIcon />
+                </div>
 
-              <List>
-                <ListItem
-                  button
-                  onClick={() =>
-                    this._handleExpansionPanel({
-                      key: 'noMtpInstructions',
-                    })
-                  }
-                >
-                  <ListItemIcon>
-                    <WarningIcon color="error" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Android device is either busy or not connected"
-                    secondary={
-                      !expansionPanel.noMtpInstructions
-                        ? 'Click here for the instructions'
-                        : 'Click here to hide the instructions'
-                    }
-                  />
-                  {expansionPanel.noMtpInstructions ? (
-                    <ExpandLessIcon />
-                  ) : (
-                    <ExpandMoreIcon />
-                  )}
-                </ListItem>
-                <Collapse
-                  in={expansionPanel.noMtpInstructions}
-                  timeout="auto"
-                  unmountOnExit
-                >
-                  <List component="div" disablePadding>
-                    <div className={styles.nestedPanel}>
-                      <ListItem>
-                        <ListItemIcon>
-                          <CloseIcon />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary="Quit Google drive, Android File Transfer, Dropbox, OneDrive, Preview (for macOS ventura) or any other app that might be reading USB"
-                          secondary={
-                            <span>
-                              {`Uninstall 'Android File Transfer' by Google if it
-                              keeps popping up everytime you connect your
-                              Android device. The most recent versions of Google
-                              drive and Dropbox are known to interfere with ${APP_NAME}. Completely quiting these apps may fix
-                              this issue. `}
-                              <a
-                                onClick={(events) => {
-                                  openExternalUrl(
-                                    'https://github.com/ganeshrvel/openmtp/issues/276',
-                                    events
-                                  );
-                                }}
-                              >
-                                Read more...
-                              </a>
-                            </span>
-                          }
-                        />
-                      </ListItem>
+                <Typography className={styles.title}>
+                  {t('Connect your Android phone')}
+                </Typography>
+                <Typography className={styles.subtitle}>
+                  {mtpDevice.isLoading
+                    ? t('Checking USB connection…')
+                    : t(
+                        'Connect your phone via USB and select File Transfer (MTP) mode.'
+                      )}
+                </Typography>
 
-                      <ListItem>
-                        <ListItemIcon>
-                          <ToggleOffIcon />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={`If you face frequent device disconnections, turn off 'USB Hotplug'`}
-                          secondary={`Settings > General Tab`}
-                        />
-                      </ListItem>
+                <div className={styles.actionsRow}>
+                  <Button
+                    disableElevation
+                    className={styles.primaryBtn}
+                    startIcon={<RefreshIcon />}
+                    onClick={this._handleTryConnection}
+                    disabled={mtpDevice.isLoading || isCheckingConflicts}
+                  >
+                    {t('Try connection again')}
+                  </Button>
+                  <Button
+                    disableRipple
+                    className={styles.secondaryLinkBtn}
+                    onClick={this._handleHelpPhoneNotRecognizedBtn}
+                  >
+                    {t('Open connection guide')}
+                    <OpenInNewIcon />
+                  </Button>
+                </div>
 
-                      <ListItem>
-                        <ListItemIcon>
-                          <LockOpenIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="Unlock your Android device" />
-                      </ListItem>
-                      <ListItem>
-                        <ListItemIcon>
-                          <UsbIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="With a USB cable, connect your device to your computer" />
-                      </ListItem>
-                      <ListItem>
-                        <ListItemIcon>
-                          <TouchAppIcon />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary="On your device, tap the 'Charging this device via
-                  USB' notification"
-                        />
-                      </ListItem>
-                      <ListItem>
-                        <ListItemIcon>
-                          <RadioButtonCheckedIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="Under 'Use USB for' select File Transfer" />
-                      </ListItem>
-                      <ListItem>
-                        <ListItemIcon>
-                          <CachedIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="Tap on the 'Refresh' button above" />
-                      </ListItem>
-                      <ListItem>
-                        <ListItemIcon>
-                          <PermDeviceInformationIcon />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary="If you are trying to connect a SAMSUNG device then accept the 'Allow access to device data' confirmation pop up in your phone"
-                          secondary="Tap on the 'Refresh' button again. Reconnect your phone and repeat the above steps if it doesn't help"
-                        />
-                      </ListItem>
-                      <ListItem>
-                        <ListItemIcon>
-                          <SettingsInputHdmiIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="Reconnect the cable and repeat the above steps if you keep seeing this message" />
-                      </ListItem>
-                    </div>
-                  </List>
-                </Collapse>
-
-                <Divider className={styles.divider} />
-
-                <ListItem
-                  button
-                  onClick={() =>
-                    this._handleExpansionPanel({
-                      key: 'keyboardNavigation',
-                    })
-                  }
-                >
-                  <ListItemIcon>
-                    <KeyboardIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Keyboard Shortcuts"
-                    secondary={
-                      expansionPanel.keyboardNavigation
-                        ? 'Click here to hide the shortcuts'
-                        : 'Click here to view the shortcuts'
-                    }
-                  />
-                  {expansionPanel.keyboardNavigation ? (
-                    <ExpandLessIcon />
-                  ) : (
-                    <ExpandMoreIcon />
-                  )}
-                </ListItem>
-                <Collapse
-                  in={expansionPanel.keyboardNavigation}
-                  timeout="auto"
-                  unmountOnExit
-                >
-                  <List component="div" disablePadding>
-                    <ListItem>
-                      <div className={styles.nestedPanel}>
-                        <KeyboadShortcuts />
-                      </div>
-                    </ListItem>
-                  </List>
-                </Collapse>
-
-                <Divider className={styles.divider} />
-
-                <ListItem
-                  button
-                  onClick={() =>
-                    this._handleExpansionPanel({
-                      key: 'features',
-                    })
-                  }
-                >
-                  <ListItemIcon>
-                    <StarRateIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Features"
-                    secondary={
-                      expansionPanel.features
-                        ? 'Click here to hide the available features'
-                        : 'Click here to view the available features'
-                    }
-                  />
-                  {expansionPanel.features ? (
-                    <ExpandLessIcon />
-                  ) : (
-                    <ExpandMoreIcon />
-                  )}
-                </ListItem>
-                <Collapse
-                  in={expansionPanel.features}
-                  timeout="auto"
-                  unmountOnExit
-                >
-                  <div className={styles.nestedPanel}>
-                    <Features hideTitle />
+                {connectionDetail ? (
+                  <div className={styles.diagnosticAlert}>
+                    <ErrorOutlineIcon />
+                    <div>{connectionDetail}</div>
                   </div>
-                </Collapse>
-              </List>
-            </Paper>
+                ) : conflictingApps.length > 0 ? (
+                  <div className={styles.conflictWarningAlert}>
+                    <ErrorOutlineIcon />
+                    <div>{conflictText}</div>
+                  </div>
+                ) : (
+                  <div className={styles.conflictSuccessAlert}>
+                    <CheckCircleOutlineIcon />
+                    <div>
+                      {t('No known conflicting apps are currently running')}
+                    </div>
+                  </div>
+                )}
+
+                <div className={styles.stepsGrid}>
+                  <div className={styles.stepItem}>
+                    <div className={styles.stepIconBadge}>
+                      <UsbIcon />
+                    </div>
+                    <div>
+                      <div className={styles.stepTitle}>
+                        {t('Data-capable USB Cable')}
+                      </div>
+                      <div className={styles.stepDesc}>
+                        {t('Avoid charge-only USB cables.')}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={styles.stepItem}>
+                    <div className={styles.stepIconBadge}>
+                      <LockOpenIcon />
+                    </div>
+                    <div>
+                      <div className={styles.stepTitle}>
+                        {t('Unlock Screen & Keep Active')}
+                      </div>
+                      <div className={styles.stepDesc}>
+                        {t('Keep the phone screen unlocked.')}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={styles.stepItem}>
+                    <div className={styles.stepIconBadge}>
+                      <TouchAppIcon />
+                    </div>
+                    <div>
+                      <div className={styles.stepTitle}>
+                        {t('Select File Transfer (MTP)')}
+                      </div>
+                      <div className={styles.stepDesc}>
+                        {t('Open USB notification on Android.')}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={styles.stepItem}>
+                    <div className={styles.stepIconBadge}>
+                      <RefreshIcon />
+                    </div>
+                    <div>
+                      <div className={styles.stepTitle}>
+                        {t('Allow Access & Try Again')}
+                      </div>
+                      <div className={styles.stepDesc}>
+                        {t('Accept data permission on Android and retry.')}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </TableCell>
         </TableRow>
       );
@@ -315,7 +259,7 @@ class FileExplorerTableBodyEmptyRender extends PureComponent {
           colSpan={6}
           className={styles.tableCell}
           onContextMenu={(event) =>
-            onContextMenuClick(event, {}, { ...tableData }, _eventTarget)
+            onContextMenuClick(event, {}, { ...tableData }, 'emptyRowTarget')
           }
         />
       </TableRow>

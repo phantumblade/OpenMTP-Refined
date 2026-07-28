@@ -6,13 +6,23 @@ import { APP_TITLEBAR_DOM_ID } from '../../../constants/dom';
 import { capitalize, isEmpty, niceBytes } from '../../../utils/funcs';
 import { getSelectedStorage } from '../../HomePage/actions';
 import { getCurrentWindowHash } from '../../../helpers/windowHelper';
+import { getDeviceBrand, translate } from '../../../i18n';
 
 class Titlebar extends PureComponent {
   render() {
-    const { classes: styles, mtpDevice, mtpStoragesList, mtpMode } = this.props;
+    const {
+      classes: styles,
+      mtpDevice,
+      mtpStoragesList,
+      mtpMode,
+      appLanguage,
+    } = this.props;
 
     const selectedStorage = getSelectedStorage(mtpStoragesList);
     const windowHash = getCurrentWindowHash();
+    const mtpDeviceInfo = mtpDevice?.info?.mtpDeviceInfo;
+    const brand = getDeviceBrand(mtpDeviceInfo?.Manufacturer);
+    const model = mtpDeviceInfo?.Model;
 
     return (
       <div
@@ -24,15 +34,17 @@ class Titlebar extends PureComponent {
       >
         {/* Only show the device info. on the main window */}
         {windowHash !== '/' ? null : mtpDevice?.isAvailable &&
-          mtpDevice?.info?.mtpDeviceInfo &&
+          mtpDeviceInfo &&
           !isEmpty(selectedStorage?.data?.info) ? (
           <span className={styles.deviceInfo}>
             <span className={styles.deviceModel}>
-              {`${mtpDevice?.info?.mtpDeviceInfo?.Model} (${selectedStorage?.data?.name}) - `}
+              {`${brand ? `${brand} ` : ''}${model} (${
+                selectedStorage?.data?.name
+              }) - `}
             </span>
             {`${niceBytes(
               parseInt(selectedStorage?.data.info?.FreeSpaceInBytes ?? 0, 10)
-            )} Free of ${niceBytes(
+            )} ${translate(appLanguage, 'Free of')} ${niceBytes(
               parseInt(selectedStorage?.data.info?.MaxCapability ?? 0, 10)
             )}, ${capitalize(mtpMode)} Mode`}
           </span>

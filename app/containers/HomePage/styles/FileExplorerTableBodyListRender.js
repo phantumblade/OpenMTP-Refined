@@ -27,10 +27,11 @@ export const tableCellFileExplorerTableRowsRender = {
   },
 };
 
-export const styles = (_) => {
+export const styles = (theme) => {
   return {
     tableRowSelected: {
-      backgroundColor: 'rgba(41, 121, 255, 0.15) !important',
+      backgroundColor: `${theme.palette.selectionBg} !important`,
+      boxShadow: `inset 3px 0 0 ${theme.palette.selectionBorder}`,
     },
     tableCell: tableCellFileExplorerTableRowsRender,
     fileTypeIconWrapper: {

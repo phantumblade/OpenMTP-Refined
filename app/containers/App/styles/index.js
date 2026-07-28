@@ -34,8 +34,13 @@ export const getColorPalette = () => {
           contrastText: '#fff',
         },
         background: {
-          default: darkPrimaryColor,
+          default: lightPrimaryColor,
           paper: lightPrimaryColor,
+        },
+        text: {
+          primary: '#1d1d1f',
+          secondary: 'rgba(0, 0, 0, 0.60)',
+          disabled: 'rgba(0, 0, 0, 0.38)',
         },
         snackbar: {
           error: snackbarError,
@@ -49,6 +54,14 @@ export const getColorPalette = () => {
         disabledBgColor: `#f3f3f3`,
         nativeSystemColor: `#ececec`,
         contrastPrimaryMainColor: darkPrimaryColor,
+        selectionBg: 'rgba(0, 106, 217, 0.12)',
+        selectionHover: 'rgba(0, 106, 217, 0.08)',
+        selectionBorder: '#006ad9',
+        focusRing: 'rgba(0, 106, 217, 0.42)',
+        checkboxEdge: 'rgba(255, 255, 255, 0.72)',
+        toolbarButtonHover: 'rgba(0, 0, 0, 0.07)',
+        toolbarButtonActive: 'rgba(0, 106, 217, 0.12)',
+        statusSurface: '#f5f6f8',
       };
     },
     get dark() {
@@ -90,6 +103,14 @@ export const getColorPalette = () => {
         disabledBgColor: `rgba(255, 255, 255, 0.15)`,
         nativeSystemColor: `#323232`,
         contrastPrimaryMainColor: lightPrimaryColor,
+        selectionBg: 'rgba(82, 156, 255, 0.2)',
+        selectionHover: 'rgba(82, 156, 255, 0.14)',
+        selectionBorder: '#72adff',
+        focusRing: 'rgba(114, 173, 255, 0.52)',
+        checkboxEdge: 'rgba(0, 0, 0, 0.55)',
+        toolbarButtonHover: 'rgba(255, 255, 255, 0.1)',
+        toolbarButtonActive: 'rgba(82, 156, 255, 0.18)',
+        statusSurface: '#292a2d',
       };
     },
   };
@@ -112,9 +133,9 @@ export const materialUiTheme = ({ ...args }) => {
       useNextVariants: true,
       fontSize: variables().sizes.regularFontSize,
       fontFamily: [
-        'Roboto',
         '-apple-system',
         'BlinkMacSystemFont',
+        '"SF Pro Text"',
         '"Segoe UI"',
         '"Helvetica Neue"',
         'Arial',

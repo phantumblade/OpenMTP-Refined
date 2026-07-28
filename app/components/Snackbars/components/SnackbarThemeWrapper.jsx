@@ -8,6 +8,7 @@ import SnackbarContent from '@material-ui/core/SnackbarContent';
 import WarningIcon from '@material-ui/icons/Warning';
 import { withStyles } from '@material-ui/core/styles';
 import { styles } from '../styles/SnackbarThemeWrapper';
+import { translate } from '../../../i18n';
 
 const variantIcon = {
   success: CheckCircleIcon,
@@ -17,8 +18,15 @@ const variantIcon = {
 };
 
 function SnackbarThemeWrapper(props) {
-  const { classes: styles, message, onClose, variant, ...other } = props;
-  const Icon = variantIcon[variant];
+  const {
+    classes: styles,
+    message,
+    onClose,
+    variant,
+    appLanguage,
+    ...other
+  } = props;
+  const Icon = variantIcon[variant] || variantIcon.info;
 
   return (
     <SnackbarContent
@@ -38,7 +46,7 @@ function SnackbarThemeWrapper(props) {
           color="primary"
           className={styles.closeBtn}
         >
-          Close
+          {translate(appLanguage, 'Close')}
         </Button>,
       ]}
       {...other}

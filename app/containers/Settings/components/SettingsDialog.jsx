@@ -16,18 +16,23 @@ import Switch from '@material-ui/core/Switch';
 import FormControl from '@material-ui/core/FormControl';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
 import { DEVICES_LABEL } from '../../../constants';
 import SettingsDialogTabContainer from './SettingsDialogTabContainer';
 import {
   DEVICE_TYPE,
   FILE_EXPLORER_VIEW_TYPE,
   APP_THEME_MODE_TYPE,
+  APP_LANGUAGE_TYPE,
   MTP_MODE,
   FILE_TRANSFER_DIRECTION,
 } from '../../../enums';
 import { capitalize, isPrereleaseVersion } from '../../../utils/funcs';
 import { IpcEvents } from '../../../services/ipc-events/IpcEventType';
 import { isKalamModeSupported } from '../../../helpers/binaries';
+import { translate } from '../../../i18n';
 
 const isMas = electronIs.mas();
 
@@ -71,6 +76,7 @@ export default class SettingsDialog extends PureComponent {
       hideHiddenFiles,
       fileExplorerListingType,
       appThemeMode,
+      appLanguage,
       styles,
       enableAutoUpdateCheck,
       enableBackgroundAutoUpdate,
@@ -91,6 +97,7 @@ export default class SettingsDialog extends PureComponent {
       onPrereleaseUpdatesChange,
       onStatusBarChange,
       onAppThemeModeChange,
+      onAppLanguageChange,
       onShowLocalPaneChange,
       onShowLocalPaneOnLeftSideChange,
       onShowDirectoriesFirstChange,
@@ -101,6 +108,7 @@ export default class SettingsDialog extends PureComponent {
     } = this.props;
 
     const { tabIndex } = this.state;
+    const t = (key, values) => translate(appLanguage, key, values);
 
     const hideHiddenFilesLocal = hideHiddenFiles[DEVICE_TYPE.local];
     const hideHiddenFilesMtp = hideHiddenFiles[DEVICE_TYPE.mtp];
@@ -127,7 +135,7 @@ export default class SettingsDialog extends PureComponent {
         }
       >
         <Typography variant="h5" className={styles.title}>
-          Settings
+          {t('Settings')}
         </Typography>
         <DialogContent>
           <Tabs
@@ -140,16 +148,16 @@ export default class SettingsDialog extends PureComponent {
             scrollButtons="auto"
           >
             {this.shoudThisTabHeadRender(0) && (
-              <Tab label="General" className={styles.tab} />
+              <Tab label={t('General')} className={styles.tab} />
             )}
             {this.shoudThisTabHeadRender(1) && (
-              <Tab label="File Manager" className={styles.tab} />
+              <Tab label={t('File Manager')} className={styles.tab} />
             )}
             {this.shoudThisTabHeadRender(2) && (
-              <Tab label="Updates" className={styles.tab} />
+              <Tab label={t('Updates')} className={styles.tab} />
             )}
             {this.shoudThisTabHeadRender(3) && (
-              <Tab label="Privacy" className={styles.tab} />
+              <Tab label={t('Privacy')} className={styles.tab} />
             )}
           </Tabs>
 
@@ -159,8 +167,28 @@ export default class SettingsDialog extends PureComponent {
               <SettingsDialogTabContainer>
                 <div className={styles.tabContainer}>
                   <FormGroup>
+                    <FormControl className={styles.languageControl}>
+                      <InputLabel id="app-language-label">
+                        {t('Language')}
+                      </InputLabel>
+                      <Select
+                        labelId="app-language-label"
+                        value={appLanguage}
+                        onChange={(event) =>
+                          onAppLanguageChange(event, event.target.value)
+                        }
+                      >
+                        <MenuItem value={APP_LANGUAGE_TYPE.english}>
+                          {t('English')}
+                        </MenuItem>
+                        <MenuItem value={APP_LANGUAGE_TYPE.italian}>
+                          {t('Italian')}
+                        </MenuItem>
+                      </Select>
+                    </FormControl>
+
                     <Typography variant="subtitle2" className={styles.subtitle}>
-                      Theme
+                      {t('Theme')}
                     </Typography>
                     <RadioGroup
                       aria-label="app-theme-mode"
@@ -171,17 +199,17 @@ export default class SettingsDialog extends PureComponent {
                       <FormControlLabel
                         value={APP_THEME_MODE_TYPE.light}
                         control={<Radio />}
-                        label="Light"
+                        label={t('Light')}
                       />
                       <FormControlLabel
                         value={APP_THEME_MODE_TYPE.dark}
                         control={<Radio />}
-                        label="Dark"
+                        label={t('Dark')}
                       />
                       <FormControlLabel
                         value={APP_THEME_MODE_TYPE.auto}
                         control={<Radio />}
-                        label="Auto"
+                        label={t('Auto')}
                       />
                     </RadioGroup>
 
@@ -191,7 +219,7 @@ export default class SettingsDialog extends PureComponent {
                           variant="subtitle2"
                           className={`${styles.subtitle}  ${styles.fmSettingsStylesFix}`}
                         >
-                          MTP Mode
+                          {t('MTP Mode')}
                         </Typography>
                         <RadioGroup
                           aria-label="app-theme-mode"
@@ -219,7 +247,7 @@ export default class SettingsDialog extends PureComponent {
                       variant="subtitle2"
                       className={`${styles.subtitle} ${styles.fmSettingsStylesFix}`}
                     >
-                      Enable auto device detection (USB Hotplug)
+                      {t('Enable auto device detection (USB Hotplug)')}
                     </Typography>
                     <FormControlLabel
                       className={styles.switch}
@@ -231,7 +259,7 @@ export default class SettingsDialog extends PureComponent {
                           }
                         />
                       }
-                      label={enableUsbHotplug ? `Enabled` : `Disabled`}
+                      label={t(enableUsbHotplug ? 'Enabled' : 'Disabled')}
                     />
                   </FormGroup>
                 </div>
@@ -244,7 +272,7 @@ export default class SettingsDialog extends PureComponent {
                 <div className={styles.tabContainer}>
                   <FormGroup>
                     <Typography variant="subtitle2" className={styles.subtitle}>
-                      Show hidden files
+                      {t('Show hidden files')}
                     </Typography>
                     <FormControlLabel
                       className={styles.switch}
@@ -260,7 +288,7 @@ export default class SettingsDialog extends PureComponent {
                           }
                         />
                       }
-                      label={DEVICES_LABEL[DEVICE_TYPE.local]}
+                      label={t(DEVICES_LABEL[DEVICE_TYPE.local])}
                     />
                     <FormControlLabel
                       className={styles.switch}
@@ -276,14 +304,14 @@ export default class SettingsDialog extends PureComponent {
                           }
                         />
                       }
-                      label={DEVICES_LABEL[DEVICE_TYPE.mtp]}
+                      label={t(DEVICES_LABEL[DEVICE_TYPE.mtp])}
                     />
 
                     <Typography
                       variant="subtitle2"
                       className={`${styles.subtitle} ${styles.fmSettingsStylesFix}`}
                     >
-                      View as grid
+                      {t('View as grid')}
                     </Typography>
                     <FormControlLabel
                       className={styles.switch}
@@ -301,7 +329,7 @@ export default class SettingsDialog extends PureComponent {
                           }
                         />
                       }
-                      label={DEVICES_LABEL[DEVICE_TYPE.local]}
+                      label={t(DEVICES_LABEL[DEVICE_TYPE.local])}
                     />
                     <FormControlLabel
                       className={styles.switch}
@@ -319,14 +347,16 @@ export default class SettingsDialog extends PureComponent {
                           }
                         />
                       }
-                      label={DEVICES_LABEL[DEVICE_TYPE.mtp]}
+                      label={t(DEVICES_LABEL[DEVICE_TYPE.mtp])}
                     />
 
                     <Typography
                       variant="subtitle2"
                       className={`${styles.subtitle} ${styles.fmSettingsStylesFix}`}
                     >
-                      Display overall progress on the file transfer screen
+                      {t(
+                        'Display overall progress on the file transfer screen'
+                      )}
                     </Typography>
                     <FormControlLabel
                       className={styles.switch}
@@ -348,7 +378,9 @@ export default class SettingsDialog extends PureComponent {
                           }
                         />
                       }
-                      label={`To ${DEVICES_LABEL[DEVICE_TYPE.local]}`}
+                      label={t('To {device}', {
+                        device: t(DEVICES_LABEL[DEVICE_TYPE.local]),
+                      })}
                     />
                     <FormControlLabel
                       className={styles.switch}
@@ -370,7 +402,9 @@ export default class SettingsDialog extends PureComponent {
                           }
                         />
                       }
-                      label={`To ${DEVICES_LABEL[DEVICE_TYPE.mtp]}`}
+                      label={t('To {device}', {
+                        device: t(DEVICES_LABEL[DEVICE_TYPE.mtp]),
+                      })}
                     />
 
                     {freshInstall ? (
@@ -383,28 +417,27 @@ export default class SettingsDialog extends PureComponent {
                           className={`${styles.onboardingPaperBody}`}
                         >
                           <span className={`${styles.onboardingPaperBodyItem}`}>
-                            &#9679;&nbsp;Use the toggles to enable or disable an
-                            item.
+                            &#9679;&nbsp;
+                            {t('Use the toggles to enable or disable an item.')}
                           </span>
                           <span className={`${styles.onboardingPaperBodyItem}`}>
-                            &#9679;&nbsp;Scroll down for more Settings.
+                            &#9679;&nbsp;{t('Scroll down for more Settings.')}
                           </span>
                         </Typography>
                       </Paper>
                     ) : null}
 
                     <Typography variant="caption">
-                      Note: To fetch the total transfer information, the files
-                      need to be processed first. It may take a few seconds to a
-                      few minutes depending on the total number of files to be
-                      copied.
+                      {t(
+                        'To calculate the overall transfer progress, files must be analyzed first. This can take from a few seconds to a few minutes.'
+                      )}
                     </Typography>
 
                     <Typography
                       variant="subtitle2"
                       className={`${styles.subtitle} ${styles.fmSettingsStylesFix}`}
                     >
-                      Show directories first
+                      {t('Show directories first')}
                     </Typography>
                     <FormControlLabel
                       className={styles.switch}
@@ -419,14 +452,14 @@ export default class SettingsDialog extends PureComponent {
                           }
                         />
                       }
-                      label={showDirectoriesFirst ? `Enabled` : `Disabled`}
+                      label={t(showDirectoriesFirst ? 'Enabled' : 'Disabled')}
                     />
 
                     <Typography
                       variant="subtitle2"
                       className={`${styles.subtitle} ${styles.fmSettingsStylesFix}`}
                     >
-                      Show status bar
+                      {t('Show status bar')}
                     </Typography>
                     <FormControlLabel
                       className={styles.switch}
@@ -438,14 +471,14 @@ export default class SettingsDialog extends PureComponent {
                           }
                         />
                       }
-                      label={enableStatusBar ? `Enabled` : `Disabled`}
+                      label={t(enableStatusBar ? 'Enabled' : 'Disabled')}
                     />
 
                     <Typography
                       variant="subtitle2"
                       className={`${styles.subtitle} ${styles.fmSettingsStylesFix}`}
                     >
-                      Show Local Disk pane
+                      {t('Show Local Disk pane')}
                     </Typography>
                     <FormControlLabel
                       className={styles.switch}
@@ -457,18 +490,19 @@ export default class SettingsDialog extends PureComponent {
                           }
                         />
                       }
-                      label={showLocalPane ? `Enabled` : `Disabled`}
+                      label={t(showLocalPane ? 'Enabled' : 'Disabled')}
                     />
                     <Typography variant="caption">
-                      Note: You can drag files from the Finder into the Mobile
-                      pane but not the other way around.
+                      {t(
+                        'You can drag files from Finder to the phone pane, but not in the opposite direction.'
+                      )}
                     </Typography>
 
                     <Typography
                       variant="subtitle2"
                       className={`${styles.subtitle} ${styles.fmSettingsStylesFix}`}
                     >
-                      Show Local Disk pane on the left side
+                      {t('Show Local Disk pane on the left side')}
                     </Typography>
                     <FormControlLabel
                       className={styles.switch}
@@ -483,7 +517,9 @@ export default class SettingsDialog extends PureComponent {
                           }
                         />
                       }
-                      label={showLocalPaneOnLeftSide ? `Enabled` : `Disabled`}
+                      label={t(
+                        showLocalPaneOnLeftSide ? 'Enabled' : 'Disabled'
+                      )}
                     />
                   </FormGroup>
                 </div>
@@ -497,7 +533,7 @@ export default class SettingsDialog extends PureComponent {
                 <div className={styles.tabContainer}>
                   <FormGroup>
                     <Typography variant="subtitle2" className={styles.subtitle}>
-                      Automatically check for updates
+                      {t('Automatically check for updates')}
                     </Typography>
 
                     <FormControlLabel
@@ -510,14 +546,15 @@ export default class SettingsDialog extends PureComponent {
                           }
                         />
                       }
-                      label={enableAutoUpdateCheck ? `Enabled` : `Disabled`}
+                      label={t(enableAutoUpdateCheck ? 'Enabled' : 'Disabled')}
                     />
                   </FormGroup>
 
                   <FormGroup>
                     <Typography variant="subtitle2" className={styles.subtitle}>
-                      Automatically download the new updates when available
-                      (recommended)
+                      {t(
+                        'Automatically download the new updates when available (recommended)'
+                      )}
                     </Typography>
 
                     <FormControlLabel
@@ -534,9 +571,9 @@ export default class SettingsDialog extends PureComponent {
                           }
                         />
                       }
-                      label={
-                        enableBackgroundAutoUpdate ? `Enabled` : `Disabled`
-                      }
+                      label={t(
+                        enableBackgroundAutoUpdate ? 'Enabled' : 'Disabled'
+                      )}
                     />
                   </FormGroup>
 
@@ -545,7 +582,7 @@ export default class SettingsDialog extends PureComponent {
                       variant="subtitle2"
                       className={`${styles.subtitle} ${styles.subtitleMarginFix}`}
                     >
-                      Enable beta update channel
+                      {t('Enable beta update channel')}
                     </Typography>
 
                     <FormControlLabel
@@ -562,12 +599,15 @@ export default class SettingsDialog extends PureComponent {
                           }
                         />
                       }
-                      label={enablePrereleaseUpdates ? `Enabled` : `Disabled`}
+                      label={t(
+                        enablePrereleaseUpdates ? 'Enabled' : 'Disabled'
+                      )}
                     />
                   </FormGroup>
                   <Typography variant="caption">
-                    Early access preview of the upcoming features but might
-                    result in crashes.
+                    {t(
+                      'Preview upcoming features. Beta versions may be less stable.'
+                    )}
                   </Typography>
                 </div>
               </SettingsDialogTabContainer>
@@ -580,7 +620,7 @@ export default class SettingsDialog extends PureComponent {
                 <div className={styles.tabContainer}>
                   <FormGroup>
                     <Typography variant="subtitle2" className={styles.subtitle}>
-                      Enable anonymous usage statistics gathering
+                      {t('Enable anonymous usage statistics gathering')}
                     </Typography>
 
                     <FormControlLabel
@@ -593,12 +633,13 @@ export default class SettingsDialog extends PureComponent {
                           }
                         />
                       }
-                      label={enableAnalytics ? `Enabled` : `Disabled`}
+                      label={t(enableAnalytics ? 'Enabled' : 'Disabled')}
                     />
                     <Typography variant="caption">
-                      We do not gather any kind of personal information and
-                      neither do we sell your data. We use this information only
-                      to improve the User Experience and squash some bugs.&nbsp;
+                      {t(
+                        'We do not collect personal information or sell your data. Anonymous statistics help improve the app and fix bugs.'
+                      )}
+                      &nbsp;
                       <a
                         className={styles.a}
                         onClick={() => {
@@ -607,7 +648,7 @@ export default class SettingsDialog extends PureComponent {
                           );
                         }}
                       >
-                        Learn more...
+                        {t('Learn more…')}
                       </a>
                     </Typography>
                   </FormGroup>
@@ -628,7 +669,7 @@ export default class SettingsDialog extends PureComponent {
             color="primary"
             className={classNames(styles.btnPositive)}
           >
-            Close
+            {t('Close')}
           </Button>
         </DialogActions>
       </Dialog>

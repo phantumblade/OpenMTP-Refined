@@ -15,17 +15,23 @@ class FileExplorerTableFooterRender extends PureComponent {
       isStatusBarEnabled,
       directoryLists,
       fileTransferClipboard,
+      fileTransferProgress,
       mtpDevice,
+      appLanguage,
+      onPaste,
     } = this.props;
 
     return (
       <TableFooter component="div" className={styles.tableFooter}>
-        {isStatusBarEnabled && (
+        {(isStatusBarEnabled || fileTransferClipboard.queue.length > 0) && (
           <FileExplorerTableFooterStatusBarRender
             directoryLists={directoryLists}
             fileTransferClipboard={fileTransferClipboard}
+            fileTransferProgress={fileTransferProgress}
             deviceType={deviceType}
             mtpDevice={mtpDevice}
+            appLanguage={appLanguage}
+            onPaste={onPaste}
           />
         )}
         <Breadcrumb

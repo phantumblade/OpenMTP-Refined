@@ -1,6 +1,5 @@
 import path from 'path';
 import { promisify } from 'node:util';
-import findLodash from 'lodash/find';
 import { exec, spawn } from 'child_process';
 import { log } from '../../../utils/log';
 import {
@@ -187,6 +186,36 @@ export class FileExplorerLegacyDataSource {
       let prevCopiedTime = 0;
       let currentCopiedTime = 0;
       let bufferedOutput = null;
+      let settled = false;
+
+      const stopProgress = () => {
+        transferList = null;
+
+        if (handleTransferListInterval) {
+          clearInterval(handleTransferListInterval);
+          handleTransferListInterval = 0;
+        }
+      };
+
+      const finishWithError = (error) => {
+        if (settled) {
+          return;
+        }
+
+        settled = true;
+        stopProgress();
+        onError({ error, stderr: null, data: null });
+      };
+
+      const finishSuccessfully = () => {
+        if (settled) {
+          return;
+        }
+
+        settled = true;
+        stopProgress();
+        onCompleted();
+      };
 
       let handleTransferListInterval = setInterval(() => {
         if (transferList === null) {
@@ -328,19 +357,23 @@ export class FileExplorerLegacyDataSource {
           return null;
         }
 
-        onError({
-          error,
-          stderr: null,
-          data: null,
-        });
-
-        transferList = null;
+        finishWithError(filteredError || error);
       });
 
-      cmd.on('exit', () => {
-        transferList = null;
+      cmd.on('error', finishWithError);
 
-        onCompleted();
+      cmd.on('exit', (code, signal) => {
+        if (code === 0) {
+          finishSuccessfully();
+
+          return;
+        }
+
+        finishWithError(
+          `MTP transfer process stopped with code ${code ?? 'unknown'}${
+            signal ? ` (${signal})` : ''
+          }`
+        );
       });
 
       return { error: null, stderr: null, data: true };
@@ -377,13 +410,13 @@ export class FileExplorerLegacyDataSource {
       const descMatchPattern = /description:(.*)/i;
       const storageIdMatchPattern = /([^\D]+)/;
 
-      let storageList = {};
+      const storageList = {};
 
       _storageList
         .filter((a, index) => !this._filterOutMtpLines(a, index))
-        .map((a, index) => {
+        .forEach((a, index) => {
           if (!a) {
-            return null;
+            return;
           }
 
           const _matchDesc = descMatchPattern.exec(a);
@@ -395,21 +428,16 @@ export class FileExplorerLegacyDataSource {
             undefinedOrNull(_matchedStorageIds) ||
             undefinedOrNull(_matchedStorageIds[1])
           ) {
-            return null;
+            return;
           }
 
           const matchDesc = _matchDesc[1].trim();
           const matchedStorageId = parseInt(_matchedStorageIds[1].trim(), 10);
 
-          storageList = {
-            ...storageList,
-            [matchedStorageId]: {
-              name: matchDesc,
-              selected: index === 0,
-            },
+          storageList[matchedStorageId] = {
+            name: matchDesc,
+            selected: index === 0,
           };
-
-          return storageList;
         });
 
       if (undefinedOrNull(storageList) || storageList.length < 1) {
@@ -470,6 +498,7 @@ export class FileExplorerLegacyDataSource {
       }
 
       let fileProps = splitIntoLines(filePropsData);
+      const responsePaths = new Set();
 
       fileProps = fileProps.filter(
         (a, index) => !this._filterOutMtpLines(a, index)
@@ -508,9 +537,11 @@ export class FileExplorerLegacyDataSource {
         const extension = getExtension(fullPath, isFolder);
 
         // avoid duplicate values
-        if (findLodash(response, { path: fullPath })) {
+        if (responsePaths.has(fullPath)) {
           continue; // eslint-disable-line no-continue
         }
+
+        responsePaths.add(fullPath);
 
         response.push({
           name: matchedFileName,

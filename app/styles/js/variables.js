@@ -2,7 +2,7 @@
 export default (_) => {
   return {
     sizes: {
-      toolbarHeight: 64,
+      toolbarHeight: 52,
       sidebarAreaPaneWidth: 300,
       sidebarAreaPaddingTop: 40,
       regularFontSize: 14,

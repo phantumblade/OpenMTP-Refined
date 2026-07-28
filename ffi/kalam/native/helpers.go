@@ -5,6 +5,7 @@ import (
 	"github.com/ganeshrvel/go-mtpfs/mtp"
 	"github.com/ganeshrvel/go-mtpx"
 	"log"
+	"strings"
 )
 
 func verifyMtpSession(c verifyMtpSessionMode) error {
@@ -15,9 +16,7 @@ func verifyMtpSession(c verifyMtpSessionMode) error {
 	if !c.skipDeviceChangeCheck && container.deviceInfo != nil {
 		dInfo, err := mtpx.FetchDeviceInfo(container.dev)
 		if err != nil {
-			container.deviceInfo = nil
-
-			_ = _dispose()
+			invalidateMtpSession()
 
 			return err
 		}
@@ -33,8 +32,16 @@ func verifyMtpSession(c verifyMtpSessionMode) error {
 }
 
 func _initialize(i mtpx.Init) (*mtp.Device, error) {
+	if container.dev != nil {
+		if err := _dispose(); err != nil {
+			return nil, err
+		}
+	}
+
 	d, err := mtpx.Initialize(i)
 	if err != nil {
+		invalidateMtpSession()
+
 		return nil, err
 	}
 
@@ -56,7 +63,7 @@ func _fetchDeviceInfo() (*mtp.DeviceInfo, error) {
 
 	dInfo, err := mtpx.FetchDeviceInfo(container.dev)
 	if err != nil {
-		container.deviceInfo = nil
+		invalidateMtpSession()
 
 		return nil, err
 	}
@@ -73,6 +80,8 @@ func _fetchStorages() ([]mtpx.StorageData, error) {
 
 	storages, err := mtpx.FetchStorages(container.dev)
 	if err != nil {
+		invalidateMtpSessionOnFatalError(err)
+
 		return nil, err
 	}
 
@@ -86,6 +95,8 @@ func _makeDirectory(storageId uint32, fullPath string) error {
 
 	_, err := mtpx.MakeDirectory(container.dev, storageId, fullPath)
 	if err != nil {
+		invalidateMtpSessionOnFatalError(err)
+
 		return err
 	}
 
@@ -99,6 +110,8 @@ func _fileExists(storageId uint32, fileProps []mtpx.FileProp) (exists []mtpx.Fil
 
 	exists, err := mtpx.FileExists(container.dev, storageId, fileProps)
 	if err != nil {
+		invalidateMtpSessionOnFatalError(err)
+
 		return exists, err
 	}
 
@@ -112,6 +125,8 @@ func _deleteFile(storageId uint32, fileProps []mtpx.FileProp) (error error) {
 
 	err := mtpx.DeleteFile(container.dev, storageId, fileProps)
 	if err != nil {
+		invalidateMtpSessionOnFatalError(err)
+
 		return err
 	}
 
@@ -125,6 +140,8 @@ func _renameFile(storageId uint32, fileProp mtpx.FileProp, newFileName string) (
 
 	_, err := mtpx.RenameFile(container.dev, storageId, fileProp, newFileName)
 	if err != nil {
+		invalidateMtpSessionOnFatalError(err)
+
 		return err
 	}
 
@@ -146,6 +163,8 @@ func _walk(storageId uint32, fullPath string, recursive, skipDisallowedFiles, sk
 		return nil
 	})
 	if err != nil {
+		invalidateMtpSessionOnFatalError(err)
+
 		return []*mtpx.FileInfo{}, err
 	}
 
@@ -159,6 +178,8 @@ func _uploadFiles(storageId uint32, sources []string, destination string, prepro
 
 	_, _, _, err = mtpx.UploadFiles(container.dev, storageId, sources, destination, preprocessFiles, preprocessCb, progressCb)
 	if err != nil {
+		invalidateMtpSessionOnFatalError(err)
+
 		return err
 	}
 
@@ -172,6 +193,8 @@ func _downloadFiles(storageId uint32, sources []string, destination string, prep
 
 	_, _, err = mtpx.DownloadFiles(container.dev, storageId, sources, destination, preprocessFiles, preprocessCb, progressCb)
 	if err != nil {
+		invalidateMtpSessionOnFatalError(err)
+
 		return err
 	}
 
@@ -179,25 +202,44 @@ func _downloadFiles(storageId uint32, sources []string, destination string, prep
 }
 
 func _dispose() error {
-	if container.dev == nil {
+	dev := container.dev
+
+	container.dev = nil
+	container.deviceInfo = nil
+
+	if dev == nil {
 		return nil
 	}
 
-	mtpx.Dispose(container.dev)
+	mtpx.Dispose(dev)
 
 	return nil
 }
 
+func invalidateMtpSession() {
+	container.dev = nil
+	container.deviceInfo = nil
+}
+
+func invalidateMtpSessionOnFatalError(err error) {
+	if err == nil {
+		return
+	}
+
+	errorText := strings.ToUpper(err.Error())
+	if strings.Contains(errorText, "LIBUSB_ERROR_") || strings.Contains(errorText, "EOF") {
+		invalidateMtpSession()
+	}
+}
+
 func lockMtp() error {
-	if container.locked {
+	if !container.operation.TryAcquire() {
 		return fmt.Errorf("ErrorMtpLockExists")
 	}
 
-	container.locked = true
-
-	defer func() {
-		container.locked = false
-	}()
-
 	return nil
+}
+
+func unlockMtp() {
+	container.operation.Release()
 }

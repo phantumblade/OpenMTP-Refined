@@ -6,14 +6,12 @@ import mkdirp from 'mkdirp';
 import macosVersion from 'macos-version';
 import {
   readdir as fsReaddir,
-  existsSync,
-  statSync,
-  lstatSync,
+  stat as fsStat,
+  access as fsAccess,
+  constants as fsConstants,
   rename as fsRename,
-  readlink,
-  realpathSync,
+  realpath as fsRealpath,
 } from 'fs';
-import findLodash from 'lodash/find';
 import { log } from '../../../utils/log';
 import { isArray, isEmpty, undefinedOrNull } from '../../../utils/funcs';
 import { pathUp } from '../../../utils/files';
@@ -25,6 +23,9 @@ import { NODE_MAC_PERMISSIONS_MIN_OS } from '../../../constants';
 export class FileExplorerLocalDataSource {
   constructor() {
     this.readdir = promisify(fsReaddir);
+    this.stat = promisify(fsStat);
+    this.access = promisify(fsAccess);
+    this.realpath = promisify(fsRealpath);
   }
 
   /**
@@ -144,50 +145,18 @@ export class FileExplorerLocalDataSource {
   };
 
   /**
-   *
-   * description - returns file info needed for navigating through symlinks
-   * @private
-   *
-   * @param fullPath
-   * @returns {Promise<{isFolder: boolean, symlink: string|null}>}
-   * @private
-   */
-  _getSymlinkInfo = async ({ fullPath }) => {
-    const symlink = await new Promise((resolve) => {
-      try {
-        readlink(fullPath, (err, lnk) => {
-          if (err) {
-            return resolve(null);
-          }
-
-          if (!undefinedOrNull(lnk) && existsSync(lnk)) {
-            return resolve(realpathSync(lnk));
-          }
-
-          return resolve(null);
-        });
-      } catch (e) {
-        return resolve(null);
-      }
-    });
-
-    const isFolder = lstatSync(symlink ?? fullPath).isDirectory();
-
-    return {
-      isFolder,
-      symlink,
-    };
-  };
-
-  /**
    * description - Fetch local files in the path
    *
    * @param filePath
    * @param ignoreHidden
    * @return {Promise<{data: array|null, error: string|null, stderr: string|null}>}
    */
-  async listFiles({ filePath, ignoreHidden }) {
+  async listFiles({ filePath, ignoreHidden, isCancelled = () => false }) {
     try {
+      if (isCancelled()) {
+        return { error: null, data: null, cancelled: true };
+      }
+
       const _accessGranted = await this._requestUsageAccess({ filePath });
 
       if (!_accessGranted) {
@@ -198,68 +167,61 @@ export class FileExplorerLocalDataSource {
       }
 
       const response = [];
-      const { error, data } = await this.readdir(filePath, 'utf8')
-        .then((res) => {
-          return {
-            data: res,
-            error: null,
-          };
-        })
-        .catch((e) => {
-          return {
-            data: null,
-            error: e,
-          };
-        });
+      const entries = await this.readdir(filePath, {
+        encoding: 'utf8',
+        withFileTypes: true,
+      });
 
-      if (error) {
-        log.error(error, `FileExplorerLocalDataSource.listFiles`);
-
-        return { error, data: null };
+      if (isCancelled()) {
+        return { error: null, data: null, cancelled: true };
       }
 
-      let files = data;
+      let files = entries.filter((entry) => junk.not(entry.name));
 
-      files = data.filter(junk.not);
       if (ignoreHidden) {
-        // eslint-disable-next-line no-useless-escape
-        files = data.filter((item) => !/(^|\/)\.[^\/\.]/g.test(item));
+        files = files.filter((entry) => !/(^|\/)\.[^/.]/g.test(entry.name));
       }
 
-      for (let i = 0; i < files.length; i += 1) {
-        const file = files[i];
+      const concurrency = 64;
 
-        const fullPath = path.resolve(filePath, file);
+      for (let offset = 0; offset < files.length; offset += concurrency) {
+        if (isCancelled()) {
+          return { error: null, data: null, cancelled: true };
+        }
 
+        const batch = files.slice(offset, offset + concurrency);
         // eslint-disable-next-line no-await-in-loop
-        const { isFolder, symlink } = await this._getSymlinkInfo({
-          fullPath,
-        });
+        const fileInfoBatch = await Promise.all(
+          batch.map(async (entry) => {
+            const fullPath = path.resolve(filePath, entry.name);
 
-        if (!existsSync(fullPath)) {
-          continue; // eslint-disable-line no-continue
-        }
+            try {
+              const symlink = entry.isSymbolicLink()
+                ? await this.realpath(fullPath)
+                : null;
+              const stat = await this.stat(symlink ?? fullPath);
+              const extension = path.extname(fullPath);
+              const { size, atime: dateTime } = stat;
 
-        const stat = statSync(fullPath);
-        const extension = path.extname(fullPath);
-        const { size, atime: dateTime } = stat;
+              return {
+                name: entry.name,
+                path: fullPath,
+                extension,
+                size,
+                isFolder: stat.isDirectory(),
+                dateAdded: appDateFormat(dateTime),
+                symlink,
+              };
+            } catch (_) {
+              return null;
+            }
+          })
+        );
 
-        if (findLodash(response, { path: fullPath })) {
-          continue; // eslint-disable-line no-continue
-        }
-
-        response.push({
-          name: file,
-          path: fullPath,
-          extension,
-          size,
-          isFolder,
-          dateAdded: appDateFormat(dateTime),
-          symlink,
-        });
+        response.push(...fileInfoBatch.filter(Boolean));
       }
 
-      return { error, data: response };
+      return { error: null, data: response };
     } catch (e) {
       log.error(e);
 
@@ -320,11 +282,15 @@ export class FileExplorerLocalDataSource {
         return { error: `No files selected.`, stderr: null, data: null };
       }
 
-      for (let i = 0; i < fileList.length; i += 1) {
-        const filePath = fileList[i];
+      const parentDirectories = [
+        ...new Set(fileList.map((filePath) => path.dirname(filePath))),
+      ];
 
+      for (let index = 0; index < parentDirectories.length; index += 1) {
         // eslint-disable-next-line no-await-in-loop
-        const _accessGranted = await this._requestUsageAccess({ filePath });
+        const _accessGranted = await this._requestUsageAccess({
+          filePath: parentDirectories[index],
+        });
 
         if (!_accessGranted) {
           return {
@@ -332,6 +298,10 @@ export class FileExplorerLocalDataSource {
             error: 'Permission denied',
           };
         }
+      }
+
+      for (let i = 0; i < fileList.length; i += 1) {
+        const filePath = fileList[i];
 
         // eslint-disable-next-line no-await-in-loop
         const { error } = await this._delete(filePath);
@@ -413,13 +383,15 @@ export class FileExplorerLocalDataSource {
         return false;
       }
 
-      for (let i = 0; i < fileList.length; i += 1) {
-        const item = fileList[i];
-        const fullPath = path.resolve(item);
+      const fullPaths = fileList.map((item) => path.resolve(item));
+      const parentDirectories = [
+        ...new Set(fullPaths.map((fullPath) => path.dirname(fullPath))),
+      ];
 
+      for (let index = 0; index < parentDirectories.length; index += 1) {
         // eslint-disable-next-line no-await-in-loop
         const _accessGranted = await this._requestUsageAccess({
-          filePath: fullPath,
+          filePath: parentDirectories[index],
         });
 
         if (!_accessGranted) {
@@ -428,9 +400,26 @@ export class FileExplorerLocalDataSource {
             error: 'Permission denied',
           };
         }
+      }
 
+      const concurrency = 64;
+
+      for (let offset = 0; offset < fullPaths.length; offset += concurrency) {
+        const batch = fullPaths.slice(offset, offset + concurrency);
         // eslint-disable-next-line no-await-in-loop
-        if (await existsSync(fullPath)) {
+        const existenceChecks = await Promise.all(
+          batch.map(async (fullPath) => {
+            try {
+              await this.access(fullPath, fsConstants.F_OK);
+
+              return true;
+            } catch (_) {
+              return false;
+            }
+          })
+        );
+
+        if (existenceChecks.some(Boolean)) {
           return true;
         }
       }

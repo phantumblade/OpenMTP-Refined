@@ -5,6 +5,7 @@ import { withReducer } from '../../store/reducers/withReducer';
 import reducers from './reducers';
 import { clearAlert } from './actions';
 import Snackbars from '../../components/Snackbars';
+import { translate } from '../../i18n';
 
 class Alerts extends Component {
   _handleClose = () => {
@@ -14,16 +15,18 @@ class Alerts extends Component {
   };
 
   render() {
-    const { Alerts } = this.props;
+    const { Alerts, appLanguage } = this.props;
     const { message, variant, autoHideDuration } = Alerts;
+    const translatedMessage = message ? translate(appLanguage, message) : null;
 
     return (
-      message && (
+      translatedMessage && (
         <Snackbars
           OnSnackBarsCloseAlerts={() => this._handleClose()}
-          message={message}
+          message={translatedMessage}
           variant={variant}
           autoHideDuration={autoHideDuration}
+          appLanguage={appLanguage}
         />
       )
     );
@@ -43,6 +46,7 @@ const mapDispatchToProps = (dispatch, __) =>
 const mapStateToProps = (state, __) => {
   return {
     Alerts: state.Alerts,
+    appLanguage: state.Settings.appLanguage,
   };
 };
 

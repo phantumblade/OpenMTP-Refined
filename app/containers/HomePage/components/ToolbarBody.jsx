@@ -1,6 +1,5 @@
-import React, { PureComponent } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import MenuIcon from '@material-ui/icons/Menu';
+import React, { PureComponent, Fragment } from 'react';
+import PhoneAndroidIcon from '@material-ui/icons/PhoneAndroid';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Drawer from '@material-ui/core/Drawer';
@@ -23,6 +22,9 @@ import { DEVICE_TYPE, MTP_MODE } from '../../../enums';
 import { capitalize, isEmpty } from '../../../utils/funcs';
 import { imgsrc } from '../../../utils/imgsrc';
 import { isKalamModeSupported } from '../../../helpers/binaries';
+import { getDeviceBrand, translate } from '../../../i18n';
+import AnimatedActionIcon from '../../../components/AnimatedActionIcon';
+import { isTransferPhaseActive } from '../../../helpers/fileTransfer';
 
 export default class ToolbarAreaPane extends PureComponent {
   activeToolbarList = ({ ...args }) => {
@@ -34,17 +36,22 @@ export default class ToolbarAreaPane extends PureComponent {
       mtpStoragesList,
       mtpDevice,
       mtpMode,
+      fileTransferProgress,
     } = args;
 
     const _directoryLists = directoryLists[deviceType];
     const _currentBrowsePath = currentBrowsePath[deviceType];
     const _activeToolbarList = toolbarList[deviceType];
     const isMtp = deviceType === DEVICE_TYPE.mtp;
+    const isMtpTransferActive =
+      isMtp && isTransferPhaseActive(fileTransferProgress?.phase);
 
     let enabled = true;
 
-    if (isMtp && mtpMode === MTP_MODE.kalam) {
-      enabled = !mtpDevice.isLoading;
+    if (isMtp) {
+      enabled =
+        !isMtpTransferActive &&
+        (mtpMode !== MTP_MODE.kalam || !mtpDevice.isLoading);
     }
 
     Object.keys(_activeToolbarList).map((a) => {
@@ -92,6 +99,7 @@ export default class ToolbarAreaPane extends PureComponent {
         case 'mtpMode':
           _activeToolbarList[a] = {
             ...item,
+            enabled: !isMtpTransferActive,
           };
           break;
         default:
@@ -130,6 +138,9 @@ export default class ToolbarAreaPane extends PureComponent {
       onToolbarAction,
       showLocalPaneOnLeftSide,
       mtpMode,
+      multiSelectMode,
+      fileTransferProgress,
+      appLanguage,
     } = this.props;
 
     const _toolbarList = this.activeToolbarList({
@@ -140,6 +151,7 @@ export default class ToolbarAreaPane extends PureComponent {
       mtpStoragesList,
       mtpDevice,
       mtpMode,
+      fileTransferProgress,
     });
 
     const RenderLazyLoaderOverlay = LazyLoaderOverlay({ appThemeMode });
@@ -176,6 +188,11 @@ export default class ToolbarAreaPane extends PureComponent {
 
     // We have now officially retired the support for `Kalam` Kernel on macOS 10.13 (OS X El High Sierra) and lower. Only the "Legacy" MTP mode will continue working on these outdated machines.
     const showMtpModeSelection = isKalamModeSupported();
+    const isMtp = deviceType === DEVICE_TYPE.mtp;
+    const deviceInfo = mtpDevice?.info?.mtpDeviceInfo;
+    const deviceBrand = getDeviceBrand(deviceInfo?.Manufacturer);
+    const deviceModel = deviceInfo?.Model;
+    const t = (key, values) => translate(appLanguage, key, values);
 
     return (
       <div className={styles.root}>
@@ -225,6 +242,13 @@ export default class ToolbarAreaPane extends PureComponent {
             sidebarFavouriteList={sidebarFavouriteList}
             deviceType={deviceType}
             currentBrowsePath={currentBrowsePath[deviceType]}
+            appLanguage={appLanguage}
+            mtpMode={mtpMode}
+            onOpenSettings={() => onToolbarAction('settings', false)}
+            onRefresh={() => onToolbarAction('refresh', false)}
+            onSelectStorage={() => onToolbarAction('storage', false)}
+            onSelectMtpMode={() => onToolbarAction('mtpMode', false)}
+            onToggleDrawer={onToggleDrawer}
           />
         </Drawer>
 
@@ -239,46 +263,93 @@ export default class ToolbarAreaPane extends PureComponent {
             }}
           >
             {showMenu && (
-              <IconButton color="inherit" onClick={onToggleDrawer(true)}>
-                <MenuIcon />
+              <IconButton
+                color="inherit"
+                disableRipple
+                disableFocusRipple
+                style={{ outline: 'none' }}
+                aria-label={t('Menu')}
+                className={`${styles.menuButton} ${styles.noAppDrag}`}
+                onClick={onToggleDrawer(true)}
+              >
+                <AnimatedActionIcon name="menu" />
               </IconButton>
             )}
 
+            {isMtp && (
+              <div className={styles.deviceBadge}>
+                <PhoneAndroidIcon className={styles.deviceBadgeIcon} />
+                <span className={styles.deviceBadgeText}>
+                  {mtpDevice.isAvailable && deviceModel ? (
+                    <>
+                      <span className={styles.deviceBrand}>
+                        {deviceBrand || t('Connected')}
+                      </span>
+                      <span className={styles.deviceModel}>{deviceModel}</span>
+                    </>
+                  ) : (
+                    <span className={styles.deviceModel}>{t('No phone')}</span>
+                  )}
+                </span>
+                <span
+                  className={classNames(styles.deviceStatusDot, {
+                    [styles.deviceStatusConnected]: mtpDevice.isAvailable,
+                  })}
+                />
+              </div>
+            )}
+
             <div className={styles.toolbarInnerWrapper}>
-              {Object.keys(_toolbarList).map((a) => {
+              {Object.keys(_toolbarList).map((a, index, actionKeys) => {
                 const item = _toolbarList[a];
+                const previousItem = _toolbarList[actionKeys[index - 1]];
+                const startsGroup =
+                  index > 0 && previousItem?.group !== item.group;
+                const isActive =
+                  a === 'multiSelect' && multiSelectMode[deviceType];
+                const itemLabel = t(isActive ? 'Finish selection' : item.label);
 
                 return (
-                  <Tooltip key={a} title={item.label}>
-                    <div className={`${styles.navBtns} ${styles.noAppDrag}`}>
-                      <IconButton
-                        aria-label={item.label}
-                        disabled={!item.enabled}
-                        onClick={() => onToolbarAction(a)}
-                        className={classNames({
-                          [styles.disabledNavBtns]: !item.enabled,
-                          [styles.invertedNavBtns]: item.invert,
-                          [styles.imageBtn]: item.image,
-                        })}
-                      >
-                        {item.image && (
-                          <img
-                            alt={item.label}
-                            src={imgsrc(item.image, false)}
-                            className={styles.navBtnImages}
-                          />
-                        )}
+                  <Fragment key={a}>
+                    {startsGroup && (
+                      <span
+                        className={styles.toolbarDivider}
+                        aria-hidden="true"
+                      />
+                    )}
+                    <Tooltip title={itemLabel}>
+                      <div className={`${styles.navBtns} ${styles.noAppDrag}`}>
+                        <IconButton
+                          aria-label={itemLabel}
+                          disabled={!item.enabled}
+                          disableRipple
+                          onClick={() => onToolbarAction(a)}
+                          className={classNames({
+                            [styles.disabledNavBtns]: !item.enabled,
+                            [styles.invertedNavBtns]: item.invert,
+                            [styles.imageBtn]: item.image,
+                            [styles.activeNavBtn]: isActive,
+                          })}
+                        >
+                          {item.image && (
+                            <img
+                              alt={item.label}
+                              src={imgsrc(item.image, false)}
+                              className={styles.navBtnImages}
+                            />
+                          )}
 
-                        {item.icon && (
-                          <FontAwesomeIcon
-                            icon={item.icon}
-                            className={styles.navBtnIcons}
-                            title={item.label}
-                          />
-                        )}
-                      </IconButton>
-                    </div>
-                  </Tooltip>
+                          {item.icon && (
+                            <AnimatedActionIcon
+                              name={item.icon}
+                              active={isActive}
+                              className={styles.navBtnIcons}
+                            />
+                          )}
+                        </IconButton>
+                      </div>
+                    </Tooltip>
+                  </Fragment>
                 );
               })}
             </div>

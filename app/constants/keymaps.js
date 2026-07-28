@@ -71,11 +71,11 @@ export const fileExplorerKeymaps = {
     keys: ['shift+right'],
   },
   multipleSelectUp: {
-    label: `Select Multiple Items Forward (for List view)`,
+    label: `Extend Selection Up`,
     keys: ['shift+up'],
   },
   multipleSelectDown: {
-    label: `Select Multiple Items Backward (for List view)`,
+    label: `Extend Selection Down`,
     keys: ['shift+down'],
   },
   multipleSelectClick: {

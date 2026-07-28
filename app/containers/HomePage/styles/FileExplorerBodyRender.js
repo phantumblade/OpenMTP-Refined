@@ -6,6 +6,7 @@ export const styles = (theme) => ({
     ...mixins({ theme }).noselect,
   },
   tableWrapper: {
+    position: 'relative',
     ...mixins({ theme }).noOutline,
     height: `calc(100vh - 120px)`,
     overflowY: 'auto',

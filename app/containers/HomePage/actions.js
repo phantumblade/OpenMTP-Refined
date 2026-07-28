@@ -3,6 +3,7 @@ import { throwAlert } from '../Alerts/actions';
 import {
   processMtpBuffer,
   processLocalBuffer,
+  isNoMtpError,
 } from '../../helpers/processBufferOutput';
 import { isArraysEqual, isEmpty, undefinedOrNull } from '../../utils/funcs';
 import { DEVICE_TYPE, MTP_MODE } from '../../enums';
@@ -12,22 +13,56 @@ import { checkIf } from '../../utils/checkIf';
 import { MTP_ERROR } from '../../enums/mtpError';
 import { DEVICES_DEFAULT_PATH } from '../../constants';
 import { analyticsService } from '../../services/analytics';
+import { isTransferPhaseActive } from '../../helpers/fileTransfer';
+import { logTransferEvent } from '../../helpers/fileTransferLogger';
 
 const prefix = '@@Home';
+const listDirectoryRequestVersion = {
+  [DEVICE_TYPE.local]: 0,
+  [DEVICE_TYPE.mtp]: 0,
+};
+let mtpSessionVersion = 0;
+
+function shouldDeferMtpOperation(getState, deviceType, operation) {
+  if (deviceType !== DEVICE_TYPE.mtp) {
+    return false;
+  }
+
+  const progress = getState()?.Home?.fileTransfer?.progress;
+
+  if (!isTransferPhaseActive(progress?.phase)) {
+    return false;
+  }
+
+  logTransferEvent({
+    sessionId: progress?.sessionId,
+    event: 'mtp_operation_deferred',
+    details: {
+      operation,
+      phase: progress?.phase,
+    },
+  });
+
+  return true;
+}
+
 const actionTypesList = [
   'SET_FOCUSSED_FILE_EXPLORER_DEVICE_TYPE',
   'SET_CURRENT_BROWSE_PATH',
   'SET_SORTING_DIR_LISTS',
   'SET_SELECTED_DIR_LISTS',
+  'SET_MULTI_SELECT_MODE',
   'LIST_DIRECTORY',
   'SET_MTP_ERRORS',
   'SET_MTP_STATUS',
   'CHANGE_MTP_STORAGE',
   'SET_FILE_TRANSFER_CLIPBOARD',
   'SET_FILE_TRANSFER_PROGRESS',
+  'CLEAR_FILE_TRANSFER_PROGRESS',
   'CLEAR_FILE_TRANSFER',
   'SET_FILES_DRAG',
   'CLEAR_FILES_DRAG',
+  'RESET_MTP_SESSION',
 ];
 
 export const actionTypes = prefixer(prefix, actionTypesList);
@@ -61,11 +96,32 @@ export function actionSetSelectedDirLists(data, deviceType) {
   };
 }
 
+export function setMultiSelectMode(enabled, deviceType) {
+  return {
+    type: actionTypes.SET_MULTI_SELECT_MODE,
+    deviceType,
+    payload: enabled,
+  };
+}
+
 export function setCurrentBrowsePath(path, deviceType) {
   return {
     type: actionTypes.SET_CURRENT_BROWSE_PATH,
     deviceType,
     payload: path,
+  };
+}
+
+export function resetMtpSession({ errorMessage = null } = {}) {
+  mtpSessionVersion += 1;
+  listDirectoryRequestVersion[DEVICE_TYPE.mtp] += 1;
+
+  return {
+    type: actionTypes.RESET_MTP_SESSION,
+    payload: {
+      errorMessage,
+      disconnectedAt: Date.now(),
+    },
   };
 }
 
@@ -129,7 +185,13 @@ export function initializeMtp(
   const { mtpMode } = getState().Settings;
 
   return async (dispatch) => {
+    if (shouldDeferMtpOperation(getState, deviceType, 'initialize')) {
+      return null;
+    }
+
     try {
+      const sessionVersion = mtpSessionVersion;
+
       switch (mtpMode) {
         case MTP_MODE.kalam:
           return dispatch(
@@ -139,7 +201,8 @@ export function initializeMtp(
                 ignoreHidden,
                 deviceType,
               },
-              getState
+              getState,
+              sessionVersion
             )
           );
 
@@ -153,12 +216,13 @@ export function initializeMtp(
                 mtpStoragesList,
                 changeLegacyMtpStorageOnlyOnDeviceChange,
               },
-              getState
+              getState,
+              sessionVersion
             )
           );
 
         default:
-          return;
+          break;
       }
     } catch (e) {
       log.error(e);
@@ -174,6 +238,18 @@ export function disposeMtp({ deviceType, onSuccess, onError }, getState) {
     checkIf(onSuccess, 'function');
     checkIf(onError, 'function');
     checkIf(mtpMode, 'string');
+
+    if (shouldDeferMtpOperation(getState, deviceType, 'dispose')) {
+      const result = {
+        error: MTP_ERROR.ErrorMtpLockExists,
+        stderr: MTP_ERROR.ErrorMtpLockExists,
+        data: null,
+      };
+
+      onError(result);
+
+      return result;
+    }
 
     try {
       switch (mtpMode) {
@@ -226,10 +302,10 @@ export function disposeMtp({ deviceType, onSuccess, onError }, getState) {
             );
           });
 
-          return;
+          break;
 
         default:
-          return;
+          break;
       }
     } catch (e) {
       log.error(e);
@@ -237,7 +313,11 @@ export function disposeMtp({ deviceType, onSuccess, onError }, getState) {
   };
 }
 
-function initKalamMtp({ filePath, ignoreHidden, deviceType }, getState) {
+function initKalamMtp(
+  { filePath, ignoreHidden, deviceType },
+  getState,
+  sessionVersion
+) {
   return async (dispatch) => {
     checkIf(filePath, 'string');
     checkIf(ignoreHidden, 'boolean');
@@ -255,11 +335,43 @@ function initKalamMtp({ filePath, ignoreHidden, deviceType }, getState) {
         })
       );
 
-      // if the app was expecting the user to allow access to mtp storage
-      // then don't reinitialize mtp
-      const { error, stderr, data } = await fileExplorerController.initialize({
-        deviceType,
-      });
+      // Try up to 3 times with 400ms backoff if the USB device is transiently locked by PTPCamera or Preview
+      let initResult = null;
+      const MAX_ATTEMPTS = 3;
+
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+        // eslint-disable-next-line no-await-in-loop
+        initResult = await fileExplorerController.initialize({
+          deviceType,
+        });
+
+        if (sessionVersion !== mtpSessionVersion) {
+          return;
+        }
+
+        if (
+          initResult.data ||
+          attempt === MAX_ATTEMPTS ||
+          (!isNoMtpError({
+            error: initResult.error,
+            stderr: initResult.stderr,
+            mtpMode,
+          }) &&
+            initResult.stderr !== MTP_ERROR.ErrorDeviceSetup &&
+            initResult.stderr !== MTP_ERROR.ErrorMtpLockExists)
+        ) {
+          break;
+        }
+
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((resolve) => window.setTimeout(resolve, 400));
+      }
+
+      const { error, stderr, data } = initResult;
+
+      if (sessionVersion !== mtpSessionVersion) {
+        return;
+      }
 
       await new Promise((resolve) => {
         dispatch(
@@ -333,10 +445,15 @@ function initKalamMtp({ filePath, ignoreHidden, deviceType }, getState) {
                 resolve();
               },
             },
-            getState
+            getState,
+            sessionVersion
           )
         );
       });
+
+      if (sessionVersion !== mtpSessionVersion) {
+        return;
+      }
 
       const { mtpDevice: postStorageAccessMtpDevice } = getState().Home;
 
@@ -366,7 +483,8 @@ function initKalamMtp({ filePath, ignoreHidden, deviceType }, getState) {
 
 function listKalamStorages(
   { filePath, ignoreHidden, deviceType, onSuccess, onError },
-  getState
+  getState,
+  sessionVersion
 ) {
   return async (dispatch) => {
     checkIf(filePath, 'string');
@@ -385,6 +503,10 @@ function listKalamStorages(
           deviceType,
         }
       );
+
+      if (sessionVersion !== mtpSessionVersion) {
+        return null;
+      }
 
       return new Promise((resolve) => {
         dispatch(
@@ -431,7 +553,8 @@ function initLegacyMtp(
     mtpStoragesList,
     changeLegacyMtpStorageOnlyOnDeviceChange,
   },
-  getState
+  getState,
+  sessionVersion
 ) {
   return async (dispatch) => {
     checkIf(filePath, 'string');
@@ -443,11 +566,40 @@ function initLegacyMtp(
     const { mtpMode } = getState().Settings;
 
     try {
-      const { error, stderr, data } = await fileExplorerController.listStorages(
-        {
+      let initResult = null;
+      const MAX_ATTEMPTS = 3;
+
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+        // eslint-disable-next-line no-await-in-loop
+        initResult = await fileExplorerController.listStorages({
           deviceType,
+        });
+
+        if (sessionVersion !== mtpSessionVersion) {
+          return;
         }
-      );
+
+        if (
+          initResult.data ||
+          attempt === MAX_ATTEMPTS ||
+          !isNoMtpError({
+            error: initResult.error,
+            stderr: initResult.stderr,
+            mtpMode,
+          })
+        ) {
+          break;
+        }
+
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((resolve) => window.setTimeout(resolve, 400));
+      }
+
+      const { error, stderr, data } = initResult;
+
+      if (sessionVersion !== mtpSessionVersion) {
+        return;
+      }
 
       dispatch(
         churnMtpBuffer({
@@ -627,6 +779,11 @@ export function listDirectory(
   checkIf(getState, 'function');
 
   const { mtpMode } = getState().Settings;
+  const requestVersion = listDirectoryRequestVersion[deviceType] + 1;
+  const isCancelled = () =>
+    requestVersion !== listDirectoryRequestVersion[deviceType];
+
+  listDirectoryRequestVersion[deviceType] = requestVersion;
 
   try {
     switch (deviceType) {
@@ -641,7 +798,12 @@ export function listDirectory(
             filePath,
             ignoreHidden,
             storageId: null,
+            isCancelled,
           });
+
+          if (requestVersion !== listDirectoryRequestVersion[deviceType]) {
+            return;
+          }
 
           if (localError) {
             log.error(localError, 'listDirectory -> listFiles');
@@ -662,10 +824,18 @@ export function listDirectory(
           dispatch(actionListDirectory(localData, deviceType), getState);
           dispatch(setCurrentBrowsePath(filePath, deviceType));
           dispatch(actionSetSelectedDirLists({ selected: [] }, deviceType));
+
+          if (onSuccess) {
+            onSuccess({ error: null, stderr: localStderr, data: localData });
+          }
         };
 
       case DEVICE_TYPE.mtp:
         return async (dispatch) => {
+          if (shouldDeferMtpOperation(getState, deviceType, 'listDirectory')) {
+            return null;
+          }
+
           const storageId = getSelectedStorageIdFromState(getState().Home);
 
           if (undefinedOrNull(storageId)) {
@@ -679,6 +849,10 @@ export function listDirectory(
               ignoreHidden,
               storageId,
             });
+
+          if (requestVersion !== listDirectoryRequestVersion[deviceType]) {
+            return;
+          }
 
           dispatch(
             churnMtpBuffer({
@@ -737,6 +911,10 @@ export function reloadDirList(
         );
 
       case DEVICE_TYPE.mtp:
+        if (shouldDeferMtpOperation(getState, deviceType, 'reloadDirectory')) {
+          return null;
+        }
+
         switch (mtpMode) {
           case MTP_MODE.legacy:
             return dispatch(
@@ -831,6 +1009,12 @@ export function setFileTransferProgress({ ...data }) {
 export function clearFileTransfer() {
   return {
     type: actionTypes.CLEAR_FILE_TRANSFER,
+  };
+}
+
+export function clearFileTransferProgress() {
+  return {
+    type: actionTypes.CLEAR_FILE_TRANSFER_PROGRESS,
   };
 }
 

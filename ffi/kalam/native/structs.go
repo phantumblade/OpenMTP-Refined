@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/ganeshrvel/go-mtpfs/mtp"
 	"github.com/ganeshrvel/go-mtpx"
+	"kalam/internal/mtpcoord"
 	"os"
 )
 
@@ -13,7 +14,7 @@ type verifyMtpSessionMode struct {
 type deviceContainer struct {
 	dev        *mtp.Device
 	deviceInfo *mtp.DeviceInfo
-	locked     bool
+	operation  mtpcoord.Coordinator
 }
 
 type MakeDirectoryInput struct {

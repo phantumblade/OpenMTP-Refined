@@ -45,21 +45,15 @@ module.exports = () => {
   return {
     productName: 'OpenMTP',
     appId: 'io.ganeshrvel.openmtp',
-    forceCodeSigning: true,
+    forceCodeSigning: process.env.FORCE_CODE_SIGNING === 'true',
     // eslint-disable-next-line no-template-curly-in-string
     artifactName: '${name}-${version}-${os}-${arch}.${ext}',
-    copyright: '© Ganesh Rathinavel',
+    copyright: '© Ganesh Rathinavel; modifications © 2026 Andrea Perini',
     afterPack: './internals/scripts/AfterPack.js',
     afterSign: './internals/scripts/Notarize.js',
     npmRebuild: false,
-    publish: [
-      {
-        provider: 'github',
-        owner: 'ganeshrvel',
-        repo: 'openmtp',
-        private: false,
-      },
-    ],
+    // Publishing remains disabled until this fork has its own reviewed target.
+    publish: [],
     files: [
       'app/dist/',
       'app/app.html',
@@ -70,7 +64,7 @@ module.exports = () => {
     extraFiles: getExtraFiles(),
     mac: {
       type: 'distribution',
-      icon: 'build/icon.icns',
+      icon: 'app/app.icns',
       category: 'public.app-category.productivity',
       hardenedRuntime: true,
       gatekeeperAssess: false,

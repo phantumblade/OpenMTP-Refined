@@ -187,16 +187,18 @@ export class FileExplorerKalamDataSource {
       });
 
       if (error || stderr) {
-        return true;
+        return { error, stderr, data: null };
       }
 
       if (isEmpty(data)) {
-        return true;
+        return {
+          error: 'The device returned no destination check result.',
+          stderr: null,
+          data: null,
+        };
       }
 
-      const existsItems = data.filter((a) => a.exists);
-
-      return existsItems.length > 0;
+      return data.some((item) => item.exists);
     } catch (e) {
       log.error(e);
 

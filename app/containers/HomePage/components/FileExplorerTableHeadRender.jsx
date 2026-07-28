@@ -4,9 +4,10 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Tooltip from '@material-ui/core/Tooltip';
 import { styles } from '../styles/FileExplorerTableHeadRender';
+import { translate } from '../../../i18n';
+import SelectionCheckbox from '../../../components/SelectionCheckbox';
 
 const rows = [
   {
@@ -28,6 +29,12 @@ const rows = [
     disablePadding: true,
     label: 'Date',
   },
+  {
+    id: 'extension',
+    numeric: false,
+    disablePadding: true,
+    label: 'Type',
+  },
 ];
 
 class FileExplorerTableHeadRender extends PureComponent {
@@ -46,18 +53,25 @@ class FileExplorerTableHeadRender extends PureComponent {
       numSelected,
       rowCount,
       hideColList,
+      multiSelectMode,
+      appLanguage,
     } = this.props;
 
     return (
       <TableHead>
         <TableRow>
-          <TableCell padding="none" className={styles.tableHeadCell}>
-            <Checkbox
-              indeterminate={numSelected > 0 && numSelected < rowCount}
-              checked={rowCount > 0 && numSelected === rowCount}
-              onChange={onSelectAllClick}
-            />
-          </TableCell>
+          {multiSelectMode && (
+            <TableCell padding="none" className={styles.tableHeadCell}>
+              <SelectionCheckbox
+                indeterminate={numSelected > 0 && numSelected < rowCount}
+                checked={rowCount > 0 && numSelected === rowCount}
+                onChange={onSelectAllClick}
+                inputProps={{
+                  'aria-label': translate(appLanguage, 'Select All'),
+                }}
+              />
+            </TableCell>
+          )}
           {rows.map((row) => {
             return hideColList.indexOf(row.id) < 0 ? (
               <TableCell
@@ -68,7 +82,7 @@ class FileExplorerTableHeadRender extends PureComponent {
                 className={styles.tableHeadCell}
               >
                 <Tooltip
-                  title="Sort"
+                  title={translate(appLanguage, 'Sort')}
                   placement={row.numeric ? 'bottom-end' : 'bottom-start'}
                   enterDelay={300}
                 >
@@ -77,7 +91,7 @@ class FileExplorerTableHeadRender extends PureComponent {
                     direction={order}
                     onClick={this.createSortHandler(row.id)}
                   >
-                    {row.label}
+                    {translate(appLanguage, row.label)}
                   </TableSortLabel>
                 </Tooltip>
               </TableCell>

@@ -3,11 +3,23 @@
 import { EOL } from 'os';
 import { replaceBulk, undefinedOrNull } from '../utils/funcs';
 import { log } from '../utils/log';
-import { isGoogleAndroidFileTransferActive } from '../utils/isGoogleAndroidFileTransferActive';
+import { findUsbConflictingApps } from '../utils/process';
 import { DEVICES_LABEL } from '../constants';
 import { DEVICE_TYPE, MTP_MODE } from '../enums';
 import { checkIf } from '../utils/checkIf';
 import { MTP_ERROR } from '../enums/mtpError';
+
+const getUsbConflictMessage = async () => {
+  const conflictingApps = await findUsbConflictingApps();
+
+  if (conflictingApps.length < 1) {
+    return null;
+  }
+
+  return `Potential USB conflict detected: ${conflictingApps.join(
+    ', '
+  )}. Quit the listed apps completely, then refresh the connection.`;
+};
 
 /**
  * Will return true if the error is a mtp detect error.
@@ -65,8 +77,9 @@ export const mtpErrors = {
     DEVICES_LABEL[DEVICE_TYPE.mtp]
   } or MTP device found.`,
   [MTP_ERROR.ErrorDeviceChanged]: null,
-  [MTP_ERROR.ErrorMtpLockExists]: `Easy tiger! MTP is not so quick as you are`,
-  [MTP_ERROR.ErrorDeviceSetup]: `An error occured while setting up the ${
+  [MTP_ERROR.ErrorMtpLockExists]:
+    'Operation in progress. Please wait for the current task to finish.',
+  [MTP_ERROR.ErrorDeviceSetup]: `An error occurred while setting up the ${
     DEVICES_LABEL[DEVICE_TYPE.mtp]
   }`,
   [MTP_ERROR.ErrorDeviceLocked]: `Unlock your ${
@@ -77,16 +90,16 @@ export const mtpErrors = {
     DEVICES_LABEL[DEVICE_TYPE.mtp]
   }'s storage and refresh again`,
   [MTP_ERROR.ErrorDeviceInfo]:
-    'An error occured while fetching the device information',
+    'An error occurred while fetching the device information',
   [MTP_ERROR.ErrorStorageInfo]:
-    'An error occured while fetching the storage information',
+    'An error occurred while fetching the storage information',
   [MTP_ERROR.ErrorNoStorage]: `Your ${
     DEVICES_LABEL[DEVICE_TYPE.mtp]
   } storage is inaccessible.`,
   [MTP_ERROR.ErrorStorageFull]: `${
     DEVICES_LABEL[DEVICE_TYPE.mtp]
   } storage is full`,
-  [MTP_ERROR.ErrorListDirectory]: `An error occured while listing the ${
+  [MTP_ERROR.ErrorListDirectory]: `An error occurred while listing the ${
     DEVICES_LABEL[DEVICE_TYPE.mtp]
   } directory! Try again.`,
   [MTP_ERROR.ErrorFileNotFound]: 'File not found',
@@ -94,14 +107,13 @@ export const mtpErrors = {
   [MTP_ERROR.ErrorLocalFileRead]: `The file is inaccessible`,
   [MTP_ERROR.ErrorInvalidPath]: 'Invalid path',
   [MTP_ERROR.ErrorFileTransfer]:
-    'An error occured while transferring the file! Try again.',
+    'An error occurred while transferring the file! Try again.',
   [MTP_ERROR.ErrorFileObjectRead]:
-    'An error occured while reading the MTP file object! Try again.',
+    'An error occurred while reading the MTP file object! Try again.',
   [MTP_ERROR.ErrorSendObject]:
-    'An error occured while sending the object! Try again.',
-  [MTP_ERROR.ErrorGeneral]: `Oops.. Your ${
-    DEVICES_LABEL[DEVICE_TYPE.mtp]
-  } has gone crazy! Try again.`,
+    'An error occurred while sending the object! Try again.',
+  [MTP_ERROR.ErrorGeneral]:
+    'Device connection error. Please reconnect the USB cable and try again.',
 };
 
 /**
@@ -113,8 +125,6 @@ export const mtpErrors = {
  * @private
  */
 export const _processKalamMtpBuffer = async ({ stderr }) => {
-  const googleAndroidFileTransferIsActive = `Quit 'Android File Transfer' app (by Google) and Refresh`;
-
   let processedErrorValue = null;
 
   if (!undefinedOrNull(stderr)) {
@@ -124,12 +134,11 @@ export const _processKalamMtpBuffer = async ({ stderr }) => {
   switch (stderr) {
     case MTP_ERROR.ErrorMtpDetectFailed:
     case MTP_ERROR.ErrorDeviceSetup:
-      const _isGoogleAndroidFileTransferActive =
-        await isGoogleAndroidFileTransferActive();
+      const usbConflictMessage = await getUsbConflictMessage();
 
-      if (_isGoogleAndroidFileTransferActive) {
+      if (usbConflictMessage) {
         return {
-          error: googleAndroidFileTransferIsActive,
+          error: usbConflictMessage,
           throwAlert: true,
           logError: true,
           mtpStatus: false,
@@ -202,7 +211,7 @@ export const _processKalamMtpBuffer = async ({ stderr }) => {
     case MTP_ERROR.ErrorDeviceSetup:
       return {
         error: processedErrorValue,
-        throwAlert: true,
+        throwAlert: false,
         logError: true,
         mtpStatus: false,
         reportError: true,
@@ -372,9 +381,7 @@ export const _processLegacyMtpBuffer = async ({ error, stderr }) => {
     } storage is not accessible.`,
     fileNotFound: `File not found! Try again.`,
     partialDeletion: `The path is inaccessible.`,
-    common: `Oops.. Your ${
-      DEVICES_LABEL[DEVICE_TYPE.mtp]
-    } has gone crazy! Try again.`,
+    common: `Device connection error. Please reconnect the USB cable and try again.`,
   };
 
   const errorStringified =
@@ -417,12 +424,11 @@ export const _processLegacyMtpBuffer = async ({ error, stderr }) => {
     /* No MTP device found */
     noMtpError
   ) {
-    const _isGoogleAndroidFileTransferActive =
-      await isGoogleAndroidFileTransferActive();
+    const usbConflictMessage = await getUsbConflictMessage();
 
-    if (_isGoogleAndroidFileTransferActive) {
+    if (usbConflictMessage) {
       return {
-        error: errorDictionary.googleAndroidFileTransferIsActive,
+        error: usbConflictMessage,
         throwAlert: true,
         logError: true,
         mtpStatus: false,
@@ -588,7 +594,7 @@ export const _processLegacyMtpBuffer = async ({ error, stderr }) => {
 export const localErrorDictionary = {
   noPerm: `Operation not permitted`,
   commandFailed: `Could not complete! Try again.`,
-  common: `Oops.. Your device has gone crazy! Try again.`,
+  common: `An unexpected error occurred. Please try again.`,
   unResponsive: `Device is not responding! Reload`,
   invalidPath: `Invalid path`,
   fileNotFound: `File not found! Try again.`,

@@ -30,7 +30,13 @@ class Snackbars extends PureComponent {
   };
 
   render() {
-    const { classes: styles, message, variant, autoHideDuration } = this.props;
+    const {
+      classes: styles,
+      message,
+      variant,
+      autoHideDuration,
+      appLanguage,
+    } = this.props;
 
     return (
       <Snackbar
@@ -44,6 +50,7 @@ class Snackbars extends PureComponent {
           onClose={this._handleClose}
           variant={variant}
           message={message}
+          appLanguage={appLanguage}
         />
       </Snackbar>
     );

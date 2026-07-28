@@ -17,6 +17,8 @@ import {
   getSelectedStorageIdFromState,
   reloadDirList,
   getSelectedStorage,
+  actionSetSelectedDirLists,
+  setMultiSelectMode,
 } from '../actions';
 import {
   makeDirectoryLists,
@@ -26,12 +28,15 @@ import {
   makeToolbarList,
   makeCurrentBrowsePath,
   makeFocussedFileExplorerDeviceType,
+  makeMultiSelectMode,
+  makeFileTransferProgess,
 } from '../selectors';
 import {
   makeAppThemeMode,
   makeHideHiddenFiles,
   makeMtpMode,
   makeShowLocalPaneOnLeftSide,
+  makeAppLanguage,
 } from '../../Settings/selectors';
 import {
   BUY_ME_A_COFFEE_URL,
@@ -51,6 +56,7 @@ import { checkIf } from '../../../utils/checkIf';
 import { analyticsService } from '../../../services/analytics';
 import { EVENT_TYPE } from '../../../enums/events';
 import { IpcEvents } from '../../../services/ipc-events/IpcEventType';
+import { isTransferPhaseActive } from '../../../helpers/fileTransfer';
 
 class ToolbarAreaPane extends PureComponent {
   constructor(props) {
@@ -237,6 +243,8 @@ class ToolbarAreaPane extends PureComponent {
       deviceType,
       hideHiddenFiles,
       actionCreateReloadDirList,
+      actionCreateSetMultiSelectMode,
+      multiSelectMode,
     } = this.props;
 
     let filePath = '/';
@@ -272,6 +280,14 @@ class ToolbarAreaPane extends PureComponent {
 
       case 'delete':
         this._handleToggleDeleteConfirmDialog(true);
+
+        break;
+
+      case 'multiSelect':
+        actionCreateSetMultiSelectMode(
+          !multiSelectMode[deviceType],
+          deviceType
+        );
 
         break;
 
@@ -371,6 +387,9 @@ class ToolbarAreaPane extends PureComponent {
       appThemeMode,
       showLocalPaneOnLeftSide,
       mtpMode,
+      multiSelectMode,
+      fileTransferProgress,
+      appLanguage,
       ...parentProps
     } = this.props;
 
@@ -397,6 +416,9 @@ class ToolbarAreaPane extends PureComponent {
           appThemeMode={appThemeMode}
           showLocalPaneOnLeftSide={showLocalPaneOnLeftSide}
           mtpMode={mtpMode}
+          multiSelectMode={multiSelectMode}
+          fileTransferProgress={fileTransferProgress}
+          appLanguage={appLanguage}
           onDeleteConfirmDialog={this._handleDeleteConfirmDialog}
           onMtpStoragesListClick={this._handleMtpStoragesListClick}
           onMtpModeSelectionDialogClick={
@@ -482,6 +504,14 @@ const mapDispatchToProps = (dispatch, _) =>
                 );
                 break;
               case DEVICE_TYPE.mtp:
+                if (
+                  isTransferPhaseActive(
+                    getState().Home.fileTransfer.progress.phase
+                  )
+                ) {
+                  return null;
+                }
+
                 const storageId = getSelectedStorageIdFromState(
                   getState().Home
                 );
@@ -528,6 +558,13 @@ const mapDispatchToProps = (dispatch, _) =>
         deviceType
       ) =>
         function (_, getState) {
+          if (
+            deviceType === DEVICE_TYPE.mtp &&
+            isTransferPhaseActive(getState().Home.fileTransfer.progress.phase)
+          ) {
+            return null;
+          }
+
           if (Object.keys(mtpStoragesList).length < 1) {
             return null;
           }
@@ -564,12 +601,26 @@ const mapDispatchToProps = (dispatch, _) =>
           checkIf(value, 'string');
           checkIf(deviceType, 'string');
 
+          if (
+            deviceType === DEVICE_TYPE.mtp &&
+            isTransferPhaseActive(getState().Home.fileTransfer.progress.phase)
+          ) {
+            return null;
+          }
+
           dispatch(
             selectMtpMode({ value, reportEvent: false }, deviceType, getState)
           );
         },
       actionCreateToggleSettings: (data) => (_, __) => {
         dispatch(toggleSettings(data));
+      },
+      actionCreateSetMultiSelectMode: (enabled, deviceType) => (_, __) => {
+        dispatch(setMultiSelectMode(enabled, deviceType));
+
+        if (!enabled) {
+          dispatch(actionSetSelectedDirLists({ selected: [] }, deviceType));
+        }
       },
     },
     dispatch
@@ -588,6 +639,9 @@ const mapStateToProps = (state, __) => {
     appThemeMode: makeAppThemeMode(state),
     mtpMode: makeMtpMode(state),
     showLocalPaneOnLeftSide: makeShowLocalPaneOnLeftSide(state),
+    multiSelectMode: makeMultiSelectMode(state),
+    fileTransferProgress: makeFileTransferProgess(state),
+    appLanguage: makeAppLanguage(state),
   };
 };
 

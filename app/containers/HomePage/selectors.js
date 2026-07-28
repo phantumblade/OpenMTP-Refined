@@ -28,6 +28,10 @@ export const makeDirectoryLists = createSelector(make, (state) =>
   state ? state.directoryLists : initialState.directoryLists
 );
 
+export const makeMultiSelectMode = createSelector(make, (state) =>
+  state ? state.multiSelectMode : initialState.multiSelectMode
+);
+
 export const makeMtpDevice = createSelector(make, (state) =>
   state ? state.mtpDevice : initialState.mtpDevice
 );

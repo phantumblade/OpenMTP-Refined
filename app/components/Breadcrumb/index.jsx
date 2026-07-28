@@ -3,7 +3,6 @@ import { withStyles } from '@material-ui/core/styles';
 import classNames from 'classnames';
 import Paper from '@material-ui/core/Paper';
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import Tooltip from '@material-ui/core/Tooltip';
 import { quickHash } from '../../utils/funcs';
 import { styles } from './styles';
@@ -12,6 +11,31 @@ import { analyticsService } from '../../services/analytics';
 import { EVENT_TYPE } from '../../enums/events';
 
 class Breadcrumb extends PureComponent {
+  constructor(props) {
+    super(props);
+
+    this.breadcrumbRef = React.createRef();
+  }
+
+  componentDidMount() {
+    this.scrollToEnd();
+  }
+
+  componentDidUpdate(prevProps) {
+    const { currentBrowsePath } = this.props;
+
+    if (prevProps.currentBrowsePath !== currentBrowsePath) {
+      this.scrollToEnd();
+    }
+  }
+
+  scrollToEnd = () => {
+    if (this.breadcrumbRef.current) {
+      this.breadcrumbRef.current.scrollLeft =
+        this.breadcrumbRef.current.scrollWidth;
+    }
+  };
+
   _handleClickPath = (enabled, value, event) => {
     const { onBreadcrumbPathClick, deviceType } = this.props;
 
@@ -34,52 +58,31 @@ class Breadcrumb extends PureComponent {
   tokenizeCurrentBrowsePath(currentBrowsePath) {
     const sanitizedCurrentBrowsePath = sanitizePath(currentBrowsePath);
     const _currentBrowsePath = [];
-    let _bold = false;
-    let _enabled = true;
     const currentBrowsePathBroken =
       sanitizedCurrentBrowsePath === '/'
         ? ['']
         : sanitizedCurrentBrowsePath.split('/');
-    const WITHOUT_COMPRESSION_MAX_ITEMS = 3;
     const currentBrowsePathBrokenLength = currentBrowsePathBroken.length;
-    const isCompressed =
-      WITHOUT_COMPRESSION_MAX_ITEMS < currentBrowsePathBrokenLength;
 
-    currentBrowsePathBroken.map((a, index) => {
-      const label = a;
-      let _isCompressed = false;
-
-      if (index === currentBrowsePathBrokenLength - 1) {
-        _bold = true;
-        _enabled = false;
-      }
+    currentBrowsePathBroken.forEach((a, index) => {
+      const isLast = index === currentBrowsePathBrokenLength - 1;
 
       if (a === '' && index === 0) {
         _currentBrowsePath.push({
           label: 'Root',
           path: '/',
-          isCompressed: _isCompressed,
-          enabled: _enabled,
-          bold: _bold,
+          enabled: !isLast,
+          bold: isLast,
         });
 
-        return null;
+        return;
       }
 
-      if (
-        isCompressed &&
-        index < currentBrowsePathBrokenLength - 2 &&
-        index >= WITHOUT_COMPRESSION_MAX_ITEMS
-      ) {
-        _isCompressed = true;
-      }
-
-      return _currentBrowsePath.push({
-        label,
+      _currentBrowsePath.push({
+        label: a,
         path: `${currentBrowsePathBroken.slice(0, index + 1).join('/')}`,
-        isCompressed: _isCompressed,
-        enabled: _enabled,
-        bold: _bold,
+        enabled: !isLast,
+        bold: isLast,
       });
     });
 
@@ -88,63 +91,32 @@ class Breadcrumb extends PureComponent {
 
   BreadcrumbCellRender(tokenizeCurrentBrowsePath) {
     const { classes: styles } = this.props;
-    let compressedCounter = 0;
 
     return tokenizeCurrentBrowsePath.map((item, index) => {
-      const { label, path, isCompressed, enabled, bold } = item;
-
-      if (isCompressed) {
-        compressedCounter += 1;
-      }
+      const { label, path, enabled, bold } = item;
 
       return (
         <Fragment key={quickHash(path)}>
-          {isCompressed ? (
-            this.CompressedBreadcrumbCellRender({
-              isCompressed,
-              compressedCounter,
-            })
-          ) : (
-            <Fragment>
-              {index > 0 && (
-                <span>
-                  <KeyboardArrowRightIcon
-                    className={styles.breadcrumbSeperator}
-                  />
-                </span>
-              )}
-              <li className={`${styles.breadcrumbLi}`}>
-                <Tooltip title={label}>
-                  <a
-                    className={classNames(styles.breadcrumbLiA, {
-                      [`& bold`]: bold,
-                    })}
-                    onClick={(event) => {
-                      this._handleClickPath(enabled, path, event);
-                    }}
-                  >
-                    {label}
-                  </a>
-                </Tooltip>
-              </li>
-            </Fragment>
+          {index > 0 && (
+            <KeyboardArrowRightIcon className={styles.breadcrumbSeperator} />
           )}
+          <li className={styles.breadcrumbLi}>
+            <Tooltip title={path}>
+              <a
+                className={classNames(styles.breadcrumbLiA, {
+                  [styles.breadcrumbActiveA]: bold,
+                })}
+                onClick={(event) => {
+                  this._handleClickPath(enabled, path, event);
+                }}
+              >
+                {label}
+              </a>
+            </Tooltip>
+          </li>
         </Fragment>
       );
     });
-  }
-
-  CompressedBreadcrumbCellRender({ compressedCounter }) {
-    const { classes: styles } = this.props;
-
-    return compressedCounter < 2 ? (
-      <span>
-        <KeyboardArrowRightIcon className={styles.breadcrumbSeperator} />
-        <MoreHorizIcon className={styles.breadcrumbSeperator} />
-      </span>
-    ) : (
-      <Fragment />
-    );
   }
 
   render() {
@@ -154,7 +126,7 @@ class Breadcrumb extends PureComponent {
       <div className={styles.root}>
         <div className={styles.rootBreadcrumbs}>
           <Paper elevation={0}>
-            <ul className={styles.breadcrumb}>
+            <ul ref={this.breadcrumbRef} className={styles.breadcrumb}>
               {this.BreadcrumbCellRender(
                 this.tokenizeCurrentBrowsePath(currentBrowsePath)
               )}

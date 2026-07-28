@@ -23,6 +23,7 @@ import { copyJsonFileToSettings, freshInstall } from '../Settings/actions';
 import {
   makeAppThemeMode,
   makeAppThemeModeSettings,
+  makeAppLanguage,
   makeMtpMode,
 } from '../Settings/selectors';
 import { getAppThemeMode } from '../../helpers/theme';
@@ -140,8 +141,16 @@ class App extends Component {
   }
 
   render() {
-    const { classes: styles, mtpDevice, mtpStoragesList, mtpMode } = this.props;
+    const {
+      classes: styles,
+      mtpDevice,
+      mtpStoragesList,
+      mtpMode,
+      appLanguage,
+    } = this.props;
     const muiTheme = this.getMuiTheme();
+
+    document.documentElement.lang = appLanguage;
 
     return (
       <div className={styles.root}>
@@ -151,6 +160,7 @@ class App extends Component {
             mtpDevice={mtpDevice}
             mtpStoragesList={mtpStoragesList}
             mtpMode={mtpMode}
+            appLanguage={appLanguage}
           />
           <Alerts />
           <ErrorBoundary>
@@ -185,6 +195,7 @@ const mapStateToProps = (state) => {
   return {
     appThemeModeSettings: makeAppThemeModeSettings(state),
     appThemeMode: makeAppThemeMode(state),
+    appLanguage: makeAppLanguage(state),
     mtpDevice: makeMtpDevice(state),
     mtpMode: makeMtpMode(state),
     mtpStoragesList: makeMtpStoragesList(state),

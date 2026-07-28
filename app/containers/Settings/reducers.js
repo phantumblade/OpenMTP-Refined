@@ -3,6 +3,7 @@ import {
   DEVICE_TYPE,
   FILE_EXPLORER_VIEW_TYPE,
   APP_THEME_MODE_TYPE,
+  APP_LANGUAGE_TYPE,
   MTP_MODE,
   FILE_TRANSFER_DIRECTION,
 } from '../../enums';
@@ -31,6 +32,7 @@ export const initialState = {
     [DEVICE_TYPE.mtp]: FILE_EXPLORER_VIEW_TYPE.grid,
   },
   appThemeMode: APP_THEME_MODE_TYPE.auto,
+  appLanguage: APP_LANGUAGE_TYPE.english,
   showLocalPane: true,
   showLocalPaneOnLeftSide: true,
   showDirectoriesFirst: true,

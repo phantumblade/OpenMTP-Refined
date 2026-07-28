@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -27,6 +28,7 @@ func Initialize(onDonePtr *C.on_cb_result_t) {
 
 		return
 	}
+	defer unlockMtp()
 
 	_, err := _initialize(mtpx.Init{DebugMode: false})
 	if err != nil {
@@ -44,6 +46,7 @@ func Initialize(onDonePtr *C.on_cb_result_t) {
 
 	usbDesc, err := container.dev.GetUsbInfo()
 	if err != nil {
+		invalidateMtpSessionOnFatalError(err)
 		send_to_js.SendError(sendToJsOnDonePtr, err)
 
 		return
@@ -61,6 +64,7 @@ func FetchDeviceInfo(onDonePtr *C.on_cb_result_t) {
 
 		return
 	}
+	defer unlockMtp()
 
 	dInfo, err := _fetchDeviceInfo()
 	if err != nil {
@@ -71,6 +75,7 @@ func FetchDeviceInfo(onDonePtr *C.on_cb_result_t) {
 
 	usbDesc, err := container.dev.GetUsbInfo()
 	if err != nil {
+		invalidateMtpSessionOnFatalError(err)
 		send_to_js.SendError(sendToJsOnDonePtr, err)
 
 		return
@@ -88,6 +93,7 @@ func FetchStorages(onDonePtr *C.on_cb_result_t) {
 
 		return
 	}
+	defer unlockMtp()
 
 	_sendFetchStorages(true, sendToJsOnDonePtr)
 }
@@ -96,13 +102,9 @@ func _sendFetchStorages(retry bool, onDonePtr *send_to_js.SendCbResult) {
 	storages, err := _fetchStorages()
 
 	if err != nil {
-		if container.dev != nil && container.deviceInfo != nil {
-			if strings.Contains(err.Error(), "EOF") {
-				err = fmt.Errorf("error allow storage access. %+v", err.Error())
-
-				// this is done to prevent samsung devices from returning usb timeouts
-				_ = _dispose()
-			}
+		if strings.Contains(strings.ToUpper(err.Error()), "EOF") {
+			err = fmt.Errorf("error allow storage access. %+v", err.Error())
+			invalidateMtpSession()
 		}
 
 		send_to_js.SendError(onDonePtr, err)
@@ -122,6 +124,7 @@ func MakeDirectory(makeDirectoryInputJson *C.char, onDonePtr *C.on_cb_result_t) 
 
 		return
 	}
+	defer unlockMtp()
 
 	i := MakeDirectoryInput{}
 
@@ -151,6 +154,7 @@ func FileExists(fileExistsInputJson *C.char, onDonePtr *C.on_cb_result_t) {
 
 		return
 	}
+	defer unlockMtp()
 
 	i := FileExistsInput{}
 
@@ -188,6 +192,7 @@ func DeleteFile(deleteFileInputJson *C.char, onDonePtr *C.on_cb_result_t) {
 
 		return
 	}
+	defer unlockMtp()
 
 	i := DeleteFileInput{}
 
@@ -225,6 +230,7 @@ func RenameFile(renameFileInputJson *C.char, onDonePtr *C.on_cb_result_t) {
 
 		return
 	}
+	defer unlockMtp()
 
 	i := RenameFileInput{}
 
@@ -259,6 +265,7 @@ func Walk(walkInputJson *C.char, onDonePtr *C.on_cb_result_t) {
 
 		return
 	}
+	defer unlockMtp()
 
 	i := WalkInput{}
 
@@ -291,6 +298,7 @@ func UploadFiles(uploadFilesInputJson *C.char, onPreprocessPtr, onProgressPtr, o
 
 		return
 	}
+	defer unlockMtp()
 
 	i := UploadFilesInput{}
 
@@ -303,18 +311,30 @@ func UploadFiles(uploadFilesInputJson *C.char, onPreprocessPtr, onProgressPtr, o
 	}
 
 	var pInterface interface{}
+	var progressMutex sync.Mutex
+	done := make(chan struct{})
+	var relayWaitGroup sync.WaitGroup
+	var stopRelayOnce sync.Once
 
-	ch := make(chan bool)
+	relayWaitGroup.Add(1)
 	go func() {
+		defer relayWaitGroup.Done()
+
+		ticker := time.NewTicker(time.Millisecond * 250)
+		defer ticker.Stop()
+
 		for {
 			select {
-			case <-ch:
-				close(ch)
-
+			case <-done:
 				return
-			default:
-				if pInterface != nil {
-					switch v := pInterface.(type) {
+			case <-ticker.C:
+				progressMutex.Lock()
+				progressEvent := pInterface
+				pInterface = nil
+				progressMutex.Unlock()
+
+				if progressEvent != nil {
+					switch v := progressEvent.(type) {
 					case UploadPreprocessContainer:
 						send_to_js.SendUploadFilesPreprocess(sendToJsOnPreprocessPtr, v.fi, v.fullPath)
 
@@ -322,14 +342,20 @@ func UploadFiles(uploadFilesInputJson *C.char, onPreprocessPtr, onProgressPtr, o
 						send_to_js.SendTransferFilesProgress(sendToJsOnProgressPtr, v.pInfo)
 
 					default:
-						log.Panicln("unimplemented UploadFiles.pInterface type")
+						log.Printf("ignored unexpected UploadFiles progress event type %T", progressEvent)
 					}
 				}
-
-				time.Sleep(time.Millisecond * 500)
 			}
 		}
 	}()
+
+	stopRelay := func() {
+		stopRelayOnce.Do(func() {
+			close(done)
+			relayWaitGroup.Wait()
+		})
+	}
+	defer stopRelay()
 
 	err = _uploadFiles(i.StorageId, i.Sources, i.Destination, i.PreprocessFiles,
 		func(fi *os.FileInfo, fullPath string, err error) error {
@@ -337,10 +363,14 @@ func UploadFiles(uploadFilesInputJson *C.char, onPreprocessPtr, onProgressPtr, o
 				return err
 			}
 
+			fileInfoSnapshot := *fi
+
+			progressMutex.Lock()
 			pInterface = UploadPreprocessContainer{
-				fi:       fi,
+				fi:       &fileInfoSnapshot,
 				fullPath: fullPath,
 			}
+			progressMutex.Unlock()
 
 			return nil
 		},
@@ -349,22 +379,24 @@ func UploadFiles(uploadFilesInputJson *C.char, onPreprocessPtr, onProgressPtr, o
 				return err
 			}
 
+			progressSnapshot := *p
+
+			progressMutex.Lock()
 			pInterface = ProgressContainer{
-				pInfo: p,
+				pInfo: &progressSnapshot,
 			}
+			progressMutex.Unlock()
 
 			return nil
 		})
 	if err != nil {
+		stopRelay()
 		send_to_js.SendError(sendToJsOnDonePtr, err)
-
-		ch <- true
 
 		return
 	}
 
-	ch <- true
-
+	stopRelay()
 	send_to_js.SendTransferFilesDone(sendToJsOnDonePtr)
 }
 
@@ -379,6 +411,7 @@ func DownloadFiles(downloadFilesInputJson *C.char, onPreprocessPtr, onProgressPt
 
 		return
 	}
+	defer unlockMtp()
 
 	i := DownloadFilesInput{}
 
@@ -391,18 +424,30 @@ func DownloadFiles(downloadFilesInputJson *C.char, onPreprocessPtr, onProgressPt
 	}
 
 	var pInterface interface{}
+	var progressMutex sync.Mutex
+	done := make(chan struct{})
+	var relayWaitGroup sync.WaitGroup
+	var stopRelayOnce sync.Once
 
-	ch := make(chan bool)
+	relayWaitGroup.Add(1)
 	go func() {
+		defer relayWaitGroup.Done()
+
+		ticker := time.NewTicker(time.Millisecond * 250)
+		defer ticker.Stop()
+
 		for {
 			select {
-			case <-ch:
-				close(ch)
-
+			case <-done:
 				return
-			default:
-				if pInterface != nil {
-					switch v := pInterface.(type) {
+			case <-ticker.C:
+				progressMutex.Lock()
+				progressEvent := pInterface
+				pInterface = nil
+				progressMutex.Unlock()
+
+				if progressEvent != nil {
+					switch v := progressEvent.(type) {
 					case DownloadPreprocessContainer:
 						send_to_js.SendDownloadFilesPreprocess(sendToJsOnPreprocessPtr, v.fi)
 
@@ -410,14 +455,20 @@ func DownloadFiles(downloadFilesInputJson *C.char, onPreprocessPtr, onProgressPt
 						send_to_js.SendTransferFilesProgress(sendToJsOnProgressPtr, v.pInfo)
 
 					default:
-						log.Panicln("unimplemented DownloadFiles.pInterface type")
+						log.Printf("ignored unexpected DownloadFiles progress event type %T", progressEvent)
 					}
 				}
-
-				time.Sleep(time.Millisecond * 500)
 			}
 		}
 	}()
+
+	stopRelay := func() {
+		stopRelayOnce.Do(func() {
+			close(done)
+			relayWaitGroup.Wait()
+		})
+	}
+	defer stopRelay()
 
 	err = _downloadFiles(i.StorageId, i.Sources, i.Destination, i.PreprocessFiles,
 		func(fi *mtpx.FileInfo, err error) error {
@@ -425,9 +476,13 @@ func DownloadFiles(downloadFilesInputJson *C.char, onPreprocessPtr, onProgressPt
 				return err
 			}
 
+			fileInfoSnapshot := *fi
+
+			progressMutex.Lock()
 			pInterface = DownloadPreprocessContainer{
-				fi: fi,
+				fi: &fileInfoSnapshot,
 			}
+			progressMutex.Unlock()
 
 			return nil
 		},
@@ -436,22 +491,24 @@ func DownloadFiles(downloadFilesInputJson *C.char, onPreprocessPtr, onProgressPt
 				return err
 			}
 
+			progressSnapshot := *p
+
+			progressMutex.Lock()
 			pInterface = ProgressContainer{
-				pInfo: p,
+				pInfo: &progressSnapshot,
 			}
+			progressMutex.Unlock()
 
 			return nil
 		})
 	if err != nil {
+		stopRelay()
 		send_to_js.SendError(sendToJsOnDonePtr, err)
-
-		ch <- true
 
 		return
 	}
 
-	ch <- true
-
+	stopRelay()
 	send_to_js.SendTransferFilesDone(sendToJsOnDonePtr)
 }
 
@@ -464,15 +521,13 @@ func Dispose(onDonePtr *C.on_cb_result_t) {
 
 		return
 	}
+	defer unlockMtp()
 
 	if err := _dispose(); err != nil {
 		send_to_js.SendError(sendToJsOnDonePtr, err)
 
 		return
 	}
-
-	container.dev = nil
-	container.deviceInfo = nil
 
 	send_to_js.SendDispose(sendToJsOnDonePtr)
 }

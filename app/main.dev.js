@@ -2,7 +2,13 @@
 
 import './services/sentry/index';
 
-import { app, BrowserWindow, ipcMain, nativeTheme } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  ipcMain,
+  nativeTheme,
+  nativeImage,
+} from 'electron';
 import electronIs from 'electron-is';
 import usbDetect from 'usb-detection';
 import process from 'process';
@@ -249,6 +255,26 @@ if (!isDeviceBootable) {
   });
 
   IpcEventService.shared.start();
+
+  ipcMain.handle('getQuickLookThumbnail', async (event, filePath) => {
+    try {
+      if (
+        !nativeImage ||
+        typeof nativeImage.createThumbnailFromPath !== 'function'
+      ) {
+        return null;
+      }
+
+      const img = await nativeImage.createThumbnailFromPath(filePath, {
+        width: 140,
+        height: 140,
+      });
+
+      return img ? img.toDataURL() : null;
+    } catch (_) {
+      return null;
+    }
+  });
 
   app
     .whenReady()

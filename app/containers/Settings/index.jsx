@@ -128,6 +128,16 @@ class Settings extends Component {
     );
   };
 
+  _handleAppLanguageChange = (event, value, deviceType) => {
+    this._handleSetCommonSettingsChange(
+      {
+        key: 'appLanguage',
+        value,
+      },
+      deviceType
+    );
+  };
+
   _handleShowLocalPaneChange = (event, value, deviceType) => {
     this._handleSetCommonSettingsChange(
       {
@@ -217,6 +227,7 @@ class Settings extends Component {
         onPrereleaseUpdatesChange={this._handlePrereleaseUpdatesChange}
         onStatusBarChange={this._handleStatusBarChange}
         onAppThemeModeChange={this._handleSetAppThemeModeChange}
+        onAppLanguageChange={this._handleAppLanguageChange}
         onShowLocalPaneChange={this._handleShowLocalPaneChange}
         onShowLocalPaneOnLeftSideChange={
           this._handleShowLocalPaneOnLeftSideChange

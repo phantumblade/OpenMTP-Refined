@@ -180,7 +180,13 @@ class FileExplorerController {
    * @param {string} storageId
    * @return {Promise<{data: array|null, error: string|null, stderr: string|null}>}
    */
-  async listFiles({ deviceType, filePath, ignoreHidden, storageId }) {
+  async listFiles({
+    deviceType,
+    filePath,
+    ignoreHidden,
+    storageId,
+    isCancelled,
+  }) {
     checkIf(deviceType, 'string');
     checkIf(filePath, 'string');
     checkIf(ignoreHidden, 'boolean');
@@ -190,11 +196,36 @@ class FileExplorerController {
       filePath,
       ignoreHidden,
       storageId,
+      isCancelled,
     });
 
     this._sentEvent({ result, deviceType, eventKey: 'LIST_FILES' });
 
     return result;
+  }
+
+  /**
+   * Lists a directory for the recursive search service without emitting one
+   * analytics event for every directory visited.
+   */
+  async listFilesForSearch({
+    deviceType,
+    filePath,
+    ignoreHidden,
+    storageId,
+    isCancelled,
+  }) {
+    checkIf(deviceType, 'string');
+    checkIf(filePath, 'string');
+    checkIf(ignoreHidden, 'boolean');
+
+    return this.repository.listFiles({
+      deviceType,
+      filePath,
+      ignoreHidden,
+      storageId,
+      isCancelled,
+    });
   }
 
   /**
