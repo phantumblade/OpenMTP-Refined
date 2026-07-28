@@ -66,6 +66,12 @@ extras/*
 mtp-mock-files/*
 resources
 tmp/*
+.tooling/
+.cache/
+.webpack/
+performance-results/
+*.orig
+*.rej
 *.prod.js
 *.js.map
 *.js.LICENSE.txt

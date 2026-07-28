@@ -1,13 +1,16 @@
 module.exports = {
-  '*.{js,jsx,mjs}': ['yarn lint', 'yarn postlint-fix', 'git add'],
+  '*.{js,jsx,mjs}': [
+    'eslint --no-cache --fix',
+    'prettier --ignore-path .eslintignore --single-quote --write',
+  ],
   '{*.json,.{babelrc,eslintrc,prettierrc,stylelintrc}}': [
     'prettier --ignore-path .eslintignore --parser json --write',
-    'git add',
   ],
-  '*.{css,scss}': ['yarn lint-styles', 'yarn postlint-styles-fix', 'git add'],
+  '*.{css,scss}': [
+    'stylelint --custom-syntax postcss-scss --fix',
+    'prettier --ignore-path .eslintignore --single-quote --write',
+  ],
   '*.{html,md,yml}': [
     'prettier --ignore-path .eslintignore --single-quote --write',
-    'git add',
   ],
-  '*.{js,jsx,mjs,ts,tsx,css,scss,html,md,yml}': ['git add'],
 };

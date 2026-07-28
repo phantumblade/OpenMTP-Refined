@@ -283,9 +283,9 @@ if (!isDeviceBootable) {
       try {
         await createWindow();
 
-        let appUpdaterEnable = true;
+        let appUpdaterEnable = ENV_FLAVOR.enableAppUpdates;
 
-        if (isPackaged && process.platform === 'darwin') {
+        if (appUpdaterEnable && isPackaged && process.platform === 'darwin') {
           appUpdaterEnable = !isMas && app.isInApplicationsFolder();
         }
 
@@ -295,6 +295,7 @@ if (!isDeviceBootable) {
         ]);
 
         const autoUpdateCheck =
+          appUpdaterEnable &&
           autoUpdateCheckSettings.enableAutoUpdateCheck !== false;
         const isPrereleaseUpdatesEnabled = getEnablePrereleaseUpdatesSetting();
 
@@ -305,7 +306,9 @@ if (!isDeviceBootable) {
           allowPrerelease: isPrereleaseUpdatesEnabled === true,
         });
 
-        autoAppUpdate.init();
+        if (appUpdaterEnable) {
+          autoAppUpdate.init();
+        }
 
         const menuBuilder = new MenuBuilder({
           mainWindow,

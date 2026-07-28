@@ -12,20 +12,26 @@ const config = {
     reportToSenty: false,
     enableGoogleAnalytics: false,
     enableMixpanelAnalytics: false,
+    enableAppUpdates: false,
     disableReactWarnings: true,
     allowDevelopmentEnvironment: true,
   },
   prod: {
-    reportToSenty: true,
-    enableGoogleAnalytics: true,
-    enableMixpanelAnalytics: true,
+    // This independent fork must not send data to the upstream author's
+    // telemetry projects. Services can be re-enabled only after configuring
+    // fork-owned endpoints and documenting user consent.
+    reportToSenty: false,
+    enableGoogleAnalytics: false,
+    enableMixpanelAnalytics: false,
+    enableAppUpdates: false,
     disableReactWarnings: false,
     allowDevelopmentEnvironment: false,
   },
   debug: {
-    reportToSenty: true,
-    enableGoogleAnalytics: true,
-    enableMixPanelAnalytics: true,
+    reportToSenty: false,
+    enableGoogleAnalytics: false,
+    enableMixPanelAnalytics: false,
+    enableAppUpdates: false,
     disableReactWarnings: false,
     allowDevelopmentEnvironment: true,
   },

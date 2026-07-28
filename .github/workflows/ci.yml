@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - main
+      - ux-redesign
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  javascript:
+    name: JavaScript quality and build
+    runs-on: macos-13
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 16.20.2
+          cache: yarn
+
+      - name: Install Yarn
+        run: npm install --global yarn@1.22.22
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --ignore-scripts
+
+      - name: Lint JavaScript
+        run: yarn lint
+
+      - name: Lint styles
+        run: yarn lint-styles
+
+      - name: Verify performance invariants
+        run: yarn test:performance
+
+      - name: Build production bundles
+        run: yarn build
+
+  native:
+    name: Native Go tests
+    runs-on: macos-13
+    timeout-minutes: 20
+
+    defaults:
+      run:
+        working-directory: ffi/kalam/native
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.x'
+          cache-dependency-path: ffi/kalam/native/go.sum
+
+      - name: Install native build dependencies
+        run: brew install libusb pkg-config
+
+      - name: Test native coordinator
+        run: go test -mod=readonly ./...
