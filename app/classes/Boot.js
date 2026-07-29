@@ -6,6 +6,7 @@
  */
 
 import { readdirSync } from 'fs';
+import { copySync } from 'fs-extra';
 import { PATHS } from '../constants/paths';
 import {
   fileExistsSync,
@@ -17,7 +18,14 @@ import { dateNow, daysDiff } from '../utils/date';
 import { LOG_FILE_ROTATION_CLEANUP_THRESHOLD } from '../constants';
 import { baseName } from '../utils/files';
 
-const { logFile, settingsFile, logDir, prevProfileDir } = PATHS;
+const {
+  logFile,
+  settingsFile,
+  logDir,
+  prevProfileDir,
+  previousBundleProfileDir,
+  profileDir,
+} = PATHS;
 const logFileRotationCleanUpThreshold = LOG_FILE_ROTATION_CLEANUP_THRESHOLD;
 
 export default class Boot {
@@ -29,6 +37,16 @@ export default class Boot {
 
   async init() {
     try {
+      if (
+        !(await this.verifyDir(profileDir)) &&
+        (await this.verifyDir(previousBundleProfileDir))
+      ) {
+        copySync(previousBundleProfileDir, profileDir, {
+          errorOnExist: false,
+          overwrite: false,
+        });
+      }
+
       for (let i = 0; i < this.verifyDirList.length; i += 1) {
         const item = this.verifyDirList[i];
 

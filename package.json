@@ -128,6 +128,7 @@
     "run-electron": "^1.0.0",
     "sanitize-html": "2.17.5",
     "semver": "^7.8.5",
+    "slot-text": "^0.3.3",
     "source-map-support": "^0.5.21",
     "styled-components": "^4.4.1",
     "url": "^0.11.4",

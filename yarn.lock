@@ -14440,3 +14440,7 @@ zx@^5.3.0:
     ps-tree "^1.2.0"
     which "^2.0.2"
     yaml "^1.10.2"
+slot-text@^0.3.3:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/slot-text/-/slot-text-0.3.3.tgz#a99734d9c460341b299c3c3f1b39a1bea8540d05"
+  integrity sha512-9yJ0RJI9s5oFIo3NQV+fHJJoVXFpb7XpyYzRUt9mcUvSeuJ0fYt8WOQE5qljRqCyD6Elli12lO1/G9OqD2Kr/w==

@@ -16,6 +16,7 @@ release scheme is being defined.
 - Shared preview loading and thumbnail reuse.
 - Explicit multi-selection mode and keyboard navigation.
 - Transfer progress dialog with diagnostic session identifiers.
+- Animated numeric status values with reduced-motion support.
 - Native MTP operation coordinator and related Go test.
 - Performance verification scripts.
 
@@ -25,6 +26,8 @@ release scheme is being defined.
 - Improved device identity and disconnect-state handling.
 - Reworked transfer preparation, retry and recovery states.
 - Expanded file, folder, volume and media icon coverage.
+- Assigned the fork its independent `io.github.phantumblade.openmtp`
+  application identifier, with non-destructive settings migration.
 
 ### Fixed
 

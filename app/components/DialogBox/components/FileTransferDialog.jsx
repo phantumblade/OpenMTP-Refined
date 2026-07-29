@@ -147,6 +147,11 @@ class FileTransferDialog extends PureComponent {
     const totalFilesVal = String(
       transfer.totalFiles || transfer.itemCount || 0
     );
+    const transferredAmountVal = transfer.totalFileSize
+      ? `${niceBytes(transfer.totalFileSizeSent || 0)} / ${niceBytes(
+          transfer.totalFileSize
+        )}`
+      : `${filesSentVal} / ${totalFilesVal} ${translate(appLanguage, 'files')}`;
 
     return (
       <Dialog
@@ -223,16 +228,7 @@ class FileTransferDialog extends PureComponent {
                 aria-label={translate(appLanguage, 'Transfer progress')}
               />
               <div className={styles.progressMeta}>
-                <span>
-                  {transfer.totalFileSize
-                    ? `${niceBytes(
-                        transfer.totalFileSizeSent || 0
-                      )} / ${niceBytes(transfer.totalFileSize)}`
-                    : `${filesSentVal} / ${totalFilesVal} ${translate(
-                        appLanguage,
-                        'files'
-                      )}`}
-                </span>
+                <SlotText text={transferredAmountVal} />
                 <span className={styles.speedContainer}>
                   <span className={styles.speedValue}>
                     <SlotText

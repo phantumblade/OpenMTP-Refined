@@ -9,6 +9,10 @@ Fork indipendente di
 [OpenMTP](https://github.com/ganeshrvel/openmtp), il file manager open source
 per trasferire file via USB/MTP tra macOS e dispositivi Android.
 
+Il fork usa l'identificatore applicativo indipendente
+`io.github.phantumblade.openmtp`; al primo avvio conserva le impostazioni locali
+dell'app originale copiandole nel nuovo profilo, senza cancellare il precedente.
+
 Questo progetto mantiene l'architettura Electron, React e Go/Kalam di OpenMTP
 e interviene su tre aree: affidabilità dei trasferimenti, prestazioni nelle
 cartelle grandi ed esperienza d'uso. Non è una release ufficiale del progetto

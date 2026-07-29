@@ -17,6 +17,12 @@ const appPath = join(root, `./app`);
 const configDir = join(root, `./config`);
 const homeDir = homedirOs();
 const profileDir = getAppDataPath();
+const previousBundleProfileDir = join(
+  homeDir,
+  'Library',
+  'Application Support',
+  'io.ganeshrvel.openmtp'
+);
 
 // old generation [profileDir] path. Used until OpenMTP < v3.0.0
 const prevProfileDir = join(homeDir, `./.io.ganeshrvel`);
@@ -38,6 +44,7 @@ export const PATHS = {
   nodeModules: resolve(join(root, `./node_modules`)),
   homeDir: resolve(homeDir),
   profileDir: resolve(profileDir),
+  previousBundleProfileDir: resolve(previousBundleProfileDir),
   configDir: resolve(configDir),
   logDir: resolve(logDir),
   logFile: resolve(logFile),

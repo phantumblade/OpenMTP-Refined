@@ -44,7 +44,7 @@ module.exports = () => {
 
   return {
     productName: 'OpenMTP',
-    appId: 'io.ganeshrvel.openmtp',
+    appId: 'io.github.phantumblade.openmtp',
     forceCodeSigning: process.env.FORCE_CODE_SIGNING === 'true',
     // eslint-disable-next-line no-template-curly-in-string
     artifactName: '${name}-${version}-${os}-${arch}.${ext}',
