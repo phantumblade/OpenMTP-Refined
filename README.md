@@ -1,4 +1,4 @@
-# OpenMTP — UX and reliability fork
+# OpenMTP Refined — UX and reliability fork
 
 [![Platform](https://img.shields.io/badge/platform-macOS-000000?logo=apple)](https://www.apple.com/macos/)
 [![Electron](https://img.shields.io/badge/Electron-18.3.15-47848f?logo=electron)](https://www.electronjs.org/)

@@ -1,4 +1,4 @@
-# OpenMTP UX and reliability fork
+# OpenMTP Refined — UX and reliability fork
 
 ## Register
 

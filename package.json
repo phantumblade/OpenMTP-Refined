@@ -41,7 +41,7 @@
   "main": "./app/main.prod.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/phantumblade/openmtp.git"
+    "url": "git+https://github.com/phantumblade/OpenMTP-Refined.git"
   },
   "author": {
     "name": "Ganesh Rathinavel",
@@ -55,7 +55,7 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/phantumblade/openmtp/issues/"
+    "url": "https://github.com/phantumblade/OpenMTP-Refined/issues/"
   },
   "keywords": [
     "openmtp",
@@ -64,7 +64,7 @@
     "macOS",
     "mtp"
   ],
-  "homepage": "https://github.com/phantumblade/openmtp#readme",
+  "homepage": "https://github.com/phantumblade/OpenMTP-Refined#readme",
   "browserslist": {
     "production": [
       "last 2 Chrome versions"
