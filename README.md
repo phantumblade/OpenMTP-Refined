@@ -18,6 +18,23 @@ e interviene su tre aree: affidabilità dei trasferimenti, prestazioni nelle
 cartelle grandi ed esperienza d'uso. Non è una release ufficiale del progetto
 originale.
 
+## Interfaccia
+
+<p align="center">
+  <img src="docs/images/readme/openmtp-dual-pane.png" alt="OpenMTP in vista a due pannelli tra Mac e telefono Android" width="100%">
+</p>
+
+| Selezione multipla | Trasferimento trasparente |
+| --- | --- |
+| ![Selezione multipla con checkbox](docs/images/readme/openmtp-multi-selection.png) | ![Progresso dettagliato del trasferimento](docs/images/readme/openmtp-transfer-progress.png) |
+
+| Tema scuro | Navigazione rapida |
+| --- | --- |
+| ![OpenMTP con tema scuro](docs/images/readme/openmtp-dark-mode.png) | ![Pannello laterale di navigazione](docs/images/readme/openmtp-navigation.png) |
+
+> Le schermate utilizzano nomi e percorsi dimostrativi per proteggere i dati
+> dei dispositivi usati durante lo sviluppo.
+
 ## Stato del progetto
 
 | Area                   | Stato                                 |
@@ -169,7 +186,6 @@ non firmato è destinato esclusivamente ai test locali.
 - Eseguire regressioni su Intel e Apple Silicon.
 - Verificare Samsung e almeno un dispositivo Android di un altro produttore.
 - Sostituire l'icona privata con un'identità originale e documentata.
-- Assegnare al fork un application identifier indipendente.
 - Configurare aggiornamenti, firma Developer ID e notarizzazione.
 - Verificare il DMG in un account macOS pulito.
 
