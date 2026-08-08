@@ -53,8 +53,10 @@ const exactFileRules = new Map([
 ]);
 
 const extensionRules = [
+  [/jpe?g$/, 'jpg'],
+  [/dng$/, 'dng'],
   [
-    /(jpe?g|png|gif|webp|bmp|heic|heif|tiff?|dng|arw|cr2|nef|orf|rw2|pef|raf|psd)$/,
+    /(png|gif|webp|bmp|heic|heif|tiff?|arw|cr2|nef|orf|rw2|pef|raf|psd)$/,
     'image',
   ],
   [/(mp4|m4v|mov|webm|avi|mkv|mxf)$/, 'video'],

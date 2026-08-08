@@ -657,7 +657,10 @@ class FileExplorer extends Component {
       actionCreateTableClick,
     } = this.props;
     const { tableData, deviceType, event } = data;
-    const { queue, nodes, order, orderBy } = directoryLists[deviceType];
+    const interactionDirectoryList =
+      tableData?.directoryLists || directoryLists[deviceType];
+    const { nodes, order, orderBy } = interactionDirectoryList;
+    const { queue } = directoryLists[deviceType];
 
     // eslint-disable-next-line prefer-destructuring
     const selected = queue.selected;
@@ -795,7 +798,7 @@ class FileExplorer extends Component {
         break;
 
       case 'selectAll':
-        this._handleSelectAllClick(deviceType);
+        this._handleSelectAllClick(deviceType, null, nodes);
         break;
 
       case 'rename':
@@ -2043,10 +2046,12 @@ class FileExplorer extends Component {
     this._handleDirectoryGeneratedTime();
   };
 
-  _handleSelectAllClick = (deviceType, event) => {
+  _handleSelectAllClick = (deviceType, event, interactionNodes = null) => {
     const { directoryLists, actionCreateSelectAllClick } = this.props;
     const selected =
-      directoryLists[deviceType].nodes.map((item) => item.path) || [];
+      (interactionNodes || directoryLists[deviceType].nodes).map(
+        (item) => item.path
+      ) || [];
     let isChecked = true;
 
     if (event) {
@@ -2056,14 +2061,26 @@ class FileExplorer extends Component {
     actionCreateSelectAllClick({ selected }, isChecked, deviceType);
   };
 
-  _handleTableClick = (path, deviceType, event, selectionIntent = 'row') => {
+  _handleTableClick = (
+    path,
+    deviceType,
+    event,
+    selectionIntent = 'row',
+    interactionNodes = null
+  ) => {
     if (undefinedOrNull(path)) {
       return null;
     }
 
     const { directoryLists, actionCreateTableClick, multiSelectMode } =
       this.props;
-    const { nodes, order, orderBy, queue } = directoryLists[deviceType];
+    const {
+      nodes: sourceNodes,
+      order,
+      orderBy,
+      queue,
+    } = directoryLists[deviceType];
+    const nodes = interactionNodes || sourceNodes;
     const { selected } = queue;
 
     if (

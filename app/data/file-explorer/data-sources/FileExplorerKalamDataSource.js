@@ -123,11 +123,25 @@ export class FileExplorerKalamDataSource {
     checkIf(storageId, 'number');
 
     try {
-      return this.kalamFfi.walk({
+      const result = await this.kalamFfi.walk({
         fullPath: filePath,
         storageId,
         skipHiddenFiles: ignoreHidden,
       });
+
+      if (!result?.data) {
+        return result;
+      }
+
+      return {
+        ...result,
+        data: result.data.map((item) => ({
+          ...item,
+          // MTP exposes the object's modification time, not a reliable
+          // filesystem creation time.
+          dateModified: item.dateAdded,
+        })),
+      };
     } catch (e) {
       log.error(e);
 

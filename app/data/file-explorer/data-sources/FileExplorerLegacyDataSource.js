@@ -550,6 +550,7 @@ export class FileExplorerLegacyDataSource {
           size: null,
           isFolder,
           dateAdded: dateTime,
+          dateModified: dateTime,
         });
       }
 

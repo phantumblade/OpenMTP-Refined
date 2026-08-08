@@ -201,7 +201,9 @@ export class FileExplorerLocalDataSource {
                 : null;
               const stat = await this.stat(symlink ?? fullPath);
               const extension = path.extname(fullPath);
-              const { size, atime: dateTime } = stat;
+              const { size, mtime, birthtime } = stat;
+              const dateCreated =
+                birthtime && birthtime.getTime() > 0 ? birthtime : mtime;
 
               return {
                 name: entry.name,
@@ -209,7 +211,9 @@ export class FileExplorerLocalDataSource {
                 extension,
                 size,
                 isFolder: stat.isDirectory(),
-                dateAdded: appDateFormat(dateTime),
+                dateAdded: appDateFormat(mtime),
+                dateCreated: dateCreated.toISOString(),
+                dateModified: mtime.toISOString(),
                 symlink,
               };
             } catch (_) {

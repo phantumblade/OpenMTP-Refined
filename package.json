@@ -33,7 +33,7 @@
     "postlint-fix": "prettier --ignore-path .eslintignore --single-quote --write '**/*.*{js,jsx,json}'",
     "postlint-styles-fix": "prettier --ignore-path .eslintignore --single-quote --write '**/*.{css,scss}'",
     "test": "yarn lint && yarn test:performance && yarn test:native",
-    "test:performance": "cross-env BABEL_DISABLE_CACHE=1 node -r @babel/register scripts/performance/verify-file-explorer-window.js && cross-env BABEL_DISABLE_CACHE=1 node -r @babel/register scripts/performance/verify-file-search.js && cross-env BABEL_DISABLE_CACHE=1 node -r @babel/register scripts/performance/verify-file-transfer.js",
+    "test:performance": "cross-env BABEL_DISABLE_CACHE=1 node -r @babel/register scripts/performance/verify-file-explorer-window.js && cross-env BABEL_DISABLE_CACHE=1 node -r @babel/register scripts/performance/verify-file-search.js && cross-env BABEL_DISABLE_CACHE=1 node -r @babel/register scripts/performance/verify-file-date-filter.js && cross-env BABEL_DISABLE_CACHE=1 node -r @babel/register scripts/performance/verify-file-type-filter.js && cross-env BABEL_DISABLE_CACHE=1 node -r @babel/register scripts/performance/verify-file-transfer.js",
     "test:native": "cd ffi/kalam/native && go test -mod=readonly ./...",
     "preinstall": "internals/scripts/preinstall.sh",
     "postinstall": "yarn build-dll && electron-builder install-app-deps"

@@ -19,6 +19,8 @@ import { getFileIcon, getFolderIcon } from '../../../helpers/fileExplorerIcons';
 import { imgsrc } from '../../../utils/imgsrc';
 import { translate } from '../../../i18n';
 import { isTransferPhaseActive } from '../../../helpers/fileTransfer';
+import FileExplorerDateFilter from './FileExplorerDateFilter';
+import FileExplorerTypeFilter from './FileExplorerTypeFilter';
 
 class FileExplorerSearchBar extends PureComponent {
   constructor(props) {
@@ -296,6 +298,12 @@ class FileExplorerSearchBar extends PureComponent {
       deviceType,
       mtpDevice,
       fileTransferProgress,
+      dateFilter,
+      onDateFilterChange,
+      creationDateAvailable,
+      fileTypeFilter,
+      fileTypeOptions,
+      onFileTypeFilterChange,
     } = this.props;
     const {
       query,
@@ -361,6 +369,24 @@ class FileExplorerSearchBar extends PureComponent {
               </IconButton>
             </Tooltip>
           )}
+          <span className={styles.filterDivider} aria-hidden="true" />
+          <span className={styles.filterActions}>
+            <FileExplorerTypeFilter
+              value={fileTypeFilter}
+              options={fileTypeOptions}
+              disabled={isDisabled}
+              appLanguage={appLanguage}
+              onChange={onFileTypeFilterChange}
+            />
+            <FileExplorerDateFilter
+              value={dateFilter}
+              disabled={isDisabled}
+              creationDateAvailable={creationDateAvailable}
+              appLanguage={appLanguage}
+              deviceType={deviceType}
+              onChange={onDateFilterChange}
+            />
+          </span>
         </div>
 
         {isOpen && (

@@ -16,6 +16,14 @@ import { FILE_EXPLORER_DEFAULT_FOCUSSED_DEVICE_TYPE } from '../../../constants';
 import { FILE_EXPLORER_BODY_WRAPPER_ID } from '../../../constants/dom';
 import { DEVICE_TYPE } from '../../../enums';
 import FileExplorerSearchBar from './FileExplorerSearchBar';
+import {
+  EMPTY_FILE_DATE_FILTER,
+  filterFileNodesByDate,
+} from '../../../helpers/fileDateFilter';
+import {
+  filterFileNodesByType,
+  getFileTypeOptions,
+} from '../../../helpers/fileTypeFilter';
 
 class FileExplorerBodyRender extends PureComponent {
   constructor(props) {
@@ -27,6 +35,11 @@ class FileExplorerBodyRender extends PureComponent {
       FILE_EXPLORER_DEFAULT_FOCUSSED_DEVICE_TYPE;
     this.fileExplorerBodyWrapperId = `${FILE_EXPLORER_BODY_WRAPPER_ID}-${deviceType}`;
     this.acceleratorIgnoreList = ['multipleSelectClick'];
+    this.state = {
+      dateFilter: { ...EMPTY_FILE_DATE_FILTER },
+      fileTypeFilter: [],
+    };
+    this.filteredNodesCache = null;
   }
 
   componentDidMount() {
@@ -188,6 +201,7 @@ class FileExplorerBodyRender extends PureComponent {
       data: {
         event,
         deviceType,
+        tableData: this.tableData(),
       },
     });
   };
@@ -197,8 +211,101 @@ class FileExplorerBodyRender extends PureComponent {
 
     return {
       path: currentBrowsePath[deviceType],
-      directoryLists: directoryLists[deviceType],
+      directoryLists: this.getFilteredDirectoryList(directoryLists[deviceType]),
     };
+  };
+
+  getFilteredNodes = (sourceNodes) => {
+    const { directoryLists, deviceType } = this.props;
+    const { dateFilter, fileTypeFilter } = this.state;
+    const nodes = sourceNodes || directoryLists[deviceType].nodes;
+    const fileTypeFilterKey = fileTypeFilter.join('|');
+
+    if (
+      this.filteredNodesCache?.sourceNodes === nodes &&
+      this.filteredNodesCache?.field === dateFilter.field &&
+      this.filteredNodesCache?.from === dateFilter.from &&
+      this.filteredNodesCache?.to === dateFilter.to &&
+      this.filteredNodesCache?.fileTypeFilterKey === fileTypeFilterKey
+    ) {
+      return this.filteredNodesCache.result;
+    }
+
+    const dateFilteredNodes = filterFileNodesByDate(nodes, dateFilter);
+    const result = filterFileNodesByType(dateFilteredNodes, fileTypeFilter);
+
+    this.filteredNodesCache = {
+      sourceNodes: nodes,
+      field: dateFilter.field,
+      from: dateFilter.from,
+      to: dateFilter.to,
+      fileTypeFilterKey,
+      result,
+    };
+
+    return result;
+  };
+
+  getFilteredDirectoryList = (directoryList) => ({
+    ...directoryList,
+    nodes: this.getFilteredNodes(directoryList.nodes),
+  });
+
+  getFilteredDirectoryLists = () => {
+    const { directoryLists, deviceType } = this.props;
+
+    return {
+      ...directoryLists,
+      [deviceType]: this.getFilteredDirectoryList(directoryLists[deviceType]),
+    };
+  };
+
+  handleDateFilterChange = (dateFilter) => {
+    this.applyViewFilter({ dateFilter });
+  };
+
+  handleFileTypeFilterChange = (fileTypeFilter) => {
+    this.applyViewFilter({ fileTypeFilter });
+  };
+
+  applyViewFilter = (nextFilterState) => {
+    const { deviceType, onSelectAllClick } = this.props;
+
+    this.filteredNodesCache = null;
+    this.setState(nextFilterState, () => {
+      // A hidden selection must never be transferred or deleted by surprise.
+      onSelectAllClick(deviceType, { target: { checked: false } }, []);
+      this.fileExplorerBodyWrapper?.scrollTo?.({ top: 0, behavior: 'auto' });
+    });
+  };
+
+  getFileTypeOptions = () => {
+    const { directoryLists, deviceType } = this.props;
+    const { dateFilter, fileTypeFilter } = this.state;
+    const dateFilteredNodes = filterFileNodesByDate(
+      directoryLists[deviceType].nodes,
+      dateFilter
+    );
+
+    return getFileTypeOptions(dateFilteredNodes, fileTypeFilter);
+  };
+
+  handleSelectAllVisible = (deviceType, event) => {
+    const { onSelectAllClick } = this.props;
+
+    onSelectAllClick(deviceType, event, this.getFilteredNodes());
+  };
+
+  handleTableClickVisible = (path, deviceType, event, selectionIntent) => {
+    const { onTableClick } = this.props;
+
+    onTableClick(
+      path,
+      deviceType,
+      event,
+      selectionIntent,
+      this.getFilteredNodes()
+    );
   };
 
   isExternalFileDragged = (event) => {
@@ -304,6 +411,8 @@ class FileExplorerBodyRender extends PureComponent {
       ...parentProps
     } = this.props;
     const { directoryLists } = this.props;
+    const { dateFilter, fileTypeFilter } = this.state;
+    const filteredDirectoryLists = this.getFilteredDirectoryLists();
 
     const _eventTarget = 'tableWrapperTarget';
 
@@ -353,6 +462,12 @@ class FileExplorerBodyRender extends PureComponent {
             appLanguage={appLanguage}
             appThemeMode={appThemeMode}
             onOpenResult={onSearchResultOpen}
+            dateFilter={dateFilter}
+            creationDateAvailable={deviceType === DEVICE_TYPE.local}
+            onDateFilterChange={this.handleDateFilterChange}
+            fileTypeFilter={fileTypeFilter}
+            fileTypeOptions={this.getFileTypeOptions()}
+            onFileTypeFilterChange={this.handleFileTypeFilterChange}
           />
           <FileExplorerTableBodyRender
             getTableData={this.tableData}
@@ -363,6 +478,9 @@ class FileExplorerBodyRender extends PureComponent {
             mtpDevice={mtpDevice}
             appLanguage={appLanguage}
             {...parentProps}
+            directoryLists={filteredDirectoryLists}
+            onSelectAllClick={this.handleSelectAllVisible}
+            onTableClick={this.handleTableClickVisible}
           />
         </div>
         <FileExplorerTableFooterRender
@@ -370,7 +488,7 @@ class FileExplorerBodyRender extends PureComponent {
           currentBrowsePath={currentBrowsePath}
           onBreadcrumbPathClick={onBreadcrumbPathClick}
           isStatusBarEnabled={isStatusBarEnabled}
-          directoryLists={directoryLists[deviceType]}
+          directoryLists={filteredDirectoryLists[deviceType]}
           fileTransferClipboard={fileTransferClipboard}
           fileTransferProgress={fileTransferProgress}
           mtpDevice={mtpDevice}

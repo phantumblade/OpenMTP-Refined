@@ -82,7 +82,9 @@ class FileExplorerTableHeadRender extends PureComponent {
                 className={styles.tableHeadCell}
               >
                 <Tooltip
-                  title={translate(appLanguage, 'Sort')}
+                  title={translate(appLanguage, 'Sort by {field}', {
+                    field: translate(appLanguage, row.label),
+                  })}
                   placement={row.numeric ? 'bottom-end' : 'bottom-start'}
                   enterDelay={300}
                 >
