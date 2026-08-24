@@ -147,6 +147,7 @@ class FileExplorerDateFilter extends PureComponent {
               fullWidth
               variant="outlined"
               margin="dense"
+              color="secondary"
               className={classes.dateFilterField}
             >
               <InputLabel id={labelId}>{t('Date field')}</InputLabel>
@@ -179,6 +180,7 @@ class FileExplorerDateFilter extends PureComponent {
                 type="date"
                 variant="outlined"
                 margin="dense"
+                color="secondary"
                 label={t('From date')}
                 value={draft.from}
                 onChange={this.updateDraft('from')}
@@ -190,6 +192,7 @@ class FileExplorerDateFilter extends PureComponent {
                 type="date"
                 variant="outlined"
                 margin="dense"
+                color="secondary"
                 label={t('To date')}
                 value={draft.to}
                 onChange={this.updateDraft('to')}
@@ -215,7 +218,7 @@ class FileExplorerDateFilter extends PureComponent {
               <div>
                 <Button onClick={this.close}>{t('Cancel')}</Button>
                 <Button
-                  color="primary"
+                  color="secondary"
                   variant="contained"
                   disableElevation
                   disabled={!valid}

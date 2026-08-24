@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import Button from '@material-ui/core/Button';
-import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import IconButton from '@material-ui/core/IconButton';
 import Popover from '@material-ui/core/Popover';
@@ -8,6 +7,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import { withStyles } from '@material-ui/core/styles';
 import { styles } from '../styles/FileExplorerSearchBar';
+import SelectionCheckbox from '../../../components/SelectionCheckbox';
 import { translate } from '../../../i18n';
 import {
   NO_FILE_EXTENSION,
@@ -123,16 +123,18 @@ class FileExplorerTypeFilter extends PureComponent {
                     option.id === NO_FILE_EXTENSION
                       ? t('Files without extension')
                       : option.id.toUpperCase();
+                  const selected = draft.includes(option.id);
 
                   return (
                     <FormControlLabel
                       key={option.id}
-                      className={classes.typeFilterOption}
+                      className={`${classes.typeFilterOption} ${
+                        selected ? classes.typeFilterOptionSelected : ''
+                      }`}
                       control={
-                        <Checkbox
+                        <SelectionCheckbox
                           size="small"
-                          color="primary"
-                          checked={draft.includes(option.id)}
+                          checked={selected}
                           onChange={this.toggle(option.id)}
                           inputProps={{
                             'aria-label': `${optionLabel}, ${t(
@@ -168,7 +170,7 @@ class FileExplorerTypeFilter extends PureComponent {
               <div>
                 <Button onClick={this.close}>{t('Cancel')}</Button>
                 <Button
-                  color="primary"
+                  color="secondary"
                   variant="contained"
                   disableElevation
                   onClick={this.apply}

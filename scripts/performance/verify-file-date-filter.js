@@ -65,7 +65,7 @@ assert.strictEqual(
 assert.strictEqual(isFileDateFilterActive({ from: '', to: '' }), false);
 assert.strictEqual(
   getFileIcon({ name: 'photo.JPG' }, 'light'),
-  'catppuccin/latte/jpg.svg'
+  'catppuccin/latte/image.svg'
 );
 assert.strictEqual(
   getFileIcon({ name: 'negative.dng' }, 'dark'),

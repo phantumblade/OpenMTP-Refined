@@ -185,9 +185,18 @@ export const styles = (theme) => ({
     margin: 0,
     padding: '0 6px',
     borderRadius: 7,
+    transition: 'background-color 160ms cubic-bezier(0.22, 1, 0.36, 1)',
     '&:hover': { backgroundColor: theme.palette.selectionHover },
+    '&:focus-within': { backgroundColor: theme.palette.selectionHover },
     '& .MuiCheckbox-root': { padding: 6 },
     '& .MuiFormControlLabel-label': { flex: '1 1 auto', minWidth: 0 },
+    '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
+  },
+  typeFilterOptionSelected: {
+    backgroundColor: theme.palette.selectionBg,
+    '&:hover, &:focus-within': {
+      backgroundColor: theme.palette.selectionBg,
+    },
   },
   typeFilterOptionLabel: {
     display: 'flex',
