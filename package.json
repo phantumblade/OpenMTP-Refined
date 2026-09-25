@@ -245,8 +245,10 @@
     "json5": "^1.0.2"
   },
   "devEngines": {
-    "node": ">=16.x",
-    "npm": ">=6.x <=8.16.0",
-    "yarn": ">=0.21.3"
+    "runtime": {
+      "name": "node",
+      "version": ">=16",
+      "onFail": "warn"
+    }
   }
 }
