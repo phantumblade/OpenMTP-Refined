@@ -1,5 +1,5 @@
 import { log } from '../utils/log';
-import { readFileSync, writeFileSync } from '../helpers/fileOps';
+import { readFileSync, writeFileAtomicSync } from '../helpers/fileOps';
 import { checkIf } from '../utils/checkIf';
 import { isEmpty } from '../utils/funcs';
 
@@ -22,13 +22,26 @@ export default class Storage {
         return {};
       }
 
-      return JSON.parse(_stream);
-    } catch (e) {
-      if (this.doNotLog) {
-        console.error(e, `Storage -> getAll`);
-      } else {
-        log.error(e, `Storage -> getAll`);
+      const parsed = JSON.parse(_stream);
+
+      // "null", arrays or primitives are not a valid settings store.
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        return {};
       }
+
+      return parsed;
+    } catch (e) {
+      // A missing file is the normal first-run state, not an error.
+      if (e?.code !== 'ENOENT') {
+        if (this.doNotLog) {
+          console.error(e, `Storage -> getAll`);
+        } else {
+          log.error(e, `Storage -> getAll`);
+        }
+      }
+
+      // Always honour the object contract so callers can spread the result.
+      return {};
     }
   }
 
@@ -69,7 +82,7 @@ export default class Storage {
 
   setAll({ ...data }) {
     try {
-      writeFileSync(this.filePath, JSON.stringify({ ...data }));
+      writeFileAtomicSync(this.filePath, JSON.stringify({ ...data }));
     } catch (e) {
       if (this.doNotLog) {
         console.error(e, `Storage -> setAll`);
@@ -83,7 +96,7 @@ export default class Storage {
     try {
       const currentSettings = this.getAll();
 
-      writeFileSync(
+      writeFileAtomicSync(
         this.filePath,
         JSON.stringify({ ...currentSettings, ...data })
       );

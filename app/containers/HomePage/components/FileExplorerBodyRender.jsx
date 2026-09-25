@@ -282,12 +282,29 @@ class FileExplorerBodyRender extends PureComponent {
   getFileTypeOptions = () => {
     const { directoryLists, deviceType } = this.props;
     const { dateFilter, fileTypeFilter } = this.state;
-    const dateFilteredNodes = filterFileNodesByDate(
-      directoryLists[deviceType].nodes,
-      dateFilter
-    );
+    const { nodes } = directoryLists[deviceType];
 
-    return getFileTypeOptions(dateFilteredNodes, fileTypeFilter);
+    // Runs on every render (selection, transfer progress...): cache it so the
+    // O(n) scan + O(k log k) sort only happens when its inputs change.
+    if (
+      this.fileTypeOptionsCache?.sourceNodes === nodes &&
+      this.fileTypeOptionsCache?.dateFilter === dateFilter &&
+      this.fileTypeOptionsCache?.fileTypeFilter === fileTypeFilter
+    ) {
+      return this.fileTypeOptionsCache.result;
+    }
+
+    const dateFilteredNodes = filterFileNodesByDate(nodes, dateFilter);
+    const result = getFileTypeOptions(dateFilteredNodes, fileTypeFilter);
+
+    this.fileTypeOptionsCache = {
+      sourceNodes: nodes,
+      dateFilter,
+      fileTypeFilter,
+      result,
+    };
+
+    return result;
   };
 
   handleSelectAllVisible = (deviceType, event) => {

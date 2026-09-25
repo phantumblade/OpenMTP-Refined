@@ -60,19 +60,32 @@ export const inArray = (arr, n) => {
 };
 
 export const niceBytes = (a, b) => {
-  if (a === 0) {
+  const bytes = Number(a);
+
+  // Missing, negative or non numeric sizes (e.g. unknown MTP sizes) must not
+  // render as "NaN undefined".
+  if (!Number.isFinite(bytes) || bytes <= 0) {
     return '0 Bytes';
   }
 
   const c = 1024;
   const d = b || 2;
   const e = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-  const f = Math.floor(Math.log(a) / Math.log(c));
+  const f = Math.min(
+    e.length - 1,
+    Math.max(0, Math.floor(Math.log(bytes) / Math.log(c)))
+  );
 
-  return `${parseFloat((a / c ** f).toFixed(d))} ${e[f]}`; // eslint-disable-line no-restricted-properties
+  return `${parseFloat((bytes / c ** f).toFixed(d))} ${e[f]}`; // eslint-disable-line no-restricted-properties
 };
 
 export const replaceBulk = (str, findArray, replaceArray) => {
+  // An empty pattern list would build `new RegExp('')`, which matches between
+  // every character and injects "undefined" into the string.
+  if (!findArray || findArray.length < 1) {
+    return str;
+  }
+
   let i;
   let regex = [];
   const map = {};
@@ -116,10 +129,18 @@ export const quickHash = (str) => {
 };
 
 export const percentage = (current, total) => {
-  return parseInt((current / total) * 100, 10);
+  const _current = Number(current);
+  const _total = Number(total);
+
+  // Zero byte files (0 / 0) or bogus totals must not produce NaN/Infinity.
+  if (!Number.isFinite(_current) || !Number.isFinite(_total) || _total <= 0) {
+    return 0;
+  }
+
+  return Math.min(100, Math.max(0, Math.floor((_current / _total) * 100)));
 };
 
-export const truncate = (str, length) => {
+export const truncate = (str = '', length) => {
   const dots = str.length > length ? '...' : '';
 
   return str.substring(0, length) + dots;
@@ -179,30 +200,6 @@ export const isEmpty = (x) => {
   return x.length < 1;
 };
 
-export const diffObj = (obj1, obj2) => {
-  let isSame = true;
-
-  // eslint-disable-next-line no-restricted-syntax
-  for (const p in obj1) {
-    if (typeof obj1[p] === 'object') {
-      const objectValue1 = obj1[p];
-      const objectValue2 = obj2[p];
-
-      // eslint-disable-next-line no-restricted-syntax, guard-for-in
-      for (const value in objectValue1) {
-        isSame = diffObj(objectValue1[value], objectValue2[value]);
-        if (isSame === false) {
-          return false;
-        }
-      }
-    } else if (obj1 !== obj2) {
-      isSame = false;
-    }
-  }
-
-  return isSame;
-};
-
 export const arrayEquality = (array1, array2) => {
   if (array1 === array2) {
     return true;
@@ -212,10 +209,22 @@ export const arrayEquality = (array1, array2) => {
     return false;
   }
 
-  const sortedArray1 = [...array1].sort();
-  const sortedArray2 = [...array2].sort();
+  // Multiset comparison in O(n) instead of sorting both arrays (O(n log n)).
+  const counts = new Map();
 
-  return sortedArray1.every((value, index) => value === sortedArray2[index]);
+  array1.forEach((value) => counts.set(value, (counts.get(value) || 0) + 1));
+
+  return array2.every((value) => {
+    const count = counts.get(value);
+
+    if (!count) {
+      return false;
+    }
+
+    counts.set(value, count - 1);
+
+    return true;
+  });
 };
 
 export const arrayIntersection = (array1, array2) => {
@@ -248,7 +257,8 @@ export const toggleFileExplorerDeviceType = (
 };
 
 export const isFileExplorerOnFocus = () => {
-  return document.elementFromPoint(3, 2).id === APP_TITLEBAR_DOM_ID;
+  // elementFromPoint returns null while the window is hidden or resizing.
+  return document.elementFromPoint(3, 2)?.id === APP_TITLEBAR_DOM_ID;
 };
 
 export const isString = (variable) => {
@@ -276,7 +286,7 @@ export const asserts = (condition, message) => {
     return;
   }
 
-  throw message || 'Assertion failed';
+  throw new Error(message || 'Assertion failed');
 };
 
 export const capitalize = (s) => {

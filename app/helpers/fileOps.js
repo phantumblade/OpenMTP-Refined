@@ -4,6 +4,8 @@ import {
   appendFile as _appendFileAsync,
   readFileSync as _readFileSync,
   writeFileSync as _writeFileSync,
+  renameSync as _renameSync,
+  unlinkSync as _unlinkSync,
 } from 'fs';
 import { EOL } from 'os';
 import mkdirp from 'mkdirp';
@@ -28,6 +30,29 @@ export const writeFileSync = (filePath, text) => {
     _writeFileSync(filePath, text, options);
   } catch (err) {
     console.error(err, `writeFileSync`);
+  }
+};
+
+/**
+ * Writes to a temporary sibling and renames it over the target. rename() is
+ * atomic on the same filesystem, so a crash mid-write can never leave a
+ * truncated/corrupted file (e.g. an unparsable settings.json).
+ */
+export const writeFileAtomicSync = (filePath, text) => {
+  const options = { mode: 0o755 };
+  const tempFilePath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
+
+  try {
+    _writeFileSync(tempFilePath, text, options);
+    _renameSync(tempFilePath, filePath);
+  } catch (err) {
+    console.error(err, `writeFileAtomicSync`);
+
+    try {
+      _unlinkSync(tempFilePath);
+    } catch (_) {
+      // the temp file was never created
+    }
   }
 };
 

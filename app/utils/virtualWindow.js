@@ -2,6 +2,12 @@ const normalisePositiveNumber = (value, fallback) => {
   return Number.isFinite(value) && value > 0 ? value : fallback;
 };
 
+// Math.max(0, NaN) is NaN, so undefined DOM measurements (element not mounted
+// yet) would otherwise propagate NaN into the rendered window.
+const normaliseNonNegativeNumber = (value) => {
+  return Number.isFinite(value) && value > 0 ? value : 0;
+};
+
 export const calculateListWindow = ({
   itemCount,
   scrollOffset,
@@ -9,11 +15,11 @@ export const calculateListWindow = ({
   itemSize,
   overscan = 6,
 }) => {
-  const safeItemCount = Math.max(0, itemCount);
+  const safeItemCount = Math.floor(normaliseNonNegativeNumber(itemCount));
   const safeItemSize = normalisePositiveNumber(itemSize, 1);
-  const safeViewportSize = Math.max(0, viewportSize);
-  const safeScrollOffset = Math.max(0, scrollOffset);
-  const safeOverscan = Math.max(0, overscan);
+  const safeViewportSize = normaliseNonNegativeNumber(viewportSize);
+  const safeScrollOffset = normaliseNonNegativeNumber(scrollOffset);
+  const safeOverscan = normaliseNonNegativeNumber(overscan);
   const firstVisibleIndex = Math.min(
     Math.max(0, safeItemCount - 1),
     Math.floor(safeScrollOffset / safeItemSize)
@@ -42,14 +48,17 @@ export const calculateGridWindow = ({
   itemHeight,
   overscanRows = 3,
 }) => {
-  const safeItemCount = Math.max(0, itemCount);
+  const safeItemCount = Math.floor(normaliseNonNegativeNumber(itemCount));
   const safeItemWidth = normalisePositiveNumber(itemWidth, 1);
   const safeItemHeight = normalisePositiveNumber(itemHeight, 1);
-  const columns = Math.max(1, Math.floor(containerSize / safeItemWidth));
+  const columns = Math.max(
+    1,
+    Math.floor(normaliseNonNegativeNumber(containerSize) / safeItemWidth)
+  );
   const totalRows = Math.ceil(safeItemCount / columns);
-  const safeScrollOffset = Math.max(0, scrollOffset);
-  const safeViewportSize = Math.max(0, viewportSize);
-  const safeOverscanRows = Math.max(0, overscanRows);
+  const safeScrollOffset = normaliseNonNegativeNumber(scrollOffset);
+  const safeViewportSize = normaliseNonNegativeNumber(viewportSize);
+  const safeOverscanRows = normaliseNonNegativeNumber(overscanRows);
   const firstVisibleRow = Math.min(
     Math.max(0, totalRows - 1),
     Math.floor(safeScrollOffset / safeItemHeight)

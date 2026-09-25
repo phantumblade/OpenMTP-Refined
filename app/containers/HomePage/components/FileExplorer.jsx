@@ -2257,6 +2257,12 @@ class FileExplorer extends Component {
     const item = value[orderBy];
     let _primer = null;
 
+    // Devices can omit fields (e.g. no date on MTP folders): sort them as
+    // empty instead of throwing inside path.parse / toLowerCase.
+    if (undefinedOrNull(item)) {
+      return '';
+    }
+
     if (isNumber(item)) {
       if (isInt(item)) {
         _primer = parseInt(item, 10);
@@ -2267,11 +2273,11 @@ class FileExplorer extends Component {
 
     if (_primer === null) {
       if (!value.isFolder) {
-        const _pathInfo = pathInfo(item, value.isFolder);
+        const _pathInfo = pathInfo(String(item), value.isFolder);
 
         _primer = _pathInfo.name.toLowerCase();
       } else {
-        _primer = item.toLowerCase();
+        _primer = String(item).toLowerCase();
       }
     }
 
