@@ -29,6 +29,11 @@ if (process.env.NODE_ENV === 'production') {
   CheckNodeEnv('development');
 }
 
+// loader-utils hashes with md4 by default, which OpenSSL 3 (Node >= 17)
+// rejects with "digital envelope routines::unsupported". md5 works on every
+// Node version.
+const ASSET_NAME = '[md5:hash:hex:20].[ext]';
+
 /**
  * Warn if the DLL is not built
  */
@@ -149,6 +154,7 @@ export default merge(baseConfig, {
           options: {
             limit: 10000,
             mimetype: 'application/font-woff',
+            name: ASSET_NAME,
           },
         },
       },
@@ -160,6 +166,7 @@ export default merge(baseConfig, {
           options: {
             limit: 10000,
             mimetype: 'application/font-woff',
+            name: ASSET_NAME,
           },
         },
       },
@@ -173,13 +180,17 @@ export default merge(baseConfig, {
             esModule: false,
             limit: 100000,
             mimetype: 'application/octet-stream',
+            name: ASSET_NAME,
           },
         },
       },
       // EOT Font
       {
         test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-        use: 'file-loader',
+        use: {
+          loader: 'file-loader',
+          options: { name: ASSET_NAME },
+        },
       },
       // SVG Font
       {
@@ -189,6 +200,7 @@ export default merge(baseConfig, {
           options: {
             limit: 10000,
             mimetype: 'image/svg+xml',
+            name: ASSET_NAME,
           },
         },
       },
@@ -200,7 +212,7 @@ export default merge(baseConfig, {
             loader: 'url-loader',
             options: {
               limit: 10000,
-              name: 'images/[path][name].[hash].[ext]',
+              name: 'images/[path][name].[md5:hash:hex:20].[ext]',
             },
           },
         ],
