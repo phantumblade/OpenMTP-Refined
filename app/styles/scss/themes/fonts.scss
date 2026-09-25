@@ -1,1 +1,9 @@
 @import '~roboto-fontface/css/roboto/roboto-fontface.css';
+
+@font-face {
+  font-family: 'Faculty Glyphic';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/FacultyGlyphic-Regular.ttf') format('truetype');
+}

@@ -16,6 +16,7 @@ import Switch from '@material-ui/core/Switch';
 import FormControl from '@material-ui/core/FormControl';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormHelperText from '@material-ui/core/FormHelperText';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
@@ -26,6 +27,7 @@ import {
   FILE_EXPLORER_VIEW_TYPE,
   APP_THEME_MODE_TYPE,
   APP_LANGUAGE_TYPE,
+  APP_FONT_FAMILY_TYPE,
   MTP_MODE,
   FILE_TRANSFER_DIRECTION,
 } from '../../../enums';
@@ -33,6 +35,7 @@ import { capitalize, isPrereleaseVersion } from '../../../utils/funcs';
 import { IpcEvents } from '../../../services/ipc-events/IpcEventType';
 import { isKalamModeSupported } from '../../../helpers/binaries';
 import { translate } from '../../../i18n';
+import { getAppFontFamily } from '../../../helpers/fonts';
 
 const isMas = electronIs.mas();
 
@@ -77,6 +80,7 @@ export default class SettingsDialog extends PureComponent {
       fileExplorerListingType,
       appThemeMode,
       appLanguage,
+      appFontFamily,
       styles,
       enableAutoUpdateCheck,
       enableBackgroundAutoUpdate,
@@ -98,6 +102,7 @@ export default class SettingsDialog extends PureComponent {
       onStatusBarChange,
       onAppThemeModeChange,
       onAppLanguageChange,
+      onAppFontFamilyChange,
       onShowLocalPaneChange,
       onShowLocalPaneOnLeftSideChange,
       onShowDirectoriesFirstChange,
@@ -186,6 +191,46 @@ export default class SettingsDialog extends PureComponent {
                         </MenuItem>
                       </Select>
                     </FormControl>
+
+                    <FormControl className={styles.fontControl}>
+                      <InputLabel id="app-font-family-label">
+                        {t('Interface font')}
+                      </InputLabel>
+                      <Select
+                        labelId="app-font-family-label"
+                        value={appFontFamily}
+                        onChange={(event) =>
+                          onAppFontFamilyChange(event, event.target.value)
+                        }
+                      >
+                        <MenuItem value={APP_FONT_FAMILY_TYPE.system}>
+                          {t('System default (recommended)')}
+                        </MenuItem>
+                        <MenuItem
+                          value={APP_FONT_FAMILY_TYPE.facultyGlyphic}
+                          style={{
+                            fontFamily: getAppFontFamily(
+                              APP_FONT_FAMILY_TYPE.facultyGlyphic
+                            ),
+                          }}
+                        >
+                          Faculty Glyphic
+                        </MenuItem>
+                      </Select>
+                      <FormHelperText>
+                        {t('Choose the typeface used throughout the app.')}
+                      </FormHelperText>
+                    </FormControl>
+
+                    <div
+                      className={styles.fontPreview}
+                      style={{ fontFamily: getAppFontFamily(appFontFamily) }}
+                    >
+                      <span className={styles.fontPreviewLabel}>
+                        {t('Font preview')}
+                      </span>
+                      <span>{t('Mac, phone, folders and files')}</span>
+                    </div>
 
                     <Typography variant="subtitle2" className={styles.subtitle}>
                       {t('Theme')}

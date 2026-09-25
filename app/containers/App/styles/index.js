@@ -1,5 +1,6 @@
 import { variables, mixins } from '../../../styles/js';
 import { commonThemes } from '../../../styles/js/mixins';
+import { getAppFontFamily } from '../../../helpers/fonts';
 
 // Styles for App/index.jsx component
 export const styles = (theme) => {
@@ -121,9 +122,10 @@ export const getCurrentThemePalette = (appThemeMode) => {
 };
 
 export const materialUiTheme = ({ ...args }) => {
-  const { appThemeMode } = args;
+  const { appThemeMode, appFontFamily } = args;
 
   const palette = getCurrentThemePalette(appThemeMode);
+  const fontFamily = getAppFontFamily(appFontFamily);
 
   return {
     palette: {
@@ -132,18 +134,7 @@ export const materialUiTheme = ({ ...args }) => {
     typography: {
       useNextVariants: true,
       fontSize: variables().sizes.regularFontSize,
-      fontFamily: [
-        '-apple-system',
-        'BlinkMacSystemFont',
-        '"SF Pro Text"',
-        '"Segoe UI"',
-        '"Helvetica Neue"',
-        'Arial',
-        'sans-serif',
-        '"Apple Color Emoji"',
-        '"Segoe UI Emoji"',
-        '"Segoe UI Symbol"',
-      ].join(','),
+      fontFamily,
     },
 
     overrides: {
@@ -153,6 +144,7 @@ export const materialUiTheme = ({ ...args }) => {
             '--app-bg-color': palette.background.paper,
             '--app-secondary-main-color': palette.secondary.main,
             '--app-native-system-color': palette.nativeSystemColor,
+            '--app-font-family': fontFamily,
             ...commonThemes.noselect,
           },
         },

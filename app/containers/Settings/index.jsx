@@ -138,6 +138,16 @@ class Settings extends Component {
     );
   };
 
+  _handleAppFontFamilyChange = (event, value, deviceType) => {
+    this._handleSetCommonSettingsChange(
+      {
+        key: 'appFontFamily',
+        value,
+      },
+      deviceType
+    );
+  };
+
   _handleShowLocalPaneChange = (event, value, deviceType) => {
     this._handleSetCommonSettingsChange(
       {
@@ -228,6 +238,7 @@ class Settings extends Component {
         onStatusBarChange={this._handleStatusBarChange}
         onAppThemeModeChange={this._handleSetAppThemeModeChange}
         onAppLanguageChange={this._handleAppLanguageChange}
+        onAppFontFamilyChange={this._handleAppFontFamilyChange}
         onShowLocalPaneChange={this._handleShowLocalPaneChange}
         onShowLocalPaneOnLeftSideChange={
           this._handleShowLocalPaneOnLeftSideChange

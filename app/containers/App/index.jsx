@@ -24,6 +24,7 @@ import {
   makeAppThemeMode,
   makeAppThemeModeSettings,
   makeAppLanguage,
+  makeAppFontFamily,
   makeMtpMode,
 } from '../Settings/selectors';
 import { getAppThemeMode } from '../../helpers/theme';
@@ -84,10 +85,10 @@ class App extends Component {
   };
 
   getMuiTheme = () => {
-    const { appThemeModeSettings } = this.props;
+    const { appThemeModeSettings, appFontFamily } = this.props;
     const appThemeMode = getAppThemeMode(appThemeModeSettings);
 
-    return createMuiTheme(materialUiTheme({ appThemeMode }));
+    return createMuiTheme(materialUiTheme({ appThemeMode, appFontFamily }));
   };
 
   setFreshInstall() {
@@ -196,6 +197,7 @@ const mapStateToProps = (state) => {
     appThemeModeSettings: makeAppThemeModeSettings(state),
     appThemeMode: makeAppThemeMode(state),
     appLanguage: makeAppLanguage(state),
+    appFontFamily: makeAppFontFamily(state),
     mtpDevice: makeMtpDevice(state),
     mtpMode: makeMtpMode(state),
     mtpStoragesList: makeMtpStoragesList(state),

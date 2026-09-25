@@ -9,6 +9,12 @@ const italian = {
   Language: 'Lingua',
   English: 'Inglese',
   Italian: 'Italiano',
+  'Interface font': 'Carattere dell’interfaccia',
+  'System default (recommended)': 'Predefinito di sistema (consigliato)',
+  'Choose the typeface used throughout the app.':
+    'Scegli il carattere usato in tutta l’app.',
+  'Font preview': 'Anteprima del carattere',
+  'Mac, phone, folders and files': 'Mac, telefono, cartelle e file',
   Theme: 'Aspetto',
   Light: 'Chiaro',
   Dark: 'Scuro',

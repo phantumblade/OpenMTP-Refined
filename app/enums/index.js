@@ -29,6 +29,11 @@ export const APP_LANGUAGE_TYPE = {
   italian: 'it',
 };
 
+export const APP_FONT_FAMILY_TYPE = {
+  system: 'system',
+  facultyGlyphic: 'facultyGlyphic',
+};
+
 export const FILE_TRANSFER_DIRECTION = {
   upload: 'upload',
   download: 'download',

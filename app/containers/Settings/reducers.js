@@ -4,6 +4,7 @@ import {
   FILE_EXPLORER_VIEW_TYPE,
   APP_THEME_MODE_TYPE,
   APP_LANGUAGE_TYPE,
+  APP_FONT_FAMILY_TYPE,
   MTP_MODE,
   FILE_TRANSFER_DIRECTION,
 } from '../../enums';
@@ -33,6 +34,7 @@ export const initialState = {
   },
   appThemeMode: APP_THEME_MODE_TYPE.auto,
   appLanguage: APP_LANGUAGE_TYPE.english,
+  appFontFamily: APP_FONT_FAMILY_TYPE.system,
   showLocalPane: true,
   showLocalPaneOnLeftSide: true,
   showDirectoriesFirst: true,

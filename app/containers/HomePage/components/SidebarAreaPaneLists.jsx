@@ -11,7 +11,7 @@ import DesktopMacIcon from '@material-ui/icons/DesktopMac';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import StorageIcon from '@material-ui/icons/Storage';
 import ComputerIcon from '@material-ui/icons/Computer';
-import SettingsIcon from '@material-ui/icons/Settings';
+import TuneIcon from '@material-ui/icons/Tune';
 import RefreshIcon from '@material-ui/icons/Refresh';
 import FlashOnIcon from '@material-ui/icons/FlashOn';
 import PhoneAndroidIcon from '@material-ui/icons/PhoneAndroid';
@@ -220,7 +220,7 @@ class SidebarAreaPaneLists extends PureComponent {
                 onClick={() => this._handleAction(onOpenSettings)}
               >
                 <ListItemIcon className={styles.listItemIcon}>
-                  <SettingsIcon />
+                  <TuneIcon />
                 </ListItemIcon>
                 <ListItemText
                   className={styles.listItemText}

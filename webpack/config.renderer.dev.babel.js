@@ -166,10 +166,12 @@ export default merge(baseConfig, {
       // TTF Font
       {
         test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
+        type: 'javascript/auto',
         use: {
           loader: 'url-loader',
           options: {
-            limit: 10000,
+            esModule: false,
+            limit: 100000,
             mimetype: 'application/octet-stream',
           },
         },

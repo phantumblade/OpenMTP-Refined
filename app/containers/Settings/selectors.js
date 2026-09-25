@@ -64,6 +64,10 @@ export const makeAppLanguage = createSelector(make, (state) =>
   state ? state.appLanguage : initialState.appLanguage
 );
 
+export const makeAppFontFamily = createSelector(make, (state) =>
+  state ? state.appFontFamily : initialState.appFontFamily
+);
+
 // returns the app theme mode (light, dark)
 export const makeAppThemeMode = createSelector(make, (state) => {
   const theme = state ? state.appThemeMode : initialState.appThemeMode;
