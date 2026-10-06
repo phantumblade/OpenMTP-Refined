@@ -5,28 +5,30 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import DeleteIcon from '@material-ui/icons/Delete';
-import CloseIcon from '@material-ui/icons/Close';
-import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
-import ToggleOffIcon from '@material-ui/icons/ToggleOff';
-import CheckIcon from '@material-ui/icons/Check';
-import ListAltIcon from '@material-ui/icons/ListAlt';
-import SettingsIcon from '@material-ui/icons/Settings';
-import ThumbUpIcon from '@material-ui/icons/ThumbUp';
-import FolderSpecialIcon from '@material-ui/icons/FolderSpecial';
-import CachedIcon from '@material-ui/icons/Cached';
-import UsbIcon from '@material-ui/icons/Usb';
-import TouchAppIcon from '@material-ui/icons/TouchApp';
-import RadioButtonCheckedIcon from '@material-ui/icons/RadioButtonChecked';
-import LockOpenIcon from '@material-ui/icons/Lock';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import PowerIcon from '@material-ui/icons/Power';
-import ReplayIcon from '@material-ui/icons/Replay';
-import SystemUpdate from '@material-ui/icons/SystemUpdate';
+import {
+  Cached as CachedIcon,
+  Check as CheckIcon,
+  Close as CloseIcon,
+  Delete as DeleteIcon,
+  ExpandMore as ExpandMoreIcon,
+  FiberManualRecord as FiberManualRecordIcon,
+  FolderSpecial as FolderSpecialIcon,
+  ListAlt as ListAltIcon,
+  Lock as LockOpenIcon,
+  Power as PowerIcon,
+  RadioButtonChecked as RadioButtonCheckedIcon,
+  Replay as ReplayIcon,
+  Settings as SettingsIcon,
+  SystemUpdate,
+  ThumbUp as ThumbUpIcon,
+  ToggleOff as ToggleOffIcon,
+  TouchApp as TouchAppIcon,
+  Usb as UsbIcon,
+} from '../../../components/m3/symbolIcons';
 import { styles } from '../styles/HelpPhoneNotRecognized';
 import { openExternalUrl } from '../../../utils/url';
 import {

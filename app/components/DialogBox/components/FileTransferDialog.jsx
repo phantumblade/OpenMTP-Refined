@@ -1,17 +1,13 @@
 import React, { PureComponent } from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import LinearProgress from '@material-ui/core/LinearProgress';
-import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
-import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
-import ReplayIcon from '@material-ui/icons/Replay';
-import SwapHorizIcon from '@material-ui/icons/SwapHoriz';
 import classNames from 'classnames';
+import M3Button from '../../m3/M3Button';
+import M3LoadingIndicator from '../../m3/M3LoadingIndicator';
+import M3Shape from '../../m3/M3Shape';
+import M3WavyProgress from '../../m3/M3WavyProgress';
+import MaterialSymbol from '../../m3/MaterialSymbol';
 import SlotText from '../../SlotText';
 import { styles } from '../styles/FileTransferDialog';
 import {
@@ -109,18 +105,54 @@ class FileTransferDialog extends PureComponent {
     });
   };
 
-  renderStatusIcon = () => {
-    const { classes: styles, transfer } = this.props;
+  renderStatusVisual = () => {
+    const { classes: styles, transfer, appLanguage } = this.props;
 
     if (transfer.phase === FILE_TRANSFER_PHASE.completed) {
-      return <CheckCircleOutlineIcon className={styles.successIcon} />;
+      return (
+        <M3Shape
+          shape="Cookie9Sided"
+          size={56}
+          color="currentColor"
+          className={styles.visualSuccess}
+        >
+          <MaterialSymbol
+            name="check"
+            size={28}
+            weight={700}
+            className={styles.visualIcon}
+          />
+        </M3Shape>
+      );
     }
 
     if (transfer.phase === FILE_TRANSFER_PHASE.failed) {
-      return <ErrorOutlineIcon className={styles.errorIcon} />;
+      return (
+        <M3Shape
+          shape="Cookie4Sided"
+          size={56}
+          color="currentColor"
+          className={styles.visualError}
+        >
+          <MaterialSymbol
+            name="error"
+            size={28}
+            fill={1}
+            className={styles.visualIcon}
+          />
+        </M3Shape>
+      );
     }
 
-    return <CircularProgress size={24} color="secondary" />;
+    return (
+      <M3LoadingIndicator
+        size={56}
+        contained
+        color="var(--md-sys-color-on-primary-container)"
+        containerColor="var(--md-sys-color-primary-container)"
+        aria-label={translate(appLanguage, 'Transfer in progress')}
+      />
+    );
   };
 
   render() {
@@ -164,24 +196,33 @@ class FileTransferDialog extends PureComponent {
         aria-labelledby="file-transfer-dialog-title"
         aria-describedby="file-transfer-dialog-status"
       >
-        <DialogTitle id="file-transfer-dialog-title">
-          <span className={styles.titleRow}>
-            <span className={styles.statusIcon}>{this.renderStatusIcon()}</span>
-            <span>
-              <span className={styles.title}>{this.getTitle()}</span>
-              <span className={styles.itemCount}>
-                <SlotText text={countVal} />{' '}
-                {translate(appLanguage, countVal === '1' ? 'item' : 'items')}
-              </span>
-            </span>
-          </span>
-        </DialogTitle>
+        <div className={styles.header}>
+          <div className={styles.visual}>{this.renderStatusVisual()}</div>
+          <div>
+            <h2 id="file-transfer-dialog-title" className={styles.title}>
+              {this.getTitle()}
+            </h2>
+            <div className={styles.itemCount}>
+              <SlotText text={countVal} />{' '}
+              {translate(appLanguage, countVal === '1' ? 'item' : 'items')}
+            </div>
+          </div>
+        </div>
 
         <DialogContent>
-          <div className={styles.routeCard}>
-            <span>{transfer.sourceLabel || '—'}</span>
-            <SwapHorizIcon aria-hidden="true" />
-            <span>{transfer.destinationLabel || '—'}</span>
+          <div className={styles.route}>
+            <span className={styles.routeChip}>
+              {transfer.sourceLabel || '—'}
+            </span>
+            <MaterialSymbol
+              name="arrow_forward"
+              size={20}
+              weight={600}
+              className={styles.routeArrow}
+            />
+            <span className={styles.routeChip}>
+              {transfer.destinationLabel || '—'}
+            </span>
           </div>
 
           <ol
@@ -197,7 +238,11 @@ class FileTransferDialog extends PureComponent {
                 })}
               >
                 <span className={styles.stepMarker}>
-                  {item.complete ? <CheckCircleOutlineIcon /> : index + 1}
+                  {item.complete ? (
+                    <MaterialSymbol name="check" size={16} weight={700} />
+                  ) : (
+                    index + 1
+                  )}
                 </span>
                 <span>
                   {translate(
@@ -216,26 +261,24 @@ class FileTransferDialog extends PureComponent {
           {transfer.phase === FILE_TRANSFER_PHASE.transferring && (
             <div className={styles.progressBlock}>
               <div className={styles.progressHeader}>
-                <span title={currentFileName}>{currentFileName || '—'}</span>
-                <strong>
+                <span className={styles.fileName}>
+                  {currentFileName || '—'}
+                </span>
+                <span className={styles.percent}>
                   <SlotText text={percentVal} />
-                </strong>
+                </span>
               </div>
-              <LinearProgress
-                color="secondary"
-                variant="determinate"
+              <M3WavyProgress
                 value={Math.max(0, Math.min(100, progress))}
                 aria-label={translate(appLanguage, 'Transfer progress')}
               />
               <div className={styles.progressMeta}>
                 <SlotText text={transferredAmountVal} />
-                <span className={styles.speedContainer}>
-                  <span className={styles.speedValue}>
-                    <SlotText
-                      text={transfer.speed ? String(transfer.speed) : '0.00'}
-                    />
-                  </span>
-                  <span className={styles.speedUnit}>MB/s</span>
+                <span className={styles.speed}>
+                  <SlotText
+                    text={transfer.speed ? String(transfer.speed) : '0.00'}
+                  />
+                  <span>MB/s</span>
                 </span>
               </div>
             </div>
@@ -243,13 +286,22 @@ class FileTransferDialog extends PureComponent {
 
           {(transfer.phase === FILE_TRANSFER_PHASE.checking ||
             transfer.phase === FILE_TRANSFER_PHASE.preparing) && (
-            <LinearProgress color="secondary" variant="indeterminate" />
+            <M3WavyProgress
+              indeterminate
+              aria-label={translate(appLanguage, 'Transfer progress')}
+            />
           )}
 
           {transfer.phase === FILE_TRANSFER_PHASE.failed && (
             <div className={styles.errorBox} role="alert">
-              {transfer.errorMessage ||
-                translate(appLanguage, 'The transfer could not be completed.')}
+              <MaterialSymbol name="error" size={22} fill={1} />
+              <span>
+                {transfer.errorMessage ||
+                  translate(
+                    appLanguage,
+                    'The transfer could not be completed.'
+                  )}
+              </span>
             </div>
           )}
 
@@ -267,20 +319,16 @@ class FileTransferDialog extends PureComponent {
         </DialogContent>
 
         {!active && (
-          <DialogActions className={styles.actions}>
+          <div className={styles.actions}>
             {transfer.phase === FILE_TRANSFER_PHASE.failed && (
-              <Button
-                onClick={onRetry}
-                color="secondary"
-                startIcon={<ReplayIcon />}
-              >
+              <M3Button variant="tonal" icon="replay" onClick={onRetry}>
                 {translate(appLanguage, 'Try again')}
-              </Button>
+              </M3Button>
             )}
-            <Button onClick={onClose} color="secondary" variant="contained">
+            <M3Button variant="filled" onClick={onClose}>
               {translate(appLanguage, 'Close')}
-            </Button>
-          </DialogActions>
+            </M3Button>
+          </div>
         )}
       </Dialog>
     );

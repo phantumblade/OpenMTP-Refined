@@ -61,7 +61,6 @@ class Selection extends PureComponent {
                         >
                           <FontAwesomeIcon
                             icon={item.icon}
-                            title={item.name}
                             className={classnames({
                               [styles.selectedIcon]: item.selected,
                             })}

@@ -37,13 +37,18 @@ import {
   makeMtpMode,
   makeShowLocalPaneOnLeftSide,
   makeAppLanguage,
+  makeFavoriteFolders,
 } from '../../Settings/selectors';
 import {
   BUY_ME_A_COFFEE_URL,
   DEVICES_DEFAULT_PATH,
   SUPPORT_PAYPAL_URL,
 } from '../../../constants';
-import { selectMtpMode, toggleSettings } from '../../Settings/actions';
+import {
+  selectMtpMode,
+  setFavoriteFolder,
+  toggleSettings,
+} from '../../Settings/actions';
 import { toggleWindowSizeOnDoubleClick } from '../../../helpers/titlebarDoubleClick';
 import ToolbarBody from './ToolbarBody';
 import { openExternalUrl } from '../../../utils/url';
@@ -444,6 +449,12 @@ class ToolbarAreaPane extends PureComponent {
 const mapDispatchToProps = (dispatch, _) =>
   bindActionCreators(
     {
+      actionCreateSetFavoriteFolder:
+        ({ ...args }) =>
+        (_, getState) => {
+          dispatch(setFavoriteFolder({ ...args }, getState));
+        },
+
       actionCreateListDirectory:
         ({ ...args }, deviceType) =>
         (_, getState) => {
@@ -642,6 +653,7 @@ const mapStateToProps = (state, __) => {
     multiSelectMode: makeMultiSelectMode(state),
     fileTransferProgress: makeFileTransferProgess(state),
     appLanguage: makeAppLanguage(state),
+    favoriteFolders: makeFavoriteFolders(state),
   };
 };
 

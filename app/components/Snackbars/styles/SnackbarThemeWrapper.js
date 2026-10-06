@@ -1,52 +1,45 @@
-export const styles = (theme) => ({
-  success: {
-    backgroundColor: '#2e7d32',
-  },
-  error: {
-    backgroundColor: theme.palette.snackbar.error || '#d32f2f',
-  },
-  info: {
-    backgroundColor: '#1976d2',
-  },
-  warning: {
-    backgroundColor: '#f57c00',
-  },
-  icon: {
-    fontSize: 22,
-    color: '#ffffff',
-  },
-  closeBtn: {
-    color: '#ffffff',
-    fontWeight: 650,
-    textTransform: 'none',
-    borderRadius: 8,
-    padding: '4px 10px',
-    marginLeft: 12,
-    '&:hover': {
-      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+import { alphaHex, m3State, m3Type } from '../../../styles/m3/tokens';
+
+// Material 3 snackbar: inverse surface container (from the global
+// MuiSnackbarContent override), inverse-primary action. The severity is
+// carried by a small leading icon tinted for the dark inverse surface.
+export const styles = (theme) => {
+  const { m3 } = theme.palette;
+
+  return {
+    root: {
+      minWidth: 320,
+      maxWidth: 600,
+      flexWrap: 'nowrap',
     },
-  },
-  iconVariant: {
-    opacity: 0.95,
-    marginRight: 10,
-  },
-  message: {
-    display: 'flex',
-    alignItems: 'center',
-    color: '#ffffff',
-    fontWeight: 550,
-    fontSize: 13.5,
-    lineHeight: 1.4,
-  },
-  root: {
-    minWidth: 280,
-    maxWidth: 520,
-    minHeight: 52,
-    padding: '6px 16px',
-    borderRadius: 14,
-    boxShadow: '0 12px 36px rgba(0, 0, 0, 0.22)',
-    flexGrow: 'unset',
-    cursor: 'pointer',
-    border: '1px solid rgba(255, 255, 255, 0.15)',
-  },
-});
+    message: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12,
+      padding: '10px 0',
+    },
+    icon: {
+      flexShrink: 0,
+      fontSize: 20,
+      color: m3.inversePrimary,
+    },
+    error: {
+      '& $icon': { color: m3.errorContainer },
+    },
+    warning: {},
+    success: {},
+    info: {},
+    action: {
+      ...m3Type.labelLarge,
+      minHeight: 36,
+      marginLeft: 8,
+      padding: '0 12px',
+      borderRadius: 18,
+      color: m3.inversePrimary,
+      textTransform: 'none',
+      '&:hover': {
+        backgroundColor: alphaHex(m3.inversePrimary, m3State.hover),
+      },
+    },
+  };
+};

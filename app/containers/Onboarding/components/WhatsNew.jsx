@@ -5,9 +5,11 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import BuildIcon from '@material-ui/icons/Build';
-import BugReportIcon from '@material-ui/icons/BugReport';
-import SystemUpdate from '@material-ui/icons/SystemUpdate';
+import {
+  BugReport as BugReportIcon,
+  Build as BuildIcon,
+  SystemUpdate,
+} from '../../../components/m3/symbolIcons';
 import { styles } from '../styles/WhatsNew';
 import { APP_NAME, APP_VERSION } from '../../../constants/meta';
 import { isKalamModeSupported } from '../../../helpers/binaries';

@@ -6,6 +6,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import classNames from 'classnames';
 import { niceBytes, springTruncate } from '../../../utils/funcs';
 import { FILE_EXPLORER_TABLE_TRUNCATE_MAX_CHARS } from '../../../constants';
+import FavoriteStar from '../../../components/FavoriteStar';
 import { styles } from '../styles/FileExplorerTableBodyListRender';
 import { imgsrc } from '../../../utils/imgsrc';
 import { appDateFormat } from '../../../utils/date';
@@ -69,6 +70,7 @@ class FileExplorerTableBodyListRender extends PureComponent {
       onTableClick,
       onTableDoubleClick,
       multiSelectMode,
+      isFavorite,
     } = this.props;
 
     const { RenderFileIcon, RenderFolderIcon } = this;
@@ -147,6 +149,7 @@ class FileExplorerTableBodyListRender extends PureComponent {
             ) : (
               fileName.text
             )}
+            {isFavorite && <FavoriteStar style={{ marginLeft: 6 }} />}
           </TableCell>
         )}
         {hideColList.indexOf('size') < 0 && (

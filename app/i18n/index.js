@@ -75,6 +75,13 @@ const italian = {
   Paste: 'Incolla',
   'New Folder': 'Nuova cartella',
   'Open in Finder': 'Mostra nel Finder',
+  Favorites: 'Preferiti',
+  'Add to Favorites': 'Aggiungi ai preferiti',
+  'Remove from Favorites': 'Rimuovi dai preferiti',
+  'Favorites are full (max {max})': 'Preferiti pieni (massimo {max})',
+  'Right-click a folder and choose Add to Favorites.':
+    'Fai clic destro su una cartella e scegli Aggiungi ai preferiti.',
+  'Folder not found': 'Cartella non trovata',
   Name: 'Nome',
   Size: 'Dimensione',
   Date: 'Data',
@@ -86,12 +93,10 @@ const italian = {
   'Check again': 'Controlla di nuovo',
   'Try connection again': 'Riprova la connessione',
   'Checking USB connection…': 'Controllo della connessione USB…',
-  'No known conflicting apps are currently running':
-    'Non risultano aperte app note che interferiscono con la connessione',
-  'Potential conflicts currently running: {apps}':
-    'Possibili app in conflitto attualmente aperte: {apps}',
-  'Quit the listed apps completely. OpenMTP never closes other apps automatically.':
-    'Chiudi completamente le app indicate. OpenMTP non chiude mai altre applicazioni automaticamente.',
+  'Connecting to your phone…': 'Connessione al telefono in corso…',
+  'Keep the phone unlocked. This can take a few seconds.':
+    'Tieni il telefono sbloccato: può richiedere qualche secondo.',
+  'Loading…': 'Caricamento…',
   'Connect your phone via USB and select File Transfer (MTP) mode.':
     'Collega il tuo smartphone tramite cavo USB e seleziona la modalità Trasferimento File (MTP).',
   'Data-capable USB Cable': 'Cavo USB per Dati',
@@ -129,6 +134,100 @@ const italian = {
   Connected: 'Collegato',
   'No phone': 'Nessun telefono',
   'Another OpenMTP instance': 'Un’altra istanza di OpenMTP',
+  'OpenMTP (development build)': 'OpenMTP (versione di sviluppo)',
+  'The phone is in use by: {apps}': 'Il telefono è in uso da: {apps}',
+  'Close {app} and try again': 'Chiudi {app} e riprova',
+  'Free the phone and try again': 'Libera il telefono e riprova',
+  '{app} did not quit. Close it manually, then try again.':
+    '{app} non si è chiuso. Chiudilo tu e poi riprova.',
+  'No other app is using the phone': 'Nessun’altra app sta usando il telefono',
+  'How to connect': 'Come collegarlo',
+  Guide: 'Guida',
+  'Technical detail': 'Dettaglio tecnico',
+  'Made by {name} on GitHub': 'Creato da {name} su GitHub',
+  Stars: 'Stelle',
+  Forks: 'Fork',
+  Repositories: 'Repository',
+  Followers: 'Follower',
+  'GitHub statistics are unavailable offline':
+    'Statistiche GitHub non disponibili offline',
+  'Updated {when}': 'Aggiornato {when}',
+  Profile: 'Profilo',
+  Repository: 'Repository',
+  Today: 'Oggi',
+  'Last 7 days': 'Ultimi 7 giorni',
+  'Last 30 days': 'Ultimi 30 giorni',
+  'This year': 'Quest’anno',
+  'Language and font': 'Lingua e carattere',
+  'How the app talks to you and looks.': 'Come l’app ti parla e come appare.',
+  'Light, dark or following macOS.': 'Chiaro, scuro o come macOS.',
+  'Follows the macOS appearance.': 'Segue l’aspetto di macOS.',
+  'Phone connection': 'Connessione al telefono',
+  'How OpenMTP talks to Android phones over USB.':
+    'Come OpenMTP comunica con i telefoni Android via USB.',
+  'Recommended: faster and more reliable.':
+    'Consigliata: più veloce e affidabile.',
+  'Older engine, for compatibility.': 'Motore precedente, per compatibilità.',
+  'Connects to the phone as soon as you plug in the cable.':
+    'Si collega al telefono appena attacchi il cavo.',
+  'Files whose name starts with a dot, usually system files.':
+    'File il cui nome inizia con un punto, di solito file di sistema.',
+  'Large icons in a grid instead of a detailed list.':
+    'Icone grandi in griglia invece di un elenco dettagliato.',
+  Layout: 'Disposizione',
+  'What the file panes show and where.': 'Cosa mostrano i pannelli e dove.',
+  'Item counts and selection at the bottom of each pane.':
+    'Conteggio degli elementi e selezione in fondo a ogni pannello.',
+  'Keep OpenMTP up to date automatically.':
+    'Mantieni OpenMTP aggiornato automaticamente.',
+  'The phone is not answering yet. If it is locked, unlock it and tap Allow if it asks for access.':
+    'Il telefono non risponde ancora. Se è bloccato, sbloccalo e tocca «Consenti» se chiede l’accesso.',
+  'Android shows its files only while the phone is unlocked and you have allowed access.':
+    'Android mostra i file solo quando il telefono è sbloccato e hai dato il permesso di accesso.',
+  'Unlock the phone screen.': 'Sblocca lo schermo del telefono.',
+  'If the phone asks “Allow access to phone data?”, tap Allow.':
+    'Se il telefono chiede «Consentire l’accesso ai dati del telefono?», tocca Consenti.',
+  'Press Try connection again.': 'Premi Riprova la connessione.',
+  'The Mac sees the phone, but the phone did not accept the connection. This usually happens when its screen is locked or an access request is waiting on the phone.':
+    'Il Mac vede il telefono, ma il telefono non ha accettato la connessione. Di solito succede quando lo schermo è bloccato o c’è una richiesta di accesso in attesa sul telefono.',
+  'Unlock the phone and look for an access request: tap Allow.':
+    'Sblocca il telefono e cerca la richiesta di accesso: tocca Consenti.',
+  'In the USB notification, choose File Transfer.':
+    'Nella notifica USB scegli «Trasferimento file».',
+  'If it still fails, unplug and reconnect the cable, then press Try connection again.':
+    'Se ancora non funziona, scollega e ricollega il cavo, poi premi Riprova la connessione.',
+  'The phone is locked': 'Il telefono è bloccato',
+  'Unlock the phone screen and, if Android asks, tap Allow to give access to your files. Then try again.':
+    'Sblocca lo schermo del telefono e, se Android lo chiede, tocca «Consenti» per dare accesso ai file. Poi riprova.',
+  'More than one phone is connected': 'Sono collegati più telefoni',
+  'Disconnect the other Android devices and keep only the one you want to use.':
+    'Scollega gli altri dispositivi Android e lascia solo quello che vuoi usare.',
+  'A different phone was connected': 'È stato collegato un telefono diverso',
+  'Try the connection again to open the phone that is plugged in now.':
+    'Riprova la connessione per aprire il telefono collegato adesso.',
+  'Another operation is still running': 'Un’operazione è ancora in corso',
+  'Wait a few seconds for it to finish, then try again.':
+    'Attendi qualche secondo che finisca, poi riprova.',
+  'Another app is using the phone': 'Un’altra app sta usando il telefono',
+  'Close apps that access Android phones (for example Android File Transfer or Smart Switch), then try again.':
+    'Chiudi le app che accedono ai telefoni Android (per esempio Android File Transfer o Smart Switch), poi riprova.',
+  'No phone in File Transfer mode':
+    'Nessun telefono in modalità Trasferimento file',
+  'The phone did not respond': 'Il telefono non ha risposto',
+  'Unlock the phone, unplug the cable and plug it back in, then choose File Transfer on the phone.':
+    'Sblocca il telefono, scollega e ricollega il cavo, poi scegli «Trasferimento file» sul telefono.',
+  'The connection did not work': 'La connessione non è riuscita',
+  'Unlock the phone, reconnect the cable and try again.':
+    'Sblocca il telefono, ricollega il cavo e riprova.',
+  'The Mac does not see the phone': 'Il Mac non vede il telefono',
+  'Check the cable and choose File Transfer in the USB notification on the phone.':
+    'Controlla il cavo e scegli “Trasferimento file” nella notifica USB del telefono.',
+  'It is the macOS Photos / Image Capture service: OpenMTP can free the phone for you.':
+    'È il servizio di Foto / Acquisizione Immagini di macOS: OpenMTP può liberare il telefono per te.',
+  'Close it so OpenMTP can use the phone. It will be asked to quit normally, like with ⌘Q.':
+    'Chiudila per permettere a OpenMTP di usare il telefono. Verrà chiusa normalmente, come con ⌘Q.',
+  'macOS Image Capture / PTPCamera':
+    'Acquisizione Immagini di macOS (ptpcamerad)',
   'Free of': 'liberi su',
   selected: 'selezionati',
   item: 'elemento',
@@ -279,6 +378,17 @@ export function translate(language, key, values = {}) {
   }
 
   const dictionary = dictionaries[language] || dictionaries.en;
+
+  if (targetValues.apps && targetKey !== key) {
+    targetValues = {
+      ...targetValues,
+      apps: String(targetValues.apps)
+        .split(', ')
+        .map((appName) => dictionary[appName] || appName)
+        .join(', '),
+    };
+  }
+
   let template = dictionary[targetKey] || targetKey;
 
   // Fallback for dynamic strings replacing 'Phone' with 'smartphone' in Italian

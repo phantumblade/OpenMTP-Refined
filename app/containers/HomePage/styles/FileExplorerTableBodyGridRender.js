@@ -1,4 +1,10 @@
 import { mixins } from '../../../styles/js';
+import {
+  alphaHex,
+  m3Motion,
+  m3Shape,
+  m3State,
+} from '../../../styles/m3/tokens';
 
 export const styles = (theme) => ({
   wrapper: {},
@@ -8,12 +14,22 @@ export const styles = (theme) => ({
     width: 118,
     height: 155,
     padding: 5,
-    borderRadius: 10,
-    transition: 'background-color 180ms ease, transform 180ms ease',
+    borderRadius: m3Shape.large,
+    // M3 Expressive: selection morphs the shape with the spatial spring,
+    // colours change with the effects spring
+    transition: `background-color ${m3Motion.defaultEffects}, border-radius ${m3Motion.fastSpatial}`,
     cursor: 'default',
     outline: 'none',
+    '&:hover': {
+      backgroundColor: alphaHex(theme.palette.m3.onSurface, m3State.hover),
+    },
+    // M3 focus indicator, keyboard focus only
     '&:focus-visible': {
-      boxShadow: `0 0 0 3px ${theme.palette.focusRing}`,
+      outline: `3px solid ${theme.palette.m3.secondary}`,
+      outlineOffset: 2,
+    },
+    '& $fileTypeIconWrapper': {
+      transition: `transform ${m3Motion.fastSpatial}`,
     },
     '@media (prefers-reduced-motion: reduce)': {
       transition: 'none',
@@ -56,7 +72,15 @@ export const styles = (theme) => ({
     textAlign: 'center',
   },
   itemSelected: {
-    backgroundColor: `${theme.palette.selectionBg} !important`,
+    borderRadius: m3Shape.extraLarge,
+    backgroundColor: `${theme.palette.m3.secondaryContainer} !important`,
+    '& $itemFileName': {
+      color: theme.palette.m3.onSecondaryContainer,
+      fontWeight: 600,
+    },
+    '& $fileTypeIconWrapper': {
+      transform: 'scale(1.05)',
+    },
   },
   itemMultiSelect: {
     padding: 11,
@@ -71,13 +95,11 @@ export const styles = (theme) => ({
     },
   },
   itemSelectedMulti: {
-    backgroundColor: 'transparent !important',
-    '& $filePreview, & $fileTypeIcon': {
-      opacity: 0.82,
-    },
-    '& $fileTypeIconWrapper': {
-      borderRadius: 10,
-      boxShadow: `inset 0 0 0 2px ${theme.palette.selectionBorder}`,
+    borderRadius: m3Shape.extraLarge,
+    backgroundColor: `${theme.palette.m3.secondaryContainer} !important`,
+    '& $itemFileName': {
+      color: theme.palette.m3.onSecondaryContainer,
+      fontWeight: 600,
     },
   },
   videoPreviewWrapper: {

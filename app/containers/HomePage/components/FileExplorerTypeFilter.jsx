@@ -1,13 +1,14 @@
 import React, { PureComponent } from 'react';
-import Button from '@material-ui/core/Button';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import IconButton from '@material-ui/core/IconButton';
 import Popover from '@material-ui/core/Popover';
 import Tooltip from '@material-ui/core/Tooltip';
-import FilterListIcon from '@material-ui/icons/FilterList';
 import { withStyles } from '@material-ui/core/styles';
+import classNames from 'classnames';
+import M3Button from '../../../components/m3/M3Button';
+import M3Shape from '../../../components/m3/M3Shape';
+import MaterialSymbol from '../../../components/m3/MaterialSymbol';
+import { FilterList as FilterListIcon } from '../../../components/m3/symbolIcons';
 import { styles } from '../styles/FileExplorerSearchBar';
-import SelectionCheckbox from '../../../components/SelectionCheckbox';
 import { translate } from '../../../i18n';
 import {
   NO_FILE_EXTENSION,
@@ -109,14 +110,25 @@ class FileExplorerTypeFilter extends PureComponent {
             aria-label={t('Filter files by type')}
           >
             <div className={classes.dateFilterHeader}>
-              <FilterListIcon />
+              <M3Shape
+                shape="Cookie9Sided"
+                size={44}
+                color="currentColor"
+                className={classes.headerShape}
+              >
+                <MaterialSymbol
+                  name="filter_list"
+                  size={22}
+                  className={classes.headerIcon}
+                />
+              </M3Shape>
               <div>
                 <h3>{t('Filter files by type')}</h3>
                 <p>{t('Sorting will remain unchanged')}</p>
               </div>
             </div>
 
-            <div className={classes.typeFilterList}>
+            <div className={classes.typeFilterList} role="group">
               {options.length > 0 ? (
                 options.map((option) => {
                   const optionLabel =
@@ -126,31 +138,22 @@ class FileExplorerTypeFilter extends PureComponent {
                   const selected = draft.includes(option.id);
 
                   return (
-                    <FormControlLabel
+                    <button
                       key={option.id}
-                      className={`${classes.typeFilterOption} ${
-                        selected ? classes.typeFilterOptionSelected : ''
-                      }`}
-                      control={
-                        <SelectionCheckbox
-                          size="small"
-                          checked={selected}
-                          onChange={this.toggle(option.id)}
-                          inputProps={{
-                            'aria-label': `${optionLabel}, ${t(
-                              '{count} files',
-                              { count: option.count }
-                            )}`,
-                          }}
-                        />
-                      }
-                      label={
-                        <span className={classes.typeFilterOptionLabel}>
-                          <span>{optionLabel}</span>
-                          <span>{option.count}</span>
-                        </span>
-                      }
-                    />
+                      type="button"
+                      aria-pressed={selected}
+                      aria-label={`${optionLabel}, ${t('{count} files', {
+                        count: option.count,
+                      })}`}
+                      className={classNames(classes.chip, {
+                        [classes.chipSelected]: selected,
+                      })}
+                      onClick={this.toggle(option.id)}
+                    >
+                      {selected && <MaterialSymbol name="check" size={18} />}
+                      {optionLabel}
+                      <span className={classes.chipCount}>{option.count}</span>
+                    </button>
                   );
                 })
               ) : (
@@ -161,22 +164,20 @@ class FileExplorerTypeFilter extends PureComponent {
             </div>
 
             <div className={classes.dateFilterActions}>
-              <Button
+              <M3Button
+                variant="text"
                 onClick={this.clear}
                 disabled={!active && draft.length === 0}
               >
                 {t('Reset')}
-              </Button>
+              </M3Button>
               <div>
-                <Button onClick={this.close}>{t('Cancel')}</Button>
-                <Button
-                  color="secondary"
-                  variant="contained"
-                  disableElevation
-                  onClick={this.apply}
-                >
+                <M3Button variant="text" onClick={this.close}>
+                  {t('Cancel')}
+                </M3Button>
+                <M3Button variant="filled" icon="check" onClick={this.apply}>
                   {t('Apply filter')}
-                </Button>
+                </M3Button>
               </div>
             </div>
           </div>

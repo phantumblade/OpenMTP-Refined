@@ -2,6 +2,7 @@ import { createSelector } from 'reselect';
 import { initialState } from './reducers';
 import { getAppThemeMode } from '../../helpers/theme';
 import { isPrereleaseVersion } from '../../utils/funcs';
+import { normalizeFavoriteFolders } from '../../helpers/favoriteFolders';
 
 const make = (state, _) => (state ? state.Settings : {});
 
@@ -130,3 +131,9 @@ export const makeCommonSettings = createSelector(make, (state) => {
     ..._cleanedState,
   };
 });
+
+export const makeFavoriteFolders = createSelector(make, (state) =>
+  normalizeFavoriteFolders(
+    state ? state.favoriteFolders : initialState.favoriteFolders
+  )
+);

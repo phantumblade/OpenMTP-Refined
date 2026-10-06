@@ -1,12 +1,14 @@
 import React from 'react';
 import classNames from 'classnames';
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import ErrorIcon from '@material-ui/icons/Error';
-import InfoIcon from '@material-ui/icons/Info';
 import Button from '@material-ui/core/Button';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
-import WarningIcon from '@material-ui/icons/Warning';
 import { withStyles } from '@material-ui/core/styles';
+import {
+  CheckCircle as CheckCircleIcon,
+  Error as ErrorIcon,
+  Info as InfoIcon,
+  Warning as WarningIcon,
+} from '../../m3/symbolIcons';
 import { styles } from '../styles/SnackbarThemeWrapper';
 import { translate } from '../../../i18n';
 
@@ -30,22 +32,16 @@ function SnackbarThemeWrapper(props) {
 
   return (
     <SnackbarContent
-      onClick={onClose}
-      className={classNames(styles[variant], styles.root)}
+      className={classNames(styles.root, styles[variant])}
       aria-describedby="client-snackbar"
       message={
         <span id="client-snackbar" className={styles.message}>
-          <Icon className={classNames(styles.icon, styles.iconVariant)} />
+          <Icon className={styles.icon} />
           {message}
         </span>
       }
       action={[
-        <Button
-          key={1}
-          onClick={onClose}
-          color="primary"
-          className={styles.closeBtn}
-        >
+        <Button key="close" onClick={onClose} className={styles.action}>
           {translate(appLanguage, 'Close')}
         </Button>,
       ]}

@@ -30,8 +30,8 @@ export const tableCellFileExplorerTableRowsRender = {
 export const styles = (theme) => {
   return {
     tableRowSelected: {
-      backgroundColor: `${theme.palette.selectionBg} !important`,
-      boxShadow: `inset 3px 0 0 ${theme.palette.selectionBorder}`,
+      backgroundColor: `${theme.palette.m3.secondaryContainer} !important`,
+      '& td': { color: theme.palette.m3.onSecondaryContainer },
     },
     tableCell: tableCellFileExplorerTableRowsRender,
     fileTypeIconWrapper: {

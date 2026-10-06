@@ -1,10 +1,6 @@
 export const styles = (_) => ({
-  margin: {
-    margin: 10,
-  },
+  // M3: snackbars appear at the bottom of the window
   root: {
-    top: 10,
-    right: 15,
-    left: `unset`,
+    bottom: 24,
   },
 });

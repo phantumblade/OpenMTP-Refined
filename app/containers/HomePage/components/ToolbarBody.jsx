@@ -1,5 +1,4 @@
 import React, { PureComponent, Fragment } from 'react';
-import PhoneAndroidIcon from '@material-ui/icons/PhoneAndroid';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Drawer from '@material-ui/core/Drawer';
@@ -12,7 +11,6 @@ import {
   faTerminal,
 } from '@fortawesome/free-solid-svg-icons';
 import SidebarAreaPaneLists from './SidebarAreaPaneLists';
-import { LazyLoaderOverlay } from '../styles/ToolbarAreaPane';
 import { DEVICES_LABEL } from '../../../constants';
 import {
   Confirm as ConfirmDialog,
@@ -24,6 +22,9 @@ import { imgsrc } from '../../../utils/imgsrc';
 import { isKalamModeSupported } from '../../../helpers/binaries';
 import { getDeviceBrand, translate } from '../../../i18n';
 import AnimatedActionIcon from '../../../components/AnimatedActionIcon';
+import M3LoadingIndicator from '../../../components/m3/M3LoadingIndicator';
+import M3WavyProgress from '../../../components/m3/M3WavyProgress';
+import MaterialSymbol from '../../../components/m3/MaterialSymbol';
 import { isTransferPhaseActive } from '../../../helpers/fileTransfer';
 
 export default class ToolbarAreaPane extends PureComponent {
@@ -128,7 +129,6 @@ export default class ToolbarAreaPane extends PureComponent {
       toolbarList,
       isLoadedDirectoryLists,
       toggleDrawer,
-      appThemeMode,
       onDeleteConfirmDialog,
       onMtpStoragesListClick,
       onMtpModeSelectionDialogClick,
@@ -141,6 +141,8 @@ export default class ToolbarAreaPane extends PureComponent {
       multiSelectMode,
       fileTransferProgress,
       appLanguage,
+      favoriteFolders,
+      actionCreateSetFavoriteFolder,
     } = this.props;
 
     const _toolbarList = this.activeToolbarList({
@@ -154,7 +156,6 @@ export default class ToolbarAreaPane extends PureComponent {
       fileTransferProgress,
     });
 
-    const RenderLazyLoaderOverlay = LazyLoaderOverlay({ appThemeMode });
     let _mtpStoragesList = [];
 
     if (!isEmpty(mtpStoragesList)) {
@@ -240,6 +241,13 @@ export default class ToolbarAreaPane extends PureComponent {
           <SidebarAreaPaneLists
             onClickHandler={onListDirectory}
             sidebarFavouriteList={sidebarFavouriteList}
+            favoriteFolders={favoriteFolders}
+            onRemoveFavoriteFolder={(folderPath) =>
+              actionCreateSetFavoriteFolder({
+                path: folderPath,
+                favorite: false,
+              })
+            }
             deviceType={deviceType}
             currentBrowsePath={currentBrowsePath[deviceType]}
             appLanguage={appLanguage}
@@ -251,8 +259,6 @@ export default class ToolbarAreaPane extends PureComponent {
             onToggleDrawer={onToggleDrawer}
           />
         </Drawer>
-
-        {!isLoadedDirectoryLists && <RenderLazyLoaderOverlay />}
 
         <AppBar position="static" elevation={0} className={styles.appBar}>
           <Toolbar
@@ -276,27 +282,65 @@ export default class ToolbarAreaPane extends PureComponent {
               </IconButton>
             )}
 
+            {/* phone status as an M3 tonal button: retry when disconnected,
+                storage picker when connected */}
             {isMtp && (
-              <div className={styles.deviceBadge}>
-                <PhoneAndroidIcon className={styles.deviceBadgeIcon} />
-                <span className={styles.deviceBadgeText}>
-                  {mtpDevice.isAvailable && deviceModel ? (
-                    <>
-                      <span className={styles.deviceBrand}>
-                        {deviceBrand || t('Connected')}
-                      </span>
-                      <span className={styles.deviceModel}>{deviceModel}</span>
-                    </>
-                  ) : (
-                    <span className={styles.deviceModel}>{t('No phone')}</span>
-                  )}
-                </span>
-                <span
-                  className={classNames(styles.deviceStatusDot, {
-                    [styles.deviceStatusConnected]: mtpDevice.isAvailable,
+              <Tooltip
+                title={
+                  mtpDevice.isAvailable
+                    ? t('Select Storage')
+                    : t('Try connection again')
+                }
+              >
+                <button
+                  type="button"
+                  className={classNames(styles.deviceButton, styles.noAppDrag, {
+                    [styles.deviceButtonConnected]: mtpDevice.isAvailable,
                   })}
-                />
-              </div>
+                  disabled={Boolean(mtpDevice.isLoading)}
+                  onClick={() =>
+                    onToolbarAction(
+                      mtpDevice.isAvailable ? 'storage' : 'refresh',
+                      false
+                    )
+                  }
+                >
+                  {mtpDevice.isLoading ? (
+                    <M3LoadingIndicator
+                      size={24}
+                      color="currentColor"
+                      aria-label={t('Connecting to your phone…')}
+                    />
+                  ) : (
+                    <MaterialSymbol
+                      name={mtpDevice.isAvailable ? 'mobile' : 'mobile_off'}
+                      size={20}
+                      fill={mtpDevice.isAvailable ? 1 : 0}
+                      className={styles.deviceButtonIcon}
+                    />
+                  )}
+                  <span className={styles.deviceButtonText}>
+                    {mtpDevice.isAvailable && deviceModel ? (
+                      <>
+                        {deviceBrand && (
+                          <span className={styles.deviceBrand}>
+                            {deviceBrand}
+                          </span>
+                        )}
+                        <span className={styles.deviceModel}>
+                          {deviceModel}
+                        </span>
+                      </>
+                    ) : (
+                      <span className={styles.deviceModel}>
+                        {mtpDevice.isLoading
+                          ? t('Connecting to your phone…')
+                          : t('No phone')}
+                      </span>
+                    )}
+                  </span>
+                </button>
+              </Tooltip>
             )}
 
             <div className={styles.toolbarInnerWrapper}>
@@ -355,6 +399,16 @@ export default class ToolbarAreaPane extends PureComponent {
             </div>
           </Toolbar>
         </AppBar>
+        <div className={styles.loadingBarSlot}>
+          {(isMtp
+            ? mtpDevice?.isLoading ||
+              (mtpDevice?.isAvailable && !isLoadedDirectoryLists)
+            : !isLoadedDirectoryLists) && (
+            <div className={styles.loadingBar}>
+              <M3WavyProgress indeterminate aria-label={t('Loading…')} />
+            </div>
+          )}
+        </div>
       </div>
     );
   }

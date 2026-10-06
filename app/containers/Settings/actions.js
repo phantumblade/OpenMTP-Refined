@@ -8,6 +8,10 @@ import { MTP_MODE } from '../../enums';
 import { DEVICES_DEFAULT_PATH } from '../../constants';
 import { analyticsService } from '../../services/analytics';
 import { EVENT_TYPE } from '../../enums/events';
+import {
+  addFavoriteFolder,
+  removeFavoriteFolder,
+} from '../../helpers/favoriteFolders';
 
 const prefix = '@@Settings';
 const actionTypesList = [
@@ -271,6 +275,31 @@ export function setCommonSettings(
         });
       }
     }
+  };
+}
+
+// Adds or removes a local folder from the sidebar favourites.
+// Not reported to analytics: the value contains local folder paths.
+export function setFavoriteFolder(
+  { path: folderPath, name, favorite },
+  getState
+) {
+  return (dispatch) => {
+    const { favoriteFolders } = getState().Settings;
+    const value = favorite
+      ? addFavoriteFolder(favoriteFolders, { path: folderPath, name })
+      : removeFavoriteFolder(favoriteFolders, folderPath);
+
+    dispatch({
+      type: actionTypes.COMMON_SETTINGS,
+      deviceType: null,
+      payload: {
+        key: 'favoriteFolders',
+        value,
+      },
+    });
+
+    dispatch(copySettingsToJsonFile(getState));
   };
 }
 

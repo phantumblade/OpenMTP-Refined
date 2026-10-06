@@ -1,199 +1,234 @@
 import { tableCellFileExplorerTableRowsRender } from './FileExplorerTableBodyListRender';
+import { m3Motion, m3Shape, m3Type } from '../../../styles/m3/tokens';
 
-export const styles = (theme) => ({
-  emptyTableRowWrapper: {},
-  tableCell: {
-    ...tableCellFileExplorerTableRowsRender,
-    borderBottom: 'none',
-    padding: 0,
-  },
-  emptyPaneContainer: {
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 460,
-    padding: '40px 24px',
-    textAlign: 'center',
-    overflow: 'hidden',
-  },
-  contentWrapper: {
-    position: 'relative',
-    zIndex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    maxWidth: 620,
-    width: '100%',
-  },
-  phoneIconBadge: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 64,
-    height: 64,
-    borderRadius: 20,
-    color: theme.palette.secondary.main,
-    backgroundColor: 'rgba(25, 118, 210, 0.08)',
-    boxShadow: '0 8px 24px rgba(25, 118, 210, 0.12)',
-    marginBottom: 20,
-    '& svg': {
-      fontSize: 34,
+// Phone connection screen, styled with Material 3 Expressive tokens.
+export const styles = (theme) => {
+  const { m3 } = theme.palette;
+
+  const statusVariant = (container, onContainer, shape, onShape) => ({
+    backgroundColor: container,
+    color: onContainer,
+    '& $statusShape': { color: shape },
+    '& $statusIcon': { color: onShape },
+  });
+
+  return {
+    emptyTableRowWrapper: {},
+    tableCell: {
+      ...tableCellFileExplorerTableRowsRender,
+      borderBottom: 'none',
+      padding: 0,
+      // keep the connection screen inside the pane instead of widening the table
+      width: '100%',
+      maxWidth: 0,
     },
-  },
-  title: {
-    fontWeight: 700,
-    letterSpacing: '-0.025em',
-    fontSize: 22,
-    color: theme.palette.text.primary,
-    marginBottom: 6,
-  },
-  subtitle: {
-    fontSize: 13.5,
-    color: theme.palette.text.secondary,
-    maxWidth: 440,
-    lineHeight: 1.45,
-    marginBottom: 24,
-  },
-  actionsRow: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-    marginBottom: 28,
-  },
-  primaryBtn: {
-    borderRadius: 12,
-    textTransform: 'none',
-    fontWeight: 650,
-    padding: '11px 26px',
-    fontSize: 14,
-    backgroundColor: theme.palette.secondary.main,
-    color: '#ffffff',
-    boxShadow: '0 4px 16px rgba(25, 118, 210, 0.3)',
-    transition: 'all 200ms cubic-bezier(0.2, 0, 0, 1)',
-    '&:hover': {
-      backgroundColor: '#1565c0',
-      boxShadow: '0 6px 22px rgba(25, 118, 210, 0.45)',
-      transform: 'translateY(-2px)',
+    pane: {
+      display: 'flex',
+      justifyContent: 'center',
+      padding: '32px 24px',
+      color: m3.onSurface,
     },
-    '&:active': {
-      transform: 'translateY(0)',
-      boxShadow: '0 2px 8px rgba(25, 118, 210, 0.3)',
+    // Two columns when the pane is wide enough (status + steps side by side),
+    // stacked otherwise, so everything fits without scrolling.
+    layout: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+      alignItems: 'center',
+      columnGap: 40,
+      rowGap: 24,
+      width: '100%',
+      maxWidth: 1080,
     },
-    '&.Mui-disabled': {
-      backgroundColor: 'rgba(128, 128, 128, 0.2)',
-      color: 'rgba(128, 128, 128, 0.5)',
-      boxShadow: 'none',
+    statusRow: {
+      gridColumn: '1 / -1',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 12,
+      '&:empty': { display: 'none' },
     },
-  },
-  secondaryLinkBtn: {
-    borderRadius: 12,
-    textTransform: 'none',
-    fontWeight: 600,
-    padding: '11px 20px',
-    fontSize: 14,
-    color: theme.palette.text.secondary,
-    transition: 'all 200ms ease',
-    '&:hover': {
-      color: theme.palette.secondary.main,
-      backgroundColor: 'rgba(25, 118, 210, 0.08)',
-      '& svg': {
-        transform: 'translate(2px, -2px)',
+    column: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      minWidth: 0,
+      textAlign: 'center',
+    },
+    stepsColumn: {
+      display: 'flex',
+      flexDirection: 'column',
+      minWidth: 0,
+    },
+    hero: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: 104,
+      height: 104,
+      marginBottom: 20,
+      color: m3.primaryContainer,
+    },
+    heroIcon: {
+      color: m3.onPrimaryContainer,
+    },
+    headline: {
+      ...m3Type.headlineMediumEmphasized,
+      margin: 0,
+      color: m3.onSurface,
+    },
+    supporting: {
+      ...m3Type.bodyLarge,
+      margin: '8px 0 0',
+      maxWidth: 420,
+      color: m3.onSurfaceVariant,
+    },
+    actions: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      gap: 12,
+      marginTop: 24,
+    },
+    statusCard: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 24,
+      width: '100%',
+      padding: '24px 32px 24px 24px',
+      borderRadius: m3Shape.extraLarge,
+      textAlign: 'left',
+      boxSizing: 'border-box',
+      animation: '$statusIn 500ms cubic-bezier(0.38, 1.21, 0.22, 1)',
+    },
+    '@keyframes statusIn': {
+      from: { opacity: 0, transform: 'translateY(8px) scale(0.98)' },
+      to: { opacity: 1, transform: 'none' },
+    },
+    statusShape: {},
+    statusIcon: {},
+    statusError: statusVariant(
+      m3.errorContainer,
+      m3.onErrorContainer,
+      m3.error,
+      m3.onError
+    ),
+    statusOk: statusVariant(
+      m3.surfaceContainer,
+      m3.onSurfaceVariant,
+      m3.primary,
+      m3.onPrimary
+    ),
+    statusText: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 2,
+      minWidth: 0,
+    },
+    statusFace: {
+      color: m3.error,
+    },
+    statusTitle: {
+      ...m3Type.titleLarge,
+      fontWeight: 600,
+    },
+    statusBody: {
+      ...m3Type.bodyLarge,
+      opacity: 0.9,
+    },
+    statusSteps: {
+      margin: '8px 0 0',
+      paddingLeft: 22,
+      '& li': { margin: '2px 0' },
+      '& li::marker': { fontWeight: 700 },
+    },
+    technicalDetail: {
+      ...m3Type.labelLarge,
+      display: 'block',
+      marginTop: 6,
+      fontWeight: 400,
+      opacity: 0.7,
+      wordBreak: 'break-word',
+    },
+    statusActions: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: 8,
+      marginTop: 8,
+    },
+    stepsTitle: {
+      ...m3Type.labelLargeEmphasized,
+      margin: '0 0 10px 4px',
+      color: m3.primary,
+    },
+    // M3 Expressive segmented list: separate items with small gaps, large
+    // outer corners and small inner corners.
+    list: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 2,
+      width: '100%',
+      margin: 0,
+      padding: 0,
+      listStyle: 'none',
+      textAlign: 'left',
+    },
+    listItem: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 16,
+      minHeight: 64,
+      padding: '10px 20px 10px 14px',
+      boxSizing: 'border-box',
+      borderRadius: m3Shape.extraSmall,
+      backgroundColor: m3.surfaceContainer,
+      transition: `border-radius ${m3Motion.defaultSpatial}, background-color ${m3Motion.defaultEffects}`,
+      '&:first-child': {
+        borderTopLeftRadius: m3Shape.largeIncreased,
+        borderTopRightRadius: m3Shape.largeIncreased,
+      },
+      '&:last-child': {
+        borderBottomLeftRadius: m3Shape.largeIncreased,
+        borderBottomRightRadius: m3Shape.largeIncreased,
+      },
+      '&:hover': {
+        backgroundColor: m3.surfaceContainerHigh,
+        borderRadius: m3Shape.largeIncreased,
       },
     },
-    '& svg': {
-      fontSize: 18,
-      marginLeft: 4,
-      transition: 'transform 200ms ease',
+    listText: {
+      display: 'flex',
+      flexDirection: 'column',
+      flex: 1,
+      minWidth: 0,
     },
-  },
-  diagnosticAlert: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 10,
-    padding: '10px 18px',
-    marginBottom: 28,
-    borderRadius: 20,
-    fontSize: 12.5,
-    border: '1px solid rgba(255, 152, 0, 0.3)',
-    color: theme.palette.text.primary,
-    backgroundColor: 'rgba(255, 152, 0, 0.07)',
-  },
-  conflictWarningAlert: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 10,
-    padding: '10px 18px',
-    marginBottom: 28,
-    borderRadius: 20,
-    fontSize: 12.5,
-    border: '1px solid rgba(243, 57, 80, 0.3)',
-    color: theme.palette.snackbar.error,
-    backgroundColor: 'rgba(243, 57, 80, 0.07)',
-  },
-  conflictSuccessAlert: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 8,
-    padding: '8px 16px',
-    marginBottom: 28,
-    borderRadius: 20,
-    fontSize: 12,
-    color: theme.palette.text.secondary,
-    border: `1px solid ${theme.palette.fileExplorerThinLineDividerColor}`,
-    backgroundColor: 'rgba(128, 128, 128, 0.04)',
-    '& svg': {
-      fontSize: 16,
-      color: '#2e9b5f',
+    listHeadline: {
+      ...m3Type.bodyLarge,
+      fontWeight: 500,
+      color: m3.onSurface,
     },
-  },
-  stepsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: 12,
-    width: '100%',
-    textAlign: 'left',
-  },
-  stepItem: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: 12,
-    padding: '14px 16px',
-    borderRadius: 14,
-    border: `1px solid ${theme.palette.fileExplorerThinLineDividerColor}`,
-    backgroundColor: theme.palette.background.paper,
-    transition: 'all 200ms ease',
-    '&:hover': {
-      borderColor: theme.palette.secondary.main,
-      transform: 'translateY(-2px)',
-      boxShadow: '0 6px 20px rgba(0, 0, 0, 0.04)',
+    listSupporting: {
+      ...m3Type.bodyMedium,
+      color: m3.onSurfaceVariant,
     },
-  },
-  stepIconBadge: {
-    display: 'grid',
-    placeItems: 'center',
-    width: 34,
-    height: 34,
-    flex: '0 0 auto',
-    borderRadius: 10,
-    color: theme.palette.secondary.main,
-    backgroundColor: 'rgba(25, 118, 210, 0.09)',
-    '& svg': {
-      fontSize: 19,
+    listTrailing: {
+      ...m3Type.labelLarge,
+      color: m3.onSurfaceVariant,
     },
-  },
-  stepTitle: {
-    fontSize: 12.5,
-    fontWeight: 650,
-    color: theme.palette.text.primary,
-    lineHeight: 1.35,
-  },
-  stepDesc: {
-    fontSize: 11.5,
-    marginTop: 2,
-    color: theme.palette.text.secondary,
-    lineHeight: 1.35,
-  },
-});
+    avatarPrimary: {
+      color: m3.primaryContainer,
+      '& $avatarIcon': { color: m3.onPrimaryContainer },
+    },
+    avatarSecondary: {
+      color: m3.secondaryContainer,
+      '& $avatarIcon': { color: m3.onSecondaryContainer },
+    },
+    avatarTertiary: {
+      color: m3.tertiaryContainer,
+      '& $avatarIcon': { color: m3.onTertiaryContainer },
+    },
+    avatarFixed: {
+      color: m3.primaryFixedDim,
+      '& $avatarIcon': { color: m3.onPrimaryFixedVariant },
+    },
+    avatarIcon: {},
+  };
+};

@@ -1,8 +1,9 @@
-import styled, { keyframes } from 'styled-components';
 import { variables, mixins } from '../../../styles/js';
-import { getCurrentThemePalette } from '../../App/styles';
+import { m3Motion, m3Shape, m3Type } from '../../../styles/m3/tokens';
 
 export const styles = (theme) => {
+  const { m3 } = theme.palette;
+
   return {
     root: {
       ...mixins({ theme }).appDragEnable,
@@ -58,58 +59,69 @@ export const styles = (theme) => {
       backgroundColor: `${theme.palette.toolbarButtonActive} !important`,
       color: `${theme.palette.secondary.main} !important`,
     },
-    deviceBadge: {
-      display: 'flex',
+    // phone status button (M3 Expressive tonal XS button)
+    deviceButton: {
+      display: 'inline-flex',
       alignItems: 'center',
+      gap: 6,
       minWidth: 0,
-      maxWidth: 235,
+      maxWidth: 260,
+      height: 32,
       marginLeft: 8,
-      padding: '5px 9px',
-      borderRadius: 8,
-      backgroundColor: theme.palette.statusSurface,
-      border: `1px solid ${theme.palette.divider}`,
+      padding: '0 14px 0 8px',
+      border: 'none',
+      borderRadius: 16,
+      backgroundColor: m3.surfaceContainerHighest,
+      color: m3.onSurfaceVariant,
+      fontFamily: 'inherit',
+      cursor: 'pointer',
+      outline: 'none',
+      transition: `border-radius ${m3Motion.fastSpatial}, background-color ${m3Motion.defaultEffects}, color ${m3Motion.defaultEffects}`,
+      '&:hover:not(:disabled)': {
+        backgroundColor: m3.surfaceContainerHigh,
+      },
+      '&:active:not(:disabled)': {
+        borderRadius: m3Shape.small,
+      },
+      '&:focus-visible': {
+        boxShadow: `0 0 0 3px ${m3.secondary}`,
+      },
+      '&:disabled': {
+        cursor: 'default',
+      },
     },
-    deviceBadgeIcon: {
-      flex: '0 0 auto',
-      marginRight: 6,
-      fontSize: 18,
-      color: theme.palette.text.secondary,
+    deviceButtonConnected: {
+      backgroundColor: m3.primaryContainer,
+      color: m3.onPrimaryContainer,
+      '&:hover:not(:disabled)': {
+        backgroundColor: m3.primaryFixedDim,
+      },
     },
-    deviceBadgeText: {
+    deviceButtonIcon: {
+      flexShrink: 0,
+    },
+    deviceButtonText: {
       display: 'flex',
       minWidth: 0,
       alignItems: 'baseline',
-      gap: 5,
+      gap: 6,
       whiteSpace: 'nowrap',
       overflow: 'hidden',
     },
     deviceBrand: {
-      flex: '0 0 auto',
-      fontSize: 9,
+      ...m3Type.labelLarge,
+      flexShrink: 0,
+      fontSize: 11,
       fontWeight: 700,
-      letterSpacing: '0.06em',
+      letterSpacing: '0.04em',
       textTransform: 'uppercase',
-      color: theme.palette.text.secondary,
+      opacity: 0.8,
     },
     deviceModel: {
+      ...m3Type.labelLarge,
       minWidth: 0,
       overflow: 'hidden',
       textOverflow: 'ellipsis',
-      fontSize: 12,
-      fontWeight: 600,
-      color: theme.palette.text.primary,
-    },
-    deviceStatusDot: {
-      flex: '0 0 auto',
-      width: 7,
-      height: 7,
-      marginLeft: 7,
-      borderRadius: '50%',
-      backgroundColor: theme.palette.text.disabled,
-    },
-    deviceStatusConnected: {
-      backgroundColor: '#2e9d62',
-      boxShadow: '0 0 0 3px rgba(46, 157, 98, 0.13)',
     },
     noAppDrag: {
       ...mixins({ theme }).appDragDisable,
@@ -167,6 +179,18 @@ export const styles = (theme) => {
         boxShadow: 'none !important',
       },
     },
+    // Thin, non-blocking progress bar under the pane toolbar.
+    loadingBarSlot: {
+      position: 'relative',
+      height: 0,
+      zIndex: 2,
+    },
+    loadingBar: {
+      position: 'absolute',
+      top: 0,
+      left: 12,
+      right: 12,
+    },
     toolbarDivider: {
       width: 1,
       height: 22,
@@ -174,34 +198,4 @@ export const styles = (theme) => {
       backgroundColor: theme.palette.divider,
     },
   };
-};
-
-const animateLazyLoaderOverLay = keyframes`
-  0% {
-    opacity: 1;
-    position: absolute;
-  }
-  100% {
-    opacity: 0;
-    top: -9999px;
-    left: -9999px;
-    display: none;
-    position: unset;
-    z-index: -9999;
-  }
-`;
-
-export const LazyLoaderOverlay = ({ appThemeMode }) => {
-  const { background } = getCurrentThemePalette(appThemeMode);
-
-  return styled.div`
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 9999;
-    background-color: ${background.paper};
-    animation: ${animateLazyLoaderOverLay} 0s 3s forwards;
-  `;
 };

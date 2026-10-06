@@ -1,13 +1,13 @@
 import React, { PureComponent, Fragment } from 'react';
 import classnames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
-import LinearProgress from '@material-ui/core/LinearProgress';
 import Dialog from '@material-ui/core/Dialog';
 import Tooltip from '@material-ui/core/Tooltip';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import LiveHelpIcon from '@material-ui/icons/LiveHelp';
+import { LiveHelp as LiveHelpIcon } from '../../m3/symbolIcons';
+import M3WavyProgress from '../../m3/M3WavyProgress';
 import { styles } from '../styles/ProgressBar';
 import { checkIf } from '../../../utils/checkIf';
 
@@ -72,10 +72,9 @@ class ProgressBar extends PureComponent {
                   {a.bodyText1 ?? ''}
                 </DialogContentText>
 
-                <LinearProgress
-                  color="secondary"
-                  variant={a.variant ?? 'determinate'}
-                  value={a.percentage}
+                <M3WavyProgress
+                  indeterminate={(a.variant ?? 'determinate') !== 'determinate'}
+                  value={a.percentage ?? 0}
                 />
 
                 <DialogContentText className={styles.dialogContentTextBottom}>

@@ -4,9 +4,10 @@ import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Tooltip from '@material-ui/core/Tooltip';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import { PlayArrow as PlayArrowIcon } from '../../../components/m3/symbolIcons';
 import { springTruncate } from '../../../utils/funcs';
 import { FILE_EXPLORER_GRID_TRUNCATE_MAX_CHARS } from '../../../constants';
+import FavoriteStar from '../../../components/FavoriteStar';
 import { styles } from '../styles/FileExplorerTableBodyGridRender';
 import { imgsrc } from '../../../utils/imgsrc';
 import {
@@ -384,6 +385,7 @@ class FileExplorerTableBodyGridRender extends PureComponent {
       onTableClick,
       onTableDoubleClick,
       multiSelectMode,
+      isFavorite,
     } = this.props;
     const { RenderFileIcon, RenderFolderIcon } = this;
 
@@ -449,11 +451,14 @@ class FileExplorerTableBodyGridRender extends PureComponent {
                 )
               }
             >
+              {isFavorite && (
+                <FavoriteStar style={{ marginRight: 3, marginBottom: 1 }} />
+              )}
               {fileName.isTruncated ? (
                 <Tooltip title={fileName.text}>
-                  <div className={styles.truncate}>
+                  <span className={styles.truncate}>
                     {fileName.truncatedText}
-                  </div>
+                  </span>
                 </Tooltip>
               ) : (
                 fileName.text

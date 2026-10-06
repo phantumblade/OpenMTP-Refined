@@ -3,13 +3,15 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import FileCopyIcon from '@material-ui/icons/FileCopy';
-import TouchAppIcon from '@material-ui/icons/TouchApp';
-import AttachFileIcon from '@material-ui/icons/AttachFile';
-import SendIcon from '@material-ui/icons/Send';
-import UsbIcon from '@material-ui/icons/Usb';
-import EmailIcon from '@material-ui/icons/Email';
 import Button from '@material-ui/core/Button';
+import {
+  AttachFile as AttachFileIcon,
+  Email as EmailIcon,
+  FileCopy as FileCopyIcon,
+  Send as SendIcon,
+  TouchApp as TouchAppIcon,
+  Usb as UsbIcon,
+} from '../../../components/m3/symbolIcons';
 import { DEVICES_LABEL } from '../../../constants';
 import { DEVICE_TYPE } from '../../../enums';
 

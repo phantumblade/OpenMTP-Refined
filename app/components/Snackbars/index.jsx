@@ -41,7 +41,7 @@ class Snackbars extends PureComponent {
     return (
       <Snackbar
         className={styles.root}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         open={this.snackbarOpen}
         autoHideDuration={autoHideDuration}
         onClose={this._handleClose}

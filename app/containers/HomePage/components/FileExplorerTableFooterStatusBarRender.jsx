@@ -1,12 +1,14 @@
 import React, { PureComponent } from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import ComputerIcon from '@material-ui/icons/Computer';
-import PhoneAndroidIcon from '@material-ui/icons/PhoneAndroid';
-import FolderOutlinedIcon from '@material-ui/icons/FolderOutlined';
-import InsertDriveFileOutlinedIcon from '@material-ui/icons/InsertDriveFileOutlined';
-import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
-import SwapHorizIcon from '@material-ui/icons/SwapHoriz';
 import Button from '@material-ui/core/Button';
+import {
+  AssignmentOutlined as AssignmentOutlinedIcon,
+  Computer as ComputerIcon,
+  FolderOutlined as FolderOutlinedIcon,
+  InsertDriveFileOutlined as InsertDriveFileOutlinedIcon,
+  PhoneAndroid as PhoneAndroidIcon,
+  SwapHoriz as SwapHorizIcon,
+} from '../../../components/m3/symbolIcons';
 import SlotText from '../../../components/SlotText';
 import { styles } from '../styles/FileExplorerTableFooterStatusBarRender';
 import { DEVICE_TYPE } from '../../../enums';

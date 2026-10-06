@@ -2,16 +2,18 @@ import React, { PureComponent, Fragment } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-import FolderOutlinedIcon from '@material-ui/icons/FolderOutlined';
-import ImageOutlinedIcon from '@material-ui/icons/ImageOutlined';
-import MovieOutlinedIcon from '@material-ui/icons/MovieOutlined';
-import AudiotrackOutlinedIcon from '@material-ui/icons/AudiotrackOutlined';
-import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
-import ArchiveOutlinedIcon from '@material-ui/icons/ArchiveOutlined';
-import CodeOutlinedIcon from '@material-ui/icons/CodeOutlined';
-import InsertDriveFileOutlinedIcon from '@material-ui/icons/InsertDriveFileOutlined';
-import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import {
+  ArchiveOutlined as ArchiveOutlinedIcon,
+  AudiotrackOutlined as AudiotrackOutlinedIcon,
+  CodeOutlined as CodeOutlinedIcon,
+  DescriptionOutlined as DescriptionOutlinedIcon,
+  FolderOutlined as FolderOutlinedIcon,
+  ImageOutlined as ImageOutlinedIcon,
+  InsertDriveFileOutlined as InsertDriveFileOutlinedIcon,
+  KeyboardArrowDown as KeyboardArrowDownIcon,
+  KeyboardArrowRight as KeyboardArrowRightIcon,
+  MovieOutlined as MovieOutlinedIcon,
+} from '../../../components/m3/symbolIcons';
 import FileExplorerTableGridRender from './FileExplorerTableBodyGridRender';
 import { styles } from '../styles/FileExplorerTableBodyGridWrapperRender';
 import { calculateGridWindow } from '../../../utils/virtualWindow';
@@ -270,6 +272,7 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
       multiSelectMode,
       appThemeMode,
       currentBrowsePath,
+      favoritePaths,
     } = this.props;
     const { collapsedSections } = this.state;
     const selectedSet = this.getSelectedPathsSet();
@@ -323,6 +326,7 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
                 key={item.path}
                 item={item}
                 isSelected={selectedSet.has(item.path)}
+                isFavorite={!!favoritePaths && favoritePaths.has(item.path)}
                 deviceType={deviceType}
                 _eventTarget={_eventTarget}
                 getTableData={getTableData}
@@ -352,6 +356,7 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
       multiSelectMode,
       appThemeMode,
       currentBrowsePath,
+      favoritePaths,
       orderBy,
     } = this.props;
 
@@ -399,6 +404,7 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
                 key={item.path}
                 item={item}
                 isSelected={selectedSet.has(item.path)}
+                isFavorite={!!favoritePaths && favoritePaths.has(item.path)}
                 deviceType={deviceType}
                 _eventTarget={_eventTarget}
                 getTableData={getTableData}

@@ -21,7 +21,6 @@ export const styles = (_) => ({
   },
   titleText: {
     float: `left`,
-    fontSize: 17,
   },
   bottomText: {
     fontSize: 10,

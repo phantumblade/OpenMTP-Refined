@@ -4,24 +4,18 @@ import electronIs from 'electron-is';
 import classNames from 'classnames';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import Radio from '@material-ui/core/Radio';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import Paper from '@material-ui/core/Paper';
 import Switch from '@material-ui/core/Switch';
-import FormControl from '@material-ui/core/FormControl';
-import FormGroup from '@material-ui/core/FormGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
+import MaterialSymbol from '../../../components/m3/MaterialSymbol';
+import M3Shape from '../../../components/m3/M3Shape';
 import { DEVICES_LABEL } from '../../../constants';
-import SettingsDialogTabContainer from './SettingsDialogTabContainer';
 import {
   DEVICE_TYPE,
   FILE_EXPLORER_VIEW_TYPE,
@@ -70,6 +64,104 @@ export default class SettingsDialog extends PureComponent {
     }
 
     return position;
+  };
+
+  // Section = icon in an M3 shape, title and a sentence explaining it, then
+  // a segmented list of rows ("stacked" corners: large outside, small inside).
+  renderSection = ({ icon, title, description, children, grouped = true }) => {
+    const { styles } = this.props;
+
+    return (
+      <section className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <M3Shape
+            shape="Cookie9Sided"
+            size={40}
+            color="currentColor"
+            className={styles.sectionShape}
+          >
+            <MaterialSymbol
+              name={icon}
+              size={22}
+              fill={1}
+              className={styles.sectionIcon}
+            />
+          </M3Shape>
+          <div>
+            <div className={styles.sectionTitle}>{title}</div>
+            {description && (
+              <div className={styles.sectionDescription}>{description}</div>
+            )}
+          </div>
+        </div>
+        {grouped ? <div className={styles.group}>{children}</div> : children}
+      </section>
+    );
+  };
+
+  renderRowContent = ({ icon, title, description }) => {
+    const { styles } = this.props;
+
+    return (
+      <>
+        <MaterialSymbol name={icon} size={24} className={styles.rowIcon} />
+        <span className={styles.rowText}>
+          <span className={styles.rowTitle}>{title}</span>
+          {description && (
+            <span className={styles.rowDescription}>{description}</span>
+          )}
+        </span>
+      </>
+    );
+  };
+
+  renderRow = ({ icon, title, description, control }) => {
+    const { styles } = this.props;
+
+    return (
+      <div className={styles.row}>
+        {this.renderRowContent({ icon, title, description })}
+        {control && <span className={styles.rowControl}>{control}</span>}
+      </div>
+    );
+  };
+
+  // the whole row is the label, so clicking anywhere toggles the switch
+  renderSwitchRow = ({
+    icon,
+    title,
+    description,
+    checked,
+    disabled,
+    onChange,
+  }) => {
+    const { styles } = this.props;
+
+    return (
+      <label
+        className={classNames(styles.row, styles.rowInteractive, {
+          [styles.rowDisabled]: disabled,
+        })}
+      >
+        {this.renderRowContent({ icon, title, description })}
+        <span className={styles.rowControl}>
+          <Switch checked={!!checked} disabled={disabled} onChange={onChange} />
+        </span>
+      </label>
+    );
+  };
+
+  renderRadioRow = ({ icon, value, title, description }) => {
+    const { styles } = this.props;
+
+    return (
+      <label className={classNames(styles.row, styles.rowInteractive)}>
+        {this.renderRowContent({ icon, title, description })}
+        <span className={styles.rowControl}>
+          <Radio value={value} />
+        </span>
+      </label>
+    );
   };
 
   render() {
@@ -130,7 +222,8 @@ export default class SettingsDialog extends PureComponent {
       <Dialog
         open={open}
         fullWidth
-        maxWidth="sm"
+        maxWidth="md"
+        classes={{ paper: styles.dialogPaper }}
         aria-labelledby="settings-dialogbox"
         disableEscapeKeyDown={false}
         onEscapeKeyDown={() =>
@@ -139,570 +232,467 @@ export default class SettingsDialog extends PureComponent {
           })
         }
       >
-        <Typography variant="h5" className={styles.title}>
+        <h2 id="settings-dialogbox" className={styles.title}>
           {t('Settings')}
-        </Typography>
-        <DialogContent>
+        </h2>
+        <DialogContent className={styles.content}>
           <Tabs
             className={styles.tabHeadingWrapper}
             value={tabIndex}
             onChange={this._handleTabChange}
-            indicatorColor="secondary"
-            textColor="secondary"
-            variant="scrollable"
-            scrollButtons="auto"
+            indicatorColor="primary"
+            textColor="primary"
+            variant="fullWidth"
+            TabIndicatorProps={{ children: <span /> }}
           >
             {this.shoudThisTabHeadRender(0) && (
-              <Tab label={t('General')} className={styles.tab} />
+              <Tab
+                icon={<MaterialSymbol name="tune" size={24} />}
+                label={t('General')}
+              />
             )}
             {this.shoudThisTabHeadRender(1) && (
-              <Tab label={t('File Manager')} className={styles.tab} />
+              <Tab
+                icon={<MaterialSymbol name="folder_open" size={24} />}
+                label={t('File Manager')}
+              />
             )}
             {this.shoudThisTabHeadRender(2) && (
-              <Tab label={t('Updates')} className={styles.tab} />
+              <Tab
+                icon={<MaterialSymbol name="system_update_alt" size={24} />}
+                label={t('Updates')}
+              />
             )}
             {this.shoudThisTabHeadRender(3) && (
-              <Tab label={t('Privacy')} className={styles.tab} />
+              <Tab
+                icon={<MaterialSymbol name="privacy_tip" size={24} />}
+                label={t('Privacy')}
+              />
             )}
           </Tabs>
 
-          {/* ----- General Tab ----- */}
-          <FormControl component="fieldset" className={styles.fieldset}>
+          <div className={styles.tabContainer}>
+            {/* ----- General Tab ----- */}
             {tabIndex === this.tabBodyRenderTabIndex(0) && (
-              <SettingsDialogTabContainer>
-                <div className={styles.tabContainer}>
-                  <FormGroup>
-                    <FormControl className={styles.languageControl}>
-                      <InputLabel id="app-language-label">
-                        {t('Language')}
-                      </InputLabel>
-                      <Select
-                        labelId="app-language-label"
-                        value={appLanguage}
-                        onChange={(event) =>
-                          onAppLanguageChange(event, event.target.value)
-                        }
-                      >
-                        <MenuItem value={APP_LANGUAGE_TYPE.english}>
-                          {t('English')}
-                        </MenuItem>
-                        <MenuItem value={APP_LANGUAGE_TYPE.italian}>
-                          {t('Italian')}
-                        </MenuItem>
-                      </Select>
-                    </FormControl>
+              <>
+                {this.renderSection({
+                  icon: 'translate',
+                  title: t('Language and font'),
+                  description: t('How the app talks to you and looks.'),
+                  children: (
+                    <>
+                      {this.renderRow({
+                        icon: 'language',
+                        title: t('Language'),
+                        control: (
+                          <Select
+                            variant="outlined"
+                            className={styles.rowSelect}
+                            value={appLanguage}
+                            onChange={(event) =>
+                              onAppLanguageChange(event, event.target.value)
+                            }
+                          >
+                            <MenuItem value={APP_LANGUAGE_TYPE.english}>
+                              {t('English')}
+                            </MenuItem>
+                            <MenuItem value={APP_LANGUAGE_TYPE.italian}>
+                              {t('Italian')}
+                            </MenuItem>
+                          </Select>
+                        ),
+                      })}
+                      {this.renderRow({
+                        icon: 'text_fields',
+                        title: t('Interface font'),
+                        description: t(
+                          'Choose the typeface used throughout the app.'
+                        ),
+                        control: (
+                          <Select
+                            variant="outlined"
+                            className={styles.rowSelect}
+                            value={appFontFamily}
+                            onChange={(event) =>
+                              onAppFontFamilyChange(event, event.target.value)
+                            }
+                          >
+                            <MenuItem value={APP_FONT_FAMILY_TYPE.system}>
+                              {t('System default (recommended)')}
+                            </MenuItem>
+                            <MenuItem
+                              value={APP_FONT_FAMILY_TYPE.facultyGlyphic}
+                              style={{
+                                fontFamily: getAppFontFamily(
+                                  APP_FONT_FAMILY_TYPE.facultyGlyphic
+                                ),
+                              }}
+                            >
+                              Faculty Glyphic
+                            </MenuItem>
+                          </Select>
+                        ),
+                      })}
+                      {this.renderRow({
+                        icon: 'text_format',
+                        title: t('Font preview'),
+                        description: (
+                          <span
+                            className={styles.fontPreview}
+                            style={{
+                              fontFamily: getAppFontFamily(appFontFamily),
+                            }}
+                          >
+                            {t('Mac, phone, folders and files')}
+                          </span>
+                        ),
+                      })}
+                    </>
+                  ),
+                })}
 
-                    <FormControl className={styles.fontControl}>
-                      <InputLabel id="app-font-family-label">
-                        {t('Interface font')}
-                      </InputLabel>
-                      <Select
-                        labelId="app-font-family-label"
-                        value={appFontFamily}
-                        onChange={(event) =>
-                          onAppFontFamilyChange(event, event.target.value)
-                        }
-                      >
-                        <MenuItem value={APP_FONT_FAMILY_TYPE.system}>
-                          {t('System default (recommended)')}
-                        </MenuItem>
-                        <MenuItem
-                          value={APP_FONT_FAMILY_TYPE.facultyGlyphic}
-                          style={{
-                            fontFamily: getAppFontFamily(
-                              APP_FONT_FAMILY_TYPE.facultyGlyphic
-                            ),
-                          }}
-                        >
-                          Faculty Glyphic
-                        </MenuItem>
-                      </Select>
-                      <FormHelperText>
-                        {t('Choose the typeface used throughout the app.')}
-                      </FormHelperText>
-                    </FormControl>
-
-                    <div
-                      className={styles.fontPreview}
-                      style={{ fontFamily: getAppFontFamily(appFontFamily) }}
-                    >
-                      <span className={styles.fontPreviewLabel}>
-                        {t('Font preview')}
-                      </span>
-                      <span>{t('Mac, phone, folders and files')}</span>
-                    </div>
-
-                    <Typography variant="subtitle2" className={styles.subtitle}>
-                      {t('Theme')}
-                    </Typography>
+                {this.renderSection({
+                  icon: 'palette',
+                  title: t('Theme'),
+                  description: t('Light, dark or following macOS.'),
+                  children: (
                     <RadioGroup
-                      aria-label="app-theme-mode"
-                      name="app-theme-mode"
+                      className={styles.group}
                       value={appThemeMode}
                       onChange={onAppThemeModeChange}
                     >
-                      <FormControlLabel
-                        value={APP_THEME_MODE_TYPE.light}
-                        control={<Radio />}
-                        label={t('Light')}
-                      />
-                      <FormControlLabel
-                        value={APP_THEME_MODE_TYPE.dark}
-                        control={<Radio />}
-                        label={t('Dark')}
-                      />
-                      <FormControlLabel
-                        value={APP_THEME_MODE_TYPE.auto}
-                        control={<Radio />}
-                        label={t('Auto')}
-                      />
+                      {this.renderRadioRow({
+                        icon: 'light_mode',
+                        value: APP_THEME_MODE_TYPE.light,
+                        title: t('Light'),
+                      })}
+                      {this.renderRadioRow({
+                        icon: 'dark_mode',
+                        value: APP_THEME_MODE_TYPE.dark,
+                        title: t('Dark'),
+                      })}
+                      {this.renderRadioRow({
+                        icon: 'brightness_auto',
+                        value: APP_THEME_MODE_TYPE.auto,
+                        title: t('Auto'),
+                        description: t('Follows the macOS appearance.'),
+                      })}
                     </RadioGroup>
+                  ),
+                  grouped: false,
+                })}
 
-                    {showMtpModeSelection && (
-                      <>
-                        <Typography
-                          variant="subtitle2"
-                          className={`${styles.subtitle}  ${styles.fmSettingsStylesFix}`}
-                        >
-                          {t('MTP Mode')}
-                        </Typography>
+                {this.renderSection({
+                  icon: 'usb',
+                  title: t('Phone connection'),
+                  description: t(
+                    'How OpenMTP talks to Android phones over USB.'
+                  ),
+                  children: (
+                    <>
+                      {showMtpModeSelection && (
                         <RadioGroup
-                          aria-label="app-theme-mode"
-                          name="app-theme-mode"
+                          className={styles.group}
                           value={mtpMode}
                           onChange={(e, value) =>
                             onMtpModeChange(e, value, DEVICE_TYPE.mtp)
                           }
                         >
-                          <FormControlLabel
-                            value={MTP_MODE.kalam}
-                            control={<Radio />}
-                            label={capitalize(MTP_MODE.kalam)}
-                          />
-                          <FormControlLabel
-                            value={MTP_MODE.legacy}
-                            control={<Radio />}
-                            label={capitalize(MTP_MODE.legacy)}
-                          />
+                          {this.renderRadioRow({
+                            icon: 'bolt',
+                            value: MTP_MODE.kalam,
+                            title: capitalize(MTP_MODE.kalam),
+                            description: t(
+                              'Recommended: faster and more reliable.'
+                            ),
+                          })}
+                          {this.renderRadioRow({
+                            icon: 'history',
+                            value: MTP_MODE.legacy,
+                            title: capitalize(MTP_MODE.legacy),
+                            description: t('Older engine, for compatibility.'),
+                          })}
                         </RadioGroup>
-                      </>
-                    )}
-
-                    <Typography
-                      variant="subtitle2"
-                      className={`${styles.subtitle} ${styles.fmSettingsStylesFix}`}
-                    >
-                      {t('Enable auto device detection (USB Hotplug)')}
-                    </Typography>
-                    <FormControlLabel
-                      className={styles.switch}
-                      control={
-                        <Switch
-                          checked={enableUsbHotplug}
-                          onChange={(e) =>
-                            onEnableUsbHotplug(e, !enableUsbHotplug)
-                          }
-                        />
-                      }
-                      label={t(enableUsbHotplug ? 'Enabled' : 'Disabled')}
-                    />
-                  </FormGroup>
-                </div>
-              </SettingsDialogTabContainer>
+                      )}
+                      <div className={styles.group}>
+                        {this.renderSwitchRow({
+                          icon: 'cable',
+                          title: t(
+                            'Enable auto device detection (USB Hotplug)'
+                          ),
+                          description: t(
+                            'Connects to the phone as soon as you plug in the cable.'
+                          ),
+                          checked: enableUsbHotplug,
+                          onChange: (e) =>
+                            onEnableUsbHotplug(e, !enableUsbHotplug),
+                        })}
+                      </div>
+                    </>
+                  ),
+                  grouped: false,
+                })}
+              </>
             )}
 
             {/* ----- File Manager Tab ----- */}
             {tabIndex === this.tabBodyRenderTabIndex(1) && (
-              <SettingsDialogTabContainer>
-                <div className={styles.tabContainer}>
-                  <FormGroup>
-                    <Typography variant="subtitle2" className={styles.subtitle}>
-                      {t('Show hidden files')}
-                    </Typography>
-                    <FormControlLabel
-                      className={styles.switch}
-                      control={
-                        <Switch
-                          checked={!hideHiddenFilesLocal}
-                          onChange={(e) =>
-                            onHiddenFilesChange(
-                              e,
-                              !hideHiddenFilesLocal,
-                              DEVICE_TYPE.local
-                            )
-                          }
-                        />
-                      }
-                      label={t(DEVICES_LABEL[DEVICE_TYPE.local])}
-                    />
-                    <FormControlLabel
-                      className={styles.switch}
-                      control={
-                        <Switch
-                          checked={!hideHiddenFilesMtp}
-                          onChange={(e) =>
-                            onHiddenFilesChange(
-                              e,
-                              !hideHiddenFilesMtp,
-                              DEVICE_TYPE.mtp
-                            )
-                          }
-                        />
-                      }
-                      label={t(DEVICES_LABEL[DEVICE_TYPE.mtp])}
-                    />
-
-                    <Typography
-                      variant="subtitle2"
-                      className={`${styles.subtitle} ${styles.fmSettingsStylesFix}`}
-                    >
-                      {t('View as grid')}
-                    </Typography>
-                    <FormControlLabel
-                      className={styles.switch}
-                      control={
-                        <Switch
-                          checked={fileExplorerListingTypeLocalGrid}
-                          onChange={(e) =>
-                            onFileExplorerListingType(
-                              e,
-                              fileExplorerListingTypeLocalGrid
-                                ? FILE_EXPLORER_VIEW_TYPE.list
-                                : FILE_EXPLORER_VIEW_TYPE.grid,
-                              DEVICE_TYPE.local
-                            )
-                          }
-                        />
-                      }
-                      label={t(DEVICES_LABEL[DEVICE_TYPE.local])}
-                    />
-                    <FormControlLabel
-                      className={styles.switch}
-                      control={
-                        <Switch
-                          checked={fileExplorerListingTypeMtpGrid}
-                          onChange={(e) =>
-                            onFileExplorerListingType(
-                              e,
-                              fileExplorerListingTypeMtpGrid
-                                ? FILE_EXPLORER_VIEW_TYPE.list
-                                : FILE_EXPLORER_VIEW_TYPE.grid,
-                              DEVICE_TYPE.mtp
-                            )
-                          }
-                        />
-                      }
-                      label={t(DEVICES_LABEL[DEVICE_TYPE.mtp])}
-                    />
-
-                    <Typography
-                      variant="subtitle2"
-                      className={`${styles.subtitle} ${styles.fmSettingsStylesFix}`}
-                    >
-                      {t(
-                        'Display overall progress on the file transfer screen'
-                      )}
-                    </Typography>
-                    <FormControlLabel
-                      className={styles.switch}
-                      control={
-                        <Switch
-                          checked={
-                            filesPreprocessingBeforeTransfer[
-                              FILE_TRANSFER_DIRECTION.download
-                            ]
-                          }
-                          onChange={(e) =>
-                            onFilesPreprocessingBeforeTransferChange(
-                              e,
-                              !filesPreprocessingBeforeTransfer[
-                                FILE_TRANSFER_DIRECTION.download
-                              ],
-                              FILE_TRANSFER_DIRECTION.download
-                            )
-                          }
-                        />
-                      }
-                      label={t('To {device}', {
-                        device: t(DEVICES_LABEL[DEVICE_TYPE.local]),
+              <>
+                {this.renderSection({
+                  icon: 'visibility',
+                  title: t('Show hidden files'),
+                  description: t(
+                    'Files whose name starts with a dot, usually system files.'
+                  ),
+                  children: (
+                    <>
+                      {this.renderSwitchRow({
+                        icon: 'laptop_mac',
+                        title: t(DEVICES_LABEL[DEVICE_TYPE.local]),
+                        checked: !hideHiddenFilesLocal,
+                        onChange: (e) =>
+                          onHiddenFilesChange(
+                            e,
+                            !hideHiddenFilesLocal,
+                            DEVICE_TYPE.local
+                          ),
                       })}
-                    />
-                    <FormControlLabel
-                      className={styles.switch}
-                      control={
-                        <Switch
-                          checked={
-                            filesPreprocessingBeforeTransfer[
-                              FILE_TRANSFER_DIRECTION.upload
-                            ]
-                          }
-                          onChange={(e) =>
-                            onFilesPreprocessingBeforeTransferChange(
-                              e,
-                              !filesPreprocessingBeforeTransfer[
-                                FILE_TRANSFER_DIRECTION.upload
-                              ],
-                              FILE_TRANSFER_DIRECTION.upload
-                            )
-                          }
-                        />
-                      }
-                      label={t('To {device}', {
-                        device: t(DEVICES_LABEL[DEVICE_TYPE.mtp]),
+                      {this.renderSwitchRow({
+                        icon: 'mobile',
+                        title: t(DEVICES_LABEL[DEVICE_TYPE.mtp]),
+                        checked: !hideHiddenFilesMtp,
+                        onChange: (e) =>
+                          onHiddenFilesChange(
+                            e,
+                            !hideHiddenFilesMtp,
+                            DEVICE_TYPE.mtp
+                          ),
                       })}
-                    />
+                    </>
+                  ),
+                })}
 
-                    {freshInstall ? (
-                      <Paper
-                        className={`${styles.onboardingPaper}`}
-                        elevation={0}
-                      >
-                        <Typography
-                          component="p"
-                          className={`${styles.onboardingPaperBody}`}
-                        >
-                          <span className={`${styles.onboardingPaperBodyItem}`}>
-                            &#9679;&nbsp;
-                            {t('Use the toggles to enable or disable an item.')}
-                          </span>
-                          <span className={`${styles.onboardingPaperBodyItem}`}>
-                            &#9679;&nbsp;{t('Scroll down for more Settings.')}
-                          </span>
-                        </Typography>
-                      </Paper>
-                    ) : null}
+                {this.renderSection({
+                  icon: 'grid_view',
+                  title: t('View as grid'),
+                  description: t(
+                    'Large icons in a grid instead of a detailed list.'
+                  ),
+                  children: (
+                    <>
+                      {this.renderSwitchRow({
+                        icon: 'laptop_mac',
+                        title: t(DEVICES_LABEL[DEVICE_TYPE.local]),
+                        checked: fileExplorerListingTypeLocalGrid,
+                        onChange: (e) =>
+                          onFileExplorerListingType(
+                            e,
+                            fileExplorerListingTypeLocalGrid
+                              ? FILE_EXPLORER_VIEW_TYPE.list
+                              : FILE_EXPLORER_VIEW_TYPE.grid,
+                            DEVICE_TYPE.local
+                          ),
+                      })}
+                      {this.renderSwitchRow({
+                        icon: 'mobile',
+                        title: t(DEVICES_LABEL[DEVICE_TYPE.mtp]),
+                        checked: fileExplorerListingTypeMtpGrid,
+                        onChange: (e) =>
+                          onFileExplorerListingType(
+                            e,
+                            fileExplorerListingTypeMtpGrid
+                              ? FILE_EXPLORER_VIEW_TYPE.list
+                              : FILE_EXPLORER_VIEW_TYPE.grid,
+                            DEVICE_TYPE.mtp
+                          ),
+                      })}
+                    </>
+                  ),
+                })}
 
-                    <Typography variant="caption">
-                      {t(
-                        'To calculate the overall transfer progress, files must be analyzed first. This can take from a few seconds to a few minutes.'
-                      )}
-                    </Typography>
+                {this.renderSection({
+                  icon: 'view_column',
+                  title: t('Layout'),
+                  description: t('What the file panes show and where.'),
+                  children: (
+                    <>
+                      {this.renderSwitchRow({
+                        icon: 'folder',
+                        title: t('Show directories first'),
+                        checked: showDirectoriesFirst,
+                        onChange: (e) =>
+                          onShowDirectoriesFirstChange(
+                            e,
+                            !showDirectoriesFirst
+                          ),
+                      })}
+                      {this.renderSwitchRow({
+                        icon: 'dock_to_bottom',
+                        title: t('Show status bar'),
+                        description: t(
+                          'Item counts and selection at the bottom of each pane.'
+                        ),
+                        checked: enableStatusBar,
+                        onChange: (e) => onStatusBarChange(e, !enableStatusBar),
+                      })}
+                      {this.renderSwitchRow({
+                        icon: 'laptop_mac',
+                        title: t('Show Local Disk pane'),
+                        description: t(
+                          'You can drag files from Finder to the phone pane, but not in the opposite direction.'
+                        ),
+                        checked: showLocalPane,
+                        onChange: (e) =>
+                          onShowLocalPaneChange(e, !showLocalPane),
+                      })}
+                      {this.renderSwitchRow({
+                        icon: 'align_horizontal_left',
+                        title: t('Show Local Disk pane on the left side'),
+                        checked: showLocalPaneOnLeftSide,
+                        onChange: (e) =>
+                          onShowLocalPaneOnLeftSideChange(
+                            e,
+                            !showLocalPaneOnLeftSide
+                          ),
+                      })}
+                    </>
+                  ),
+                })}
 
-                    <Typography
-                      variant="subtitle2"
-                      className={`${styles.subtitle} ${styles.fmSettingsStylesFix}`}
-                    >
-                      {t('Show directories first')}
-                    </Typography>
-                    <FormControlLabel
-                      className={styles.switch}
-                      control={
-                        <Switch
-                          checked={showDirectoriesFirst}
-                          onChange={(e) =>
-                            onShowDirectoriesFirstChange(
-                              e,
-                              !showDirectoriesFirst
-                            )
-                          }
-                        />
-                      }
-                      label={t(showDirectoriesFirst ? 'Enabled' : 'Disabled')}
-                    />
+                {this.renderSection({
+                  icon: 'swap_horiz',
+                  title: t(
+                    'Display overall progress on the file transfer screen'
+                  ),
+                  description: t(
+                    'To calculate the overall transfer progress, files must be analyzed first. This can take from a few seconds to a few minutes.'
+                  ),
+                  children: (
+                    <>
+                      {this.renderSwitchRow({
+                        icon: 'laptop_mac',
+                        title: t('To {device}', {
+                          device: t(DEVICES_LABEL[DEVICE_TYPE.local]),
+                        }),
+                        checked:
+                          filesPreprocessingBeforeTransfer[
+                            FILE_TRANSFER_DIRECTION.download
+                          ],
+                        onChange: (e) =>
+                          onFilesPreprocessingBeforeTransferChange(
+                            e,
+                            !filesPreprocessingBeforeTransfer[
+                              FILE_TRANSFER_DIRECTION.download
+                            ],
+                            FILE_TRANSFER_DIRECTION.download
+                          ),
+                      })}
+                      {this.renderSwitchRow({
+                        icon: 'mobile',
+                        title: t('To {device}', {
+                          device: t(DEVICES_LABEL[DEVICE_TYPE.mtp]),
+                        }),
+                        checked:
+                          filesPreprocessingBeforeTransfer[
+                            FILE_TRANSFER_DIRECTION.upload
+                          ],
+                        onChange: (e) =>
+                          onFilesPreprocessingBeforeTransferChange(
+                            e,
+                            !filesPreprocessingBeforeTransfer[
+                              FILE_TRANSFER_DIRECTION.upload
+                            ],
+                            FILE_TRANSFER_DIRECTION.upload
+                          ),
+                      })}
+                    </>
+                  ),
+                })}
 
-                    <Typography
-                      variant="subtitle2"
-                      className={`${styles.subtitle} ${styles.fmSettingsStylesFix}`}
-                    >
-                      {t('Show status bar')}
-                    </Typography>
-                    <FormControlLabel
-                      className={styles.switch}
-                      control={
-                        <Switch
-                          checked={enableStatusBar}
-                          onChange={(e) =>
-                            onStatusBarChange(e, !enableStatusBar)
-                          }
-                        />
-                      }
-                      label={t(enableStatusBar ? 'Enabled' : 'Disabled')}
-                    />
-
-                    <Typography
-                      variant="subtitle2"
-                      className={`${styles.subtitle} ${styles.fmSettingsStylesFix}`}
-                    >
-                      {t('Show Local Disk pane')}
-                    </Typography>
-                    <FormControlLabel
-                      className={styles.switch}
-                      control={
-                        <Switch
-                          checked={showLocalPane}
-                          onChange={(e) =>
-                            onShowLocalPaneChange(e, !showLocalPane)
-                          }
-                        />
-                      }
-                      label={t(showLocalPane ? 'Enabled' : 'Disabled')}
-                    />
-                    <Typography variant="caption">
-                      {t(
-                        'You can drag files from Finder to the phone pane, but not in the opposite direction.'
-                      )}
-                    </Typography>
-
-                    <Typography
-                      variant="subtitle2"
-                      className={`${styles.subtitle} ${styles.fmSettingsStylesFix}`}
-                    >
-                      {t('Show Local Disk pane on the left side')}
-                    </Typography>
-                    <FormControlLabel
-                      className={styles.switch}
-                      control={
-                        <Switch
-                          checked={showLocalPaneOnLeftSide}
-                          onChange={(e) =>
-                            onShowLocalPaneOnLeftSideChange(
-                              e,
-                              !showLocalPaneOnLeftSide
-                            )
-                          }
-                        />
-                      }
-                      label={t(
-                        showLocalPaneOnLeftSide ? 'Enabled' : 'Disabled'
-                      )}
-                    />
-                  </FormGroup>
-                </div>
-              </SettingsDialogTabContainer>
+                {freshInstall ? (
+                  <div className={styles.tipCard}>
+                    <MaterialSymbol name="lightbulb" size={20} fill={1} />
+                    <span>
+                      {t('Use the toggles to enable or disable an item.')}{' '}
+                      {t('Scroll down for more Settings.')}
+                    </span>
+                  </div>
+                ) : null}
+              </>
             )}
 
             {/* ----- Updates Tab ----- */}
-
-            {tabIndex === this.tabBodyRenderTabIndex(2) && (
-              <SettingsDialogTabContainer>
-                <div className={styles.tabContainer}>
-                  <FormGroup>
-                    <Typography variant="subtitle2" className={styles.subtitle}>
-                      {t('Automatically check for updates')}
-                    </Typography>
-
-                    <FormControlLabel
-                      className={styles.switch}
-                      control={
-                        <Switch
-                          checked={enableAutoUpdateCheck}
-                          onChange={(e) =>
-                            onAutoUpdateCheckChange(e, !enableAutoUpdateCheck)
-                          }
-                        />
-                      }
-                      label={t(enableAutoUpdateCheck ? 'Enabled' : 'Disabled')}
-                    />
-                  </FormGroup>
-
-                  <FormGroup>
-                    <Typography variant="subtitle2" className={styles.subtitle}>
-                      {t(
+            {tabIndex === this.tabBodyRenderTabIndex(2) &&
+              this.renderSection({
+                icon: 'system_update_alt',
+                title: t('Updates'),
+                description: t('Keep OpenMTP up to date automatically.'),
+                children: (
+                  <>
+                    {this.renderSwitchRow({
+                      icon: 'update',
+                      title: t('Automatically check for updates'),
+                      checked: enableAutoUpdateCheck,
+                      onChange: (e) =>
+                        onAutoUpdateCheckChange(e, !enableAutoUpdateCheck),
+                    })}
+                    {this.renderSwitchRow({
+                      icon: 'download',
+                      title: t(
                         'Automatically download the new updates when available (recommended)'
-                      )}
-                    </Typography>
-
-                    <FormControlLabel
-                      className={styles.switch}
-                      control={
-                        <Switch
-                          checked={enableBackgroundAutoUpdate}
-                          disabled={!enableAutoUpdateCheck}
-                          onChange={(e) =>
-                            onEnableBackgroundAutoUpdateChange(
-                              e,
-                              !enableBackgroundAutoUpdate
-                            )
-                          }
-                        />
-                      }
-                      label={t(
-                        enableBackgroundAutoUpdate ? 'Enabled' : 'Disabled'
-                      )}
-                    />
-                  </FormGroup>
-
-                  <FormGroup>
-                    <Typography
-                      variant="subtitle2"
-                      className={`${styles.subtitle} ${styles.subtitleMarginFix}`}
-                    >
-                      {t('Enable beta update channel')}
-                    </Typography>
-
-                    <FormControlLabel
-                      className={styles.switch}
-                      control={
-                        <Switch
-                          checked={enablePrereleaseUpdates}
-                          disabled={isPrereleaseVersion()}
-                          onChange={(e) =>
-                            onPrereleaseUpdatesChange(
-                              e,
-                              !enablePrereleaseUpdates
-                            )
-                          }
-                        />
-                      }
-                      label={t(
-                        enablePrereleaseUpdates ? 'Enabled' : 'Disabled'
-                      )}
-                    />
-                  </FormGroup>
-                  <Typography variant="caption">
-                    {t(
-                      'Preview upcoming features. Beta versions may be less stable.'
-                    )}
-                  </Typography>
-                </div>
-              </SettingsDialogTabContainer>
-            )}
+                      ),
+                      checked: enableBackgroundAutoUpdate,
+                      disabled: !enableAutoUpdateCheck,
+                      onChange: (e) =>
+                        onEnableBackgroundAutoUpdateChange(
+                          e,
+                          !enableBackgroundAutoUpdate
+                        ),
+                    })}
+                    {this.renderSwitchRow({
+                      icon: 'science',
+                      title: t('Enable beta update channel'),
+                      description: t(
+                        'Preview upcoming features. Beta versions may be less stable.'
+                      ),
+                      checked: enablePrereleaseUpdates,
+                      disabled: isPrereleaseVersion(),
+                      onChange: (e) =>
+                        onPrereleaseUpdatesChange(e, !enablePrereleaseUpdates),
+                    })}
+                  </>
+                ),
+              })}
 
             {/* ----- Privacy Tab ----- */}
-
-            {tabIndex === this.tabBodyRenderTabIndex(3) && (
-              <SettingsDialogTabContainer>
-                <div className={styles.tabContainer}>
-                  <FormGroup>
-                    <Typography variant="subtitle2" className={styles.subtitle}>
-                      {t('Enable anonymous usage statistics gathering')}
-                    </Typography>
-
-                    <FormControlLabel
-                      className={styles.switch}
-                      control={
-                        <Switch
-                          checked={enableAnalytics}
-                          onChange={(e) =>
-                            onAnalyticsChange(e, !enableAnalytics)
-                          }
-                        />
-                      }
-                      label={t(enableAnalytics ? 'Enabled' : 'Disabled')}
-                    />
-                    <Typography variant="caption">
-                      {t(
-                        'We do not collect personal information or sell your data. Anonymous statistics help improve the app and fix bugs.'
-                      )}
-                      &nbsp;
-                      <a
-                        className={styles.a}
-                        onClick={() => {
-                          ipcRenderer.send(
-                            IpcEvents.OPEN_HELP_PRIVACY_POLICY_WINDOW
-                          );
-                        }}
-                      >
-                        {t('Learn more…')}
-                      </a>
-                    </Typography>
-                  </FormGroup>
-                </div>
-              </SettingsDialogTabContainer>
-            )}
-          </FormControl>
-
-          <FormControl component="fieldset" className={styles.fieldset} />
+            {tabIndex === this.tabBodyRenderTabIndex(3) &&
+              this.renderSection({
+                icon: 'policy',
+                title: t('Privacy'),
+                description: t(
+                  'We do not collect personal information or sell your data. Anonymous statistics help improve the app and fix bugs.'
+                ),
+                children: this.renderSwitchRow({
+                  icon: 'analytics',
+                  title: t('Enable anonymous usage statistics gathering'),
+                  description: (
+                    <a
+                      className={styles.link}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        ipcRenderer.send(
+                          IpcEvents.OPEN_HELP_PRIVACY_POLICY_WINDOW
+                        );
+                      }}
+                    >
+                      {t('Learn more…')}
+                    </a>
+                  ),
+                  checked: enableAnalytics,
+                  onChange: (e) => onAnalyticsChange(e, !enableAnalytics),
+                }),
+              })}
+          </div>
         </DialogContent>
         <DialogActions>
           <Button

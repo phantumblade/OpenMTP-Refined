@@ -31,6 +31,7 @@ import {
   actionSetMtpStatus,
   reloadDirList,
   resetMtpSession,
+  isMtpInitRecentlyActive,
 } from '../actions';
 import { getFileCategory } from '../../../helpers/fileExplorerIcons';
 import {
@@ -54,7 +55,14 @@ import {
   makeMtpMode,
   makeShowDirectoriesFirst,
   makeAppLanguage,
+  makeFavoriteFolders,
 } from '../../Settings/selectors';
+import { setFavoriteFolder } from '../../Settings/actions';
+import {
+  FAVORITE_FOLDERS_MAX,
+  isFavoriteFolder,
+  isFavoriteFoldersFull,
+} from '../../../helpers/favoriteFolders';
 import {
   DEVICES_LABEL,
   USB_HOTPLUG_MAX_ATTEMPTS,
@@ -109,6 +117,10 @@ const { Menu, getCurrentWindow } = remote;
 
 let allowFileDropFlag = false;
 const activeTransferSessions = new Set();
+
+// a real cable re-plug keeps the device away at least this long
+const USB_REPLUG_MIN_GAP_MS = 2000;
+const EMPTY_FAVORITE_PATHS = new Set();
 
 class FileExplorer extends Component {
   constructor(props) {
@@ -439,6 +451,8 @@ class FileExplorer extends Component {
       });
 
       if (eventName === USB_HOTPLUG_EVENTS.detach) {
+        this.usbLastDetachAt = Date.now();
+
         const connectedUsbDevice = mtpDevice?.info?.usbDeviceInfo ?? {};
 
         if (
@@ -478,6 +492,24 @@ class FileExplorer extends Component {
       // Automatic connection is available only for Kalam. Detach handling
       // above always runs so stale device contents can never remain visible.
       if (mtpMode !== MTP_MODE.kalam || !enableUsbHotplug) {
+        return;
+      }
+
+      // attach events caused by our own connection attempt (USB reset)
+      if (isMtpInitRecentlyActive()) {
+        return;
+      }
+
+      // After a failed attempt, only a real re-plug (cable out for a couple
+      // of seconds) retries automatically. USB resets and ptpcamerad make the
+      // phone re-enumerate within a second and must not start endless
+      // attempts; the user can always press "Try connection again".
+      const lastAttemptFailed = !mtpDevice.isAvailable && !!mtpDevice.error;
+      const unpluggedFor = this.usbLastDetachAt
+        ? Date.now() - this.usbLastDetachAt
+        : 0;
+
+      if (lastAttemptFailed && unpluggedFor < USB_REPLUG_MIN_GAP_MS) {
         return;
       }
 
@@ -1024,6 +1056,7 @@ class FileExplorer extends Component {
       fileTransferClipboard,
       directoryLists,
       appLanguage,
+      favoriteFolders,
     } = this.props;
     const { queue } = directoryLists[deviceType];
     const _contextMenuList = contextMenuList[deviceType];
@@ -1114,6 +1147,38 @@ class FileExplorer extends Component {
           });
 
           break;
+
+        case 'favorite': {
+          const isFolder =
+            Object.keys(rowData).length > 0 && !!rowData.isFolder;
+          const isFavorite =
+            isFolder && isFavoriteFolder(favoriteFolders, rowData.path);
+          const isFull = !isFavorite && isFavoriteFoldersFull(favoriteFolders);
+          let label = 'Add to Favorites';
+
+          if (isFavorite) {
+            label = 'Remove from Favorites';
+          } else if (isFolder && isFull) {
+            label = 'Favorites are full (max {max})';
+          }
+
+          contextMenuActiveList.push({
+            label: translate(appLanguage, label, { max: FAVORITE_FOLDERS_MAX }),
+            enabled: isFolder && !isFull,
+            data: rowData,
+            click: () => {
+              this._handleContextMenuListActions({
+                [a]: {
+                  ...item,
+                  data: { ...rowData, favorite: !isFavorite },
+                },
+              });
+            },
+          });
+
+          break;
+        }
+
         default:
           break;
       }
@@ -1125,8 +1190,29 @@ class FileExplorer extends Component {
   }
 
   /* activate actions using mouse */
+  // Memoised so PureComponent children only re-render when favourites change.
+  getFavoritePaths = () => {
+    const { deviceType, favoriteFolders } = this.props;
+
+    if (deviceType !== DEVICE_TYPE.local) {
+      return EMPTY_FAVORITE_PATHS;
+    }
+
+    if (this._favoritePathsSource !== favoriteFolders) {
+      this._favoritePathsSource = favoriteFolders;
+      this._favoritePaths = new Set(favoriteFolders.map((item) => item.path));
+    }
+
+    return this._favoritePaths;
+  };
+
   _handleContextMenuListActions = ({ ...args }) => {
-    const { deviceType, directoryLists, actionCreateCopy } = this.props;
+    const {
+      deviceType,
+      directoryLists,
+      actionCreateCopy,
+      actionCreateSetFavoriteFolder,
+    } = this.props;
     const deviceTypeUpperCase = deviceType.toUpperCase();
 
     Object.keys(args).map((a) => {
@@ -1194,6 +1280,15 @@ class FileExplorer extends Component {
 
         case 'showInEnclosingFolder':
           this._handleShowInEnclosingFolder({ ...item });
+
+          break;
+
+        case 'favorite':
+          actionCreateSetFavoriteFolder({
+            path: item.data.path,
+            name: item.data.name,
+            favorite: item.data.favorite,
+          });
 
           break;
 
@@ -2385,6 +2480,7 @@ class FileExplorer extends Component {
           fileTransferProgress={fileTransferProgess}
           mtpDevice={mtpDevice}
           multiSelectMode={multiSelectMode}
+          favoritePaths={this.getFavoritePaths()}
           appLanguage={appLanguage}
           appThemeMode={appThemeMode}
           searchStorageId={storageId}
@@ -2433,6 +2529,12 @@ const mapDispatchToProps = (dispatch, _) =>
         ({ ...args }) =>
         (_, __) => {
           dispatch(setFocussedFileExplorerDeviceType({ ...args }));
+        },
+
+      actionCreateSetFavoriteFolder:
+        ({ ...args }) =>
+        (_, getState) => {
+          dispatch(setFavoriteFolder({ ...args }, getState));
         },
 
       actionCreateRequestSort:
@@ -3208,6 +3310,7 @@ const mapStateToProps = (state, _) => {
     showDirectoriesFirst: makeShowDirectoriesFirst(state),
     multiSelectMode: makeMultiSelectMode(state),
     appLanguage: makeAppLanguage(state),
+    favoriteFolders: makeFavoriteFolders(state),
   };
 };
 

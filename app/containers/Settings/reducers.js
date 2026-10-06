@@ -44,6 +44,8 @@ export const initialState = {
     [FILE_TRANSFER_DIRECTION.upload]: true,
     [FILE_TRANSFER_DIRECTION.download]: true,
   },
+  // local folders pinned to the sidebar: [{ path, name }]
+  favoriteFolders: [],
 };
 
 export default function Settings(state = initialState, action) {

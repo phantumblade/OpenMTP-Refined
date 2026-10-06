@@ -5,24 +5,26 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import UsbIcon from '@material-ui/icons/Usb';
-import FileCopyIcon from '@material-ui/icons/FileCopy';
-import Brightness4Icon from '@material-ui/icons/Brightness4';
-import FlashOnIcon from '@material-ui/icons/FlashOn';
-import ViewListIcon from '@material-ui/icons/ViewList';
-import SdStorageIcon from '@material-ui/icons/SdStorage';
-import FlipToBackIcon from '@material-ui/icons/FlipToBack';
-import CollectionsIcon from '@material-ui/icons/Collections';
 import Collapse from '@material-ui/core/Collapse';
-import KeyboardIcon from '@material-ui/icons/Keyboard';
-import ExpandLessIcon from '@material-ui/icons/ExpandLess';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import SettingsOverscanIcon from '@material-ui/icons/SettingsOverscan';
-import HourglassFullIcon from '@material-ui/icons/HourglassFull';
-import TabIcon from '@material-ui/icons/Tab';
-import MemoryIcon from '@material-ui/icons/Memory';
-import SmartphoneIcon from '@material-ui/icons/Smartphone';
-import CameraRollIcon from '@material-ui/icons/CameraRoll';
+import {
+  Brightness4 as Brightness4Icon,
+  CameraRoll as CameraRollIcon,
+  Collections as CollectionsIcon,
+  ExpandLess as ExpandLessIcon,
+  ExpandMore as ExpandMoreIcon,
+  FileCopy as FileCopyIcon,
+  FlashOn as FlashOnIcon,
+  FlipToBack as FlipToBackIcon,
+  HourglassFull as HourglassFullIcon,
+  Keyboard as KeyboardIcon,
+  Memory as MemoryIcon,
+  SdStorage as SdStorageIcon,
+  SettingsOverscan as SettingsOverscanIcon,
+  Smartphone as SmartphoneIcon,
+  Tab as TabIcon,
+  Usb as UsbIcon,
+  ViewList as ViewListIcon,
+} from '../../../components/m3/symbolIcons';
 import KeyboadShortcuts from '../../KeyboardShortcutsPage/components/KeyboadShortcuts';
 import { styles } from '../styles/Features';
 import { capitalize } from '../../../utils/funcs';

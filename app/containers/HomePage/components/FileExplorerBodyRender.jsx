@@ -494,6 +494,7 @@ class FileExplorerBodyRender extends PureComponent {
             onContextMenuClick={onContextMenuClick}
             mtpDevice={mtpDevice}
             appLanguage={appLanguage}
+            appThemeMode={appThemeMode}
             {...parentProps}
             directoryLists={filteredDirectoryLists}
             onSelectAllClick={this.handleSelectAllVisible}
