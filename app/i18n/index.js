@@ -1,8 +1,15 @@
 import { APP_LANGUAGE_TYPE, DEVICE_TYPE } from '../enums';
 
 const italian = {
+  "Here's what's new in version {version}.":
+    'Ecco cosa cambia nella versione {version}.',
+  'Get started': 'Inizia',
+  'Files and transfers': 'File e trasferimenti',
+  'Look and feel': 'Aspetto',
+  'Italian and English': 'Italiano e inglese',
+  'Choose the language and the interface font in Settings.':
+    'Scegli la lingua e il carattere dell’interfaccia nelle Impostazioni.',
   'Welcome to OpenMTP Refined': 'Benvenuto in OpenMTP Refined',
-  "What's new in {name} {version}": 'Novità di {name} {version}',
   'A brand new Material 3 Expressive design':
     'Un design Material 3 Expressive tutto nuovo',
   'Google colors with light and dark themes, new icons and animations.':

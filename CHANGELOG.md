@@ -29,7 +29,8 @@ Silicon Macs.
   choice of interface font (including Faculty Glyphic).
 - GitHub card in the sidebar footer with the project's links and statistics,
   next to the app icon and version.
-- Welcome dialog listing what's new in 4.0, in Italian and English.
+- Welcome dialog listing what's new in 4.0 as Material 3 segmented lists
+  grouped by topic, in Italian and English.
 - Verification scripts for favorites, USB owners, error messages, the loading
   indicator and date formats.
 

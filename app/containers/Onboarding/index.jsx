@@ -5,8 +5,6 @@ import { withStyles } from '@material-ui/core/styles';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Button from '@material-ui/core/Button';
 import { styles } from './styles';
 import { setOnboarding } from '../Settings/actions';
 import { withReducer } from '../../store/reducers/withReducer';
@@ -17,6 +15,9 @@ import {
   makeOnboarding,
 } from '../Settings/selectors';
 import WhatsNew from './components/WhatsNew';
+import M3Button from '../../components/m3/M3Button';
+import { imgsrc } from '../../utils/imgsrc';
+import { APP_VERSION } from '../../constants/meta';
 import { latestUpdatePushVersion } from '../../constants/onboarding';
 import { translate } from '../../i18n';
 
@@ -51,13 +52,14 @@ class Onboarding extends PureComponent {
   render() {
     const { classes: styles, appLanguage } = this.props;
     const { fireOnboarding } = this.state;
-    const t = (key) => translate(appLanguage, key);
+    const t = (key, values) => translate(appLanguage, key, values);
 
     return (
       <Dialog
         disableBackdropClick
         disableEscapeKeyDown
         className={styles.root}
+        classes={{ paper: styles.paper }}
         fullWidth
         maxWidth="sm"
         scroll="paper"
@@ -65,20 +67,30 @@ class Onboarding extends PureComponent {
         onClose={() => this._handleClose()}
         open={fireOnboarding}
       >
-        <DialogTitle>{t('Welcome to OpenMTP Refined')}</DialogTitle>
-        <DialogContent>
-          <div className={styles.contentBox}>
-            <WhatsNew hideTitle={false} appLanguage={appLanguage} />
-          </div>
+        <div className={styles.hero}>
+          <img
+            className={styles.heroIcon}
+            src={imgsrc('app-icon.png')}
+            alt=""
+          />
+          <h2 className={styles.headline}>{t('Welcome to OpenMTP Refined')}</h2>
+          <p className={styles.supportingText}>
+            {t("Here's what's new in version {version}.", {
+              version: APP_VERSION,
+            })}
+          </p>
+        </div>
+        <DialogContent className={styles.content}>
+          <WhatsNew appLanguage={appLanguage} />
         </DialogContent>
-        <DialogActions>
-          <Button
+        <DialogActions className={styles.actions}>
+          <M3Button
+            variant="filled"
+            size="small"
             onClick={() => this._handleClose()}
-            color="primary"
-            className={styles.btnPositive}
           >
-            {t('Close')}
-          </Button>
+            {t('Get started')}
+          </M3Button>
         </DialogActions>
       </Dialog>
     );
