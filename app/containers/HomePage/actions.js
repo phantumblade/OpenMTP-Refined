@@ -10,6 +10,7 @@ import { DEVICE_TYPE, MTP_MODE } from '../../enums';
 import { log } from '../../utils/log';
 import fileExplorerController from '../../data/file-explorer/controllers/FileExplorerController';
 import { checkIf } from '../../utils/checkIf';
+import { releasePhoneFromSystemDaemons } from '../../helpers/usbOwners';
 import { MTP_ERROR } from '../../enums/mtpError';
 import { DEVICES_DEFAULT_PATH } from '../../constants';
 import { analyticsService } from '../../services/analytics';
@@ -313,7 +314,54 @@ export function disposeMtp({ deviceType, onSuccess, onError }, getState) {
   };
 }
 
-function initKalamMtp(
+// Only one Kalam initialisation may run at a time. A second concurrent call
+// (e.g. app start + USB hotplug) hits the native lock, gets ErrorMtpLockExists
+// and leaves the phone pane half-connected, so it waits for the running one.
+let kalamInitInFlight = null;
+let kalamInitFinishedAt = 0;
+
+// A failed Kalam initialisation resets the USB device, which macOS reports as
+// the phone being unplugged and plugged back in. Hotplug handlers use this to
+// ignore those self-inflicted "attach" events instead of starting a new
+// attempt, which used to loop forever while the phone was locked.
+export const HOTPLUG_IGNORE_AFTER_INIT_MS = 8000;
+
+const MTP_INIT_SLOW_ATTEMPT_MS = 4000;
+
+export const isMtpInitRecentlyActive = (now = Date.now()) =>
+  Boolean(kalamInitInFlight) ||
+  now - kalamInitFinishedAt < HOTPLUG_IGNORE_AFTER_INIT_MS;
+
+function initKalamMtp(args, getState, sessionVersion) {
+  return (dispatch) => {
+    if (kalamInitInFlight) {
+      if (kalamInitInFlight.sessionVersion === sessionVersion) {
+        return kalamInitInFlight.promise;
+      }
+
+      // the running attempt belongs to a previous session: its result will be
+      // discarded, so start a fresh one as soon as it releases the device
+      return kalamInitInFlight.promise.then(() =>
+        dispatch(initKalamMtp(args, getState, sessionVersion))
+      );
+    }
+
+    const promise = Promise.resolve(
+      dispatch(runKalamMtpInit(args, getState, sessionVersion))
+    ).finally(() => {
+      if (kalamInitInFlight?.promise === promise) {
+        kalamInitInFlight = null;
+        kalamInitFinishedAt = Date.now();
+      }
+    });
+
+    kalamInitInFlight = { sessionVersion, promise };
+
+    return promise;
+  };
+}
+
+function runKalamMtpInit(
   { filePath, ignoreHidden, deviceType },
   getState,
   sessionVersion
@@ -340,10 +388,37 @@ function initKalamMtp(
       const MAX_ATTEMPTS = 3;
 
       for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+        // macOS' ptpcamerad grabs Android phones for Photos/Image Capture as
+        // soon as they are plugged in. Stop it right before claiming the phone:
+        // launchd restarts it within ~1s, but by then OpenMTP owns the device.
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          const { released } = await releasePhoneFromSystemDaemons();
+
+          if (released.length > 0) {
+            log.info(
+              `Released the phone from: ${released
+                .map(({ name, pid }) => `${name} (${pid})`)
+                .join(', ')}`,
+              'initKalamMtp'
+            );
+          }
+        } catch (e) {
+          log.error(e, 'initKalamMtp -> releasePhoneFromSystemDaemons');
+        }
+
+        const attemptStartedAt = Date.now();
+
         // eslint-disable-next-line no-await-in-loop
         initResult = await fileExplorerController.initialize({
           deviceType,
         });
+
+        // only quick failures are transient (e.g. the interface still being
+        // released); a phone that doesn't answer times out after ~20s and
+        // retrying just makes the user wait a minute for the same error
+        const attemptWasSlow =
+          Date.now() - attemptStartedAt > MTP_INIT_SLOW_ATTEMPT_MS;
 
         if (sessionVersion !== mtpSessionVersion) {
           return;
@@ -352,6 +427,7 @@ function initKalamMtp(
         if (
           initResult.data ||
           attempt === MAX_ATTEMPTS ||
+          attemptWasSlow ||
           (!isNoMtpError({
             error: initResult.error,
             stderr: initResult.stderr,
@@ -370,6 +446,14 @@ function initKalamMtp(
       const { error, stderr, data } = initResult;
 
       if (sessionVersion !== mtpSessionVersion) {
+        return;
+      }
+
+      // the device is busy with another operation: this attempt tells us
+      // nothing about the connection, so don't mark the phone as available
+      if (stderr === MTP_ERROR.ErrorMtpLockExists) {
+        dispatch(actionSetMtpStatus({ isLoading: false }));
+
         return;
       }
 

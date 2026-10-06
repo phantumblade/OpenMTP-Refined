@@ -215,6 +215,11 @@ export const initialState = {
         label: 'Open in Finder',
         data: {},
       },
+      favorite: {
+        enabled: true,
+        label: 'Add to Favorites',
+        data: {},
+      },
     },
     [DEVICE_TYPE.mtp]: {
       rename: {

@@ -2,41 +2,6 @@ import { spawn } from 'child_process';
 import { checkIf } from './checkIf';
 import { log } from './log';
 
-const USB_CONFLICTING_APPS = [
-  {
-    name: 'Another OpenMTP instance',
-    patterns: ['/applications/android-mac.app/'],
-  },
-  {
-    name: 'Android File Transfer',
-    patterns: ['android file transfer.app', 'android file transfer agent.app'],
-  },
-  {
-    name: 'Google Drive',
-    patterns: ['/google drive.app/', 'google drive.app/contents/macos'],
-  },
-  {
-    name: 'Dropbox',
-    patterns: ['/dropbox.app/', 'dropbox.app/contents/macos'],
-  },
-  {
-    name: 'Microsoft OneDrive',
-    patterns: ['/onedrive.app/', 'onedrive.app/contents/macos'],
-  },
-  {
-    name: 'Samsung Smart Switch',
-    patterns: ['smart switch', 'smartswitch'],
-  },
-  {
-    name: 'Samsung Kies',
-    patterns: ['/kies.app/', 'kiesagent'],
-  },
-  {
-    name: 'macOS Image Capture / PTPCamera',
-    patterns: ['ptpcamera.app', 'ptpcamera'],
-  },
-];
-
 export const getRunningProcesses = () => {
   return new Promise((resolve) => {
     let stdout = '';
@@ -109,25 +74,4 @@ export const isProcessRunning = async (query) => {
   return processes.some((processLine) =>
     processLine.toLowerCase().includes(normalizedQuery)
   );
-};
-
-export const findUsbConflictingApps = async () => {
-  const processes = (await getRunningProcesses()).map((processLine) =>
-    processLine.toLowerCase()
-  );
-
-  return USB_CONFLICTING_APPS.filter(({ patterns }) =>
-    patterns.some((pattern) =>
-      processes.some((processLine) => {
-        if (pattern === 'ptpcamera' || pattern === 'ptpcamera.app') {
-          return (
-            processLine.endsWith('/ptpcamera') ||
-            processLine.includes('ptpcamera.app/')
-          );
-        }
-
-        return processLine.includes(pattern);
-      })
-    )
-  ).map(({ name }) => name);
 };

@@ -3,20 +3,36 @@
 import { EOL } from 'os';
 import { replaceBulk, undefinedOrNull } from '../utils/funcs';
 import { log } from '../utils/log';
-import { findUsbConflictingApps } from '../utils/process';
+import {
+  describeProcess,
+  getPhoneUsbStatus,
+  isReleasableOwner,
+} from './usbOwners';
 import { DEVICES_LABEL } from '../constants';
 import { DEVICE_TYPE, MTP_MODE } from '../enums';
 import { checkIf } from '../utils/checkIf';
 import { MTP_ERROR } from '../enums/mtpError';
 
+// Names the processes that actually hold the phone (read from macOS), if any.
 const getUsbConflictMessage = async () => {
-  const conflictingApps = await findUsbConflictingApps();
+  // ptpcamerad is released automatically before connecting: only apps the
+  // user has to close are worth mentioning
+  const blockers = (await getPhoneUsbStatus()).blockers.filter(
+    (owner) => !isReleasableOwner(owner)
+  );
 
-  if (conflictingApps.length < 1) {
+  if (blockers.length < 1) {
     return null;
   }
 
-  return `Potential USB conflict detected: ${conflictingApps.join(
+  const names = await Promise.all(
+    blockers.map(
+      async (owner) =>
+        (await describeProcess(owner.pid)).displayName || owner.name
+    )
+  );
+
+  return `Potential USB conflict detected: ${names.join(
     ', '
   )}. Quit the listed apps completely, then refresh the connection.`;
 };
