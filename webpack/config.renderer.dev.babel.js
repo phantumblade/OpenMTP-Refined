@@ -149,25 +149,21 @@ export default merge(baseConfig, {
       // WOFF Font
       {
         test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
-        use: {
-          loader: 'url-loader',
-          options: {
-            limit: 10000,
-            mimetype: 'application/font-woff',
-            name: ASSET_NAME,
-          },
+        // native webpack 5 assets: emitted as files with URLs relative to the
+        // extracted stylesheet (url-loader produced broken JS stubs here)
+        type: 'asset/resource',
+        generator: {
+          filename: '[name].[contenthash:20][ext]',
         },
       },
       // WOFF2 Font
       {
         test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
-        use: {
-          loader: 'url-loader',
-          options: {
-            limit: 10000,
-            mimetype: 'application/font-woff',
-            name: ASSET_NAME,
-          },
+        // native webpack 5 assets: emitted as files with URLs relative to the
+        // extracted stylesheet (url-loader produced broken JS stubs here)
+        type: 'asset/resource',
+        generator: {
+          filename: '[name].[contenthash:20][ext]',
         },
       },
       // TTF Font

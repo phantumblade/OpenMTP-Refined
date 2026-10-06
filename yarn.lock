@@ -1541,6 +1541,11 @@
     prop-types "^15.7.2"
     react-is "^16.8.0 || ^17.0.0"
 
+"@material/material-color-utilities@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@material/material-color-utilities/-/material-color-utilities-0.4.0.tgz#bf7151aadf482a2534ac03c8e746e17625c0ec51"
+  integrity sha512-dlq6VExJReb8dhjj3a/yTigr3ncNwoFmL5Iy2ENtbDX03EmNeOEdZ+vsaGrj7RTuO+mB7L58II4LCsl4NpM8uw==
+
 "@mdn/browser-compat-data@^5.3.13", "@mdn/browser-compat-data@^5.6.19":
   version "5.7.6"
   resolved "https://registry.yarnpkg.com/@mdn/browser-compat-data/-/browser-compat-data-5.7.6.tgz#190d4663fa03688d85b31f415641c763cb376f29"
@@ -8814,6 +8819,11 @@ matcher@^3.0.0:
   dependencies:
     escape-string-regexp "^4.0.0"
 
+material-symbols@0.47.5:
+  version "0.47.5"
+  resolved "https://registry.yarnpkg.com/material-symbols/-/material-symbols-0.47.5.tgz#71502691ae22f07bd432b5282542a6d1115c5b3d"
+  integrity sha512-bry9rHVqF7HewbSK9Yb77obFoDvQsEot8IrW9+F179iEkcg7P/zYv2zuwBRU1oFkA5Ez0MpDAintffdtqL70Eg==
+
 math-intrinsics@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/math-intrinsics/-/math-intrinsics-1.1.0.tgz#a0dd74be81e2aa5c2f27e65ce283605ee4e2b7f9"
@@ -11990,6 +12000,11 @@ shallowequal@^1.1.0:
   resolved "https://registry.yarnpkg.com/shallowequal/-/shallowequal-1.1.0.tgz#188d521de95b9087404fd4dcb68b13df0ae4e7f8"
   integrity sha512-y0m1JoUZSlPAjXVtPPW70aZWfIL/dSP7AFkRnniLCrK/8MDKog3TySTBmckD+RObVxH0v4Tox67+F14PdED2oQ==
 
+shape-morph@0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/shape-morph/-/shape-morph-0.4.0.tgz#ac4a094889b2c9c147e74563582fab6fed395045"
+  integrity sha512-+vXx85+sLD0ssMHprfLwpBnZc1moFCe0VaWVjoaDSTK9gudZue1c3DvKDn0kN9ItPsL/Y1iarFMnyz8dej/tMw==
+
 shebang-command@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/shebang-command/-/shebang-command-1.2.0.tgz#44aac65b695b03398968c39f363fee5deafdf1ea"
@@ -12153,6 +12168,11 @@ slice-ansi@^5.0.0:
   dependencies:
     ansi-styles "^6.0.0"
     is-fullwidth-code-point "^4.0.0"
+
+slot-text@^0.3.3:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/slot-text/-/slot-text-0.3.3.tgz#a99734d9c460341b299c3c3f1b39a1bea8540d05"
+  integrity sha512-9yJ0RJI9s5oFIo3NQV+fHJJoVXFpb7XpyYzRUt9mcUvSeuJ0fYt8WOQE5qljRqCyD6Elli12lO1/G9OqD2Kr/w==
 
 smart-buffer@^4.0.2:
   version "4.2.0"
@@ -14440,7 +14460,3 @@ zx@^5.3.0:
     ps-tree "^1.2.0"
     which "^2.0.2"
     yaml "^1.10.2"
-slot-text@^0.3.3:
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/slot-text/-/slot-text-0.3.3.tgz#a99734d9c460341b299c3c3f1b39a1bea8540d05"
-  integrity sha512-9yJ0RJI9s5oFIo3NQV+fHJJoVXFpb7XpyYzRUt9mcUvSeuJ0fYt8WOQE5qljRqCyD6Elli12lO1/G9OqD2Kr/w==

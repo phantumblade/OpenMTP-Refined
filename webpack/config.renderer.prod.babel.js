@@ -82,6 +82,10 @@ export default merge(baseConfig, {
         use: [
           {
             loader: MiniCssExtractPlugin.loader,
+            options: {
+              // font/image URLs are resolved relative to dist/style.css
+              publicPath: './',
+            },
           },
           {
             loader: 'css-loader',
@@ -131,27 +135,21 @@ export default merge(baseConfig, {
       // WOFF Font
       {
         test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
-        use: {
-          loader: 'url-loader',
-          options: {
-            publicPath: './',
-            limit: 10000,
-            mimetype: 'application/font-woff',
-            name: 'fonts/[name].[md5:hash:hex:20].[ext]',
-          },
+        // native webpack 5 assets: emitted as files with URLs relative to the
+        // extracted stylesheet (url-loader produced broken JS stubs here)
+        type: 'asset/resource',
+        generator: {
+          filename: 'fonts/[name].[contenthash:20][ext]',
         },
       },
       // WOFF2 Font
       {
         test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
-        use: {
-          loader: 'url-loader',
-          options: {
-            publicPath: './',
-            limit: 10000,
-            mimetype: 'application/font-woff',
-            name: 'fonts/[name].[md5:hash:hex:20].[ext]',
-          },
+        // native webpack 5 assets: emitted as files with URLs relative to the
+        // extracted stylesheet (url-loader produced broken JS stubs here)
+        type: 'asset/resource',
+        generator: {
+          filename: 'fonts/[name].[contenthash:20][ext]',
         },
       },
       // TTF Font
