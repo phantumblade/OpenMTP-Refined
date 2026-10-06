@@ -38,6 +38,7 @@ import { IpcEvents } from './services/ipc-events/IpcEventType';
 import IpcEventService from './services/ipc-events/IpcEventHandler';
 import { isKalamModeSupported } from './helpers/binaries';
 import { fileExistsSync } from './helpers/fileOps';
+import { applyCustomAppIcon } from './helpers/customAppIcon';
 
 const remote = getRemoteWindow();
 
@@ -282,6 +283,10 @@ if (!isDeviceBootable) {
       // eslint-disable-next-line promise/always-return
       try {
         await createWindow();
+
+        if (isPackaged) {
+          applyCustomAppIcon();
+        }
 
         let appUpdaterEnable = ENV_FLAVOR.enableAppUpdates;
 

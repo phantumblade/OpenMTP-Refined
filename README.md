@@ -1,211 +1,225 @@
-# OpenMTP Refined — UX and reliability fork
-
-[![Platform](https://img.shields.io/badge/platform-macOS-000000?logo=apple)](https://www.apple.com/macos/)
-[![Electron](https://img.shields.io/badge/Electron-18.3.15-47848f?logo=electron)](https://www.electronjs.org/)
-[![React](https://img.shields.io/badge/React-17.0.2-61dafb?logo=react)](https://react.dev/)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-
-Fork indipendente di
-[OpenMTP](https://github.com/ganeshrvel/openmtp), il file manager open source
-per trasferire file via USB/MTP tra macOS e dispositivi Android.
-
-Il fork usa l'identificatore applicativo indipendente
-`io.github.phantumblade.openmtp`; al primo avvio conserva le impostazioni locali
-dell'app originale copiandole nel nuovo profilo, senza cancellare il precedente.
-
-Questo progetto mantiene l'architettura Electron, React e Go/Kalam di OpenMTP
-e interviene su tre aree: affidabilità dei trasferimenti, prestazioni nelle
-cartelle grandi ed esperienza d'uso. Non è una release ufficiale del progetto
-originale.
-
-## Interfaccia
-
 <p align="center">
-  <img src="docs/images/readme/openmtp-dual-pane.png" alt="OpenMTP in vista a due pannelli tra Mac e telefono Android" width="100%">
+  <img src="docs/images/readme/icon.png" width="128" alt="OpenMTP Refined icon">
 </p>
 
-| Selezione multipla | Trasferimento trasparente |
-| --- | --- |
-| ![Selezione multipla con checkbox](docs/images/readme/openmtp-multi-selection.png) | ![Progresso dettagliato del trasferimento](docs/images/readme/openmtp-transfer-progress.png) |
+<h1 align="center">OpenMTP Refined</h1>
 
-| Tema scuro | Navigazione rapida |
-| --- | --- |
-| ![OpenMTP con tema scuro](docs/images/readme/openmtp-dark-mode.png) | ![Pannello laterale di navigazione](docs/images/readme/openmtp-navigation.png) |
+<p align="center"><b>Transfer files between your Mac and your Android phone over USB — redesigned with Material 3 Expressive.</b></p>
 
-> Le schermate utilizzano nomi e percorsi dimostrativi per proteggere i dati
-> dei dispositivi usati durante lo sviluppo.
+[![Download](https://img.shields.io/github/v/release/phantumblade/OpenMTP-Refined?label=download&logo=apple&color=1e6cf5)](https://github.com/phantumblade/OpenMTP-Refined/releases/latest)
+[![Platform](https://img.shields.io/badge/macOS-Apple%20Silicon-000000?logo=apple)](https://github.com/phantumblade/OpenMTP-Refined/releases/latest)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-## Stato del progetto
+🇬🇧 English · [🇮🇹 Italiano](#-italiano)
 
-| Area                   | Stato                                 |
-| ---------------------- | ------------------------------------- |
-| Build del sorgente     | Verificata su Apple Silicon           |
-| Lint JavaScript e SCSS | Superato                              |
-| Test prestazionali     | Superati                              |
-| Test nativi Go         | Superati                              |
-| Pacchetto pubblico DMG | Non ancora distribuito                |
-| Runtime Electron       | Migrazione da Electron 18 pianificata |
+OpenMTP Refined is an independent fork of [OpenMTP](https://github.com/ganeshrvel/openmtp),
+the open-source Android file manager for macOS. It keeps the proven MTP engine
+and rebuilds everything around it: a new Material 3 Expressive interface, a much
+more reliable phone connection and clear explanations whenever something goes
+wrong.
 
-> [!IMPORTANT]
-> Il sorgente può essere avviato e testato localmente. Non vengono ancora
-> pubblicati DMG perché Electron 18 è fuori supporto e la pipeline di firma e
-> notarizzazione non è stata completata.
+<p align="center">
+  <a href="https://github.com/phantumblade/OpenMTP-Refined/releases/latest">
+    <img src="https://img.shields.io/badge/Download%20for%20Mac-OpenMTP%20Refined%204.0-1e6cf5?style=for-the-badge&logo=apple" alt="Download OpenMTP Refined for Mac">
+  </a>
+</p>
 
-## Perché questo fork
+![Mac and Android phone side by side](docs/images/readme/dual-pane-light.png)
 
-OpenMTP è una base completa, ma durante l'uso reale con cartelle fotografiche,
-trasferimenti multipli e telefoni diversi sono emerse aree migliorabili:
+| Connect your phone                                                                 | Transfer progress                                                                   |
+| ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| ![Connection screen with step-by-step guide](docs/images/readme/connect-phone.png) | ![Transfer dialog with wavy progress bar](docs/images/readme/transfer-progress.png) |
 
-- operazioni che sembravano ferme durante la preparazione;
-- stato del telefono rimasto visibile dopo la disconnessione;
-- selezione e navigazione difficili nelle cartelle molto grandi;
-- anteprime e rendering costosi;
-- messaggi USB poco comprensibili;
-- interfaccia non completamente localizzata.
+| Filter by date                                           | Favorites and quick access                                       |
+| -------------------------------------------------------- | ---------------------------------------------------------------- |
+| ![Date range filter](docs/images/readme/date-filter.png) | ![Sidebar with favorite folders](docs/images/readme/sidebar.png) |
 
-Il fork affronta questi problemi senza sostituire il protocollo MTP o il kernel
-Kalam originale.
+| Settings                                            | Dark theme                                           |
+| --------------------------------------------------- | ---------------------------------------------------- |
+| ![Settings dialog](docs/images/readme/settings.png) | ![Dark theme](docs/images/readme/dual-pane-dark.png) |
 
-## Miglioramenti principali
+> Screenshots use a demo account and demo file names.
 
-### Trasferimenti e connessione
+## What's new in 4.0
 
-- Macchina a stati esplicita per controllo, preparazione, trasferimento,
-  completamento ed errore.
-- Feedback immediato all'avvio dell'operazione.
-- Progresso, velocità, file corrente e identificativo diagnostico.
-- Coordinatore nativo che serializza le operazioni Kalam sensibili.
-- Retry limitati, normalizzazione degli errori USB e recupero della sessione.
-- Pulizia dello stato e dei contenuti obsoleti dopo la disconnessione.
+- **Material 3 Expressive design** — Google's color system with light and dark
+  themes, Material Symbols icons, expressive shapes, the morphing loading
+  indicator and the wavy progress bar.
+- **A connection that just works** — OpenMTP now frees the phone from the macOS
+  services that grab it (Image Capture, Photos), avoids overlapping connection
+  attempts and stops the endless "loading" loops of earlier versions.
+- **Errors you can understand** — every connection problem (phone locked, file
+  transfer not enabled, cable, another app using the phone, no storage) is
+  explained in plain words, with what to do next.
+- **Favorites** — star up to 5 folders and reach them from the sidebar.
+- **Filters** — filter by date (modified or created, with quick ranges and the
+  date format of your language) and by file type.
+- **Smarter transfers** — clear phases (check, prepare, transfer), live speed,
+  current file and a smooth progress bar.
+- **Italian and English**, with a choice of interface font.
 
-### Prestazioni
+See the full list in the [CHANGELOG](CHANGELOG.md).
 
-- Rendering virtualizzato nelle viste a griglia e a elenco.
-- Indici `Map` e insiemi di selezione `Set`.
-- Caricamento condiviso delle anteprime con concorrenza limitata.
-- Ricerca breadth-first con budget distinti per filesystem locale e MTP.
-- Test di correttezza e micro-benchmark riproducibili.
+## Download and install
 
-Complessità, compromessi e limiti delle misurazioni sono descritti in
-[docs/PERFORMANCE_AUDIT.md](docs/PERFORMANCE_AUDIT.md).
+**Requirements:** a Mac with Apple Silicon (M1 or newer). Developed and tested
+on macOS 26 Tahoe.
 
-### Interfaccia
+1. Download **`OpenMTP-Refined-4.0.0-arm64.dmg`** from the
+   [latest release](https://github.com/phantumblade/OpenMTP-Refined/releases/latest).
+2. Open the DMG and drag **OpenMTP** into **Applications**.
+3. Open OpenMTP from Applications. The first time, macOS shows a warning,
+   because the app is not notarized by Apple (that requires a paid developer
+   account). Click **Done**.
+4. Open **System Settings → Privacy & Security**, scroll down and click
+   **Open Anyway** next to the OpenMTP message, then confirm with your password.
 
-- Ricerca esatta, per prefisso, sottostringa e corrispondenza fuzzy.
-- Modalità di selezione multipla visibile e controllabile da tastiera.
-- Anteprime per immagini e video locali compatibili.
-- Toolbar, footer, breadcrumb e pannello laterale riorganizzati.
-- Icone differenziate per file, cartelle, volumi e dispositivi.
-- Tema chiaro e scuro.
-- Interfaccia italiana e inglese selezionabile dalle impostazioni.
+You only need to do this once. If macOS ever says the app "is damaged", run
+this in Terminal and open it again:
 
-## Architettura essenziale
-
-```text
-app/
-├── components/              Componenti condivisi
-├── containers/HomePage/     Esplorazione, selezione e trasferimenti
-├── data/file-explorer/      Repository e sorgenti dati locale/MTP
-├── helpers/                 Ricerca, preview, device e transfer state
-└── i18n/                    Localizzazione
-
-ffi/kalam/
-├── src/Kalam.js             Bridge JavaScript
-└── native/                  Kernel e coordinatore MTP in Go
-
-scripts/performance/         Test e micro-benchmark
+```bash
+xattr -dr com.apple.quarantine /Applications/OpenMTP.app
 ```
 
-## Avvio rapido
+## Connect your phone
 
-### Requisiti attuali
+1. Use a **data** USB cable (many charging cables carry power only).
+2. **Unlock** the phone and keep the screen on.
+3. Pull down the notification shade, tap the **USB** notification and choose
+   **File transfer**.
+4. If the phone asks to **allow access to phone data**, tap **Allow**.
+5. Close Android File Transfer, Image Capture or Photos if they are open, then
+   click **Try connection again** in OpenMTP.
 
-- macOS 11 o successivo
-- Node.js 16
-- Yarn 1.22
-- Xcode Command Line Tools
-- Go, se si modifica o verifica il componente nativo
+## Troubleshooting
+
+| Message                          | What to do                                                                                         |
+| -------------------------------- | -------------------------------------------------------------------------------------------------- |
+| _The Mac does not see the phone_ | Try another data cable or USB port, and choose **File transfer** on the phone.                     |
+| _No phone in File Transfer mode_ | Tap the USB notification on the phone and choose **File transfer**.                                |
+| _The phone is locked_            | Unlock the phone, tap **Allow** if asked, and keep it unlocked until the files appear.             |
+| _Another app is using the phone_ | Quit Android File Transfer, Image Capture, Photos or Smart Switch, then retry.                     |
+| _The phone did not respond_      | Unplug the cable, unlock the phone, plug it back in and retry.                                     |
+| Still not working                | In **Settings → General → Phone connection**, switch between **Kalam** and **Legacy**, then retry. |
+
+The **Guide** button on the connection screen opens more detailed help.
+
+## For developers
+
+Requirements: Node.js 16+, Yarn 1.22, Xcode Command Line Tools and Go (only to
+rebuild the native Kalam module).
 
 ```bash
 yarn install --frozen-lockfile
+```
+
+```bash
 yarn dev
 ```
 
-L'applicazione avviata con `yarn dev` usa direttamente il sorgente corrente ed
-è quindi la versione corretta da provare durante lo sviluppo.
+`yarn test` runs the JavaScript lint, the performance and behaviour checks and
+the Go tests. `yarn package-mac-local` builds an ad-hoc signed app, installs it
+in `/Applications` and writes the DMG to `dist/`.
 
-## Verifiche automatiche
-
-Esegue lint JavaScript, test prestazionali e test Go:
-
-```bash
-yarn test
+```text
+app/components/m3/         Material 3 Expressive components
+app/containers/HomePage/   File explorer, connection screen and transfers
+app/helpers/               Connection, errors, favorites, dates, search
+app/styles/m3/             Generated color scheme and design tokens
+ffi/kalam/                 Native MTP engine (Go) and its bridge
+scripts/                   Build, color generation and verification scripts
 ```
 
-Controlla gli stili:
+---
+
+## 🇮🇹 Italiano
+
+**Trasferisci file tra Mac e telefono Android via USB, con un'interfaccia
+completamente ridisegnata in Material 3 Expressive.**
+
+OpenMTP Refined è un fork indipendente di
+[OpenMTP](https://github.com/ganeshrvel/openmtp). Mantiene il motore MTP
+originale e rinnova tutto il resto: nuova interfaccia Material 3 Expressive,
+connessione al telefono molto più affidabile e spiegazioni chiare quando
+qualcosa non va.
+
+### Novità della 4.0
+
+- **Design Material 3 Expressive**: sistema colori Google con tema chiaro e
+  scuro, icone Material Symbols, forme espressive, indicatore di caricamento
+  animato e barra di avanzamento ondulata.
+- **Connessione affidabile**: OpenMTP libera il telefono dai servizi di macOS
+  che lo occupano (Acquisizione Immagine, Foto), evita tentativi sovrapposti e
+  non resta più bloccato in caricamento infinito.
+- **Errori comprensibili**: ogni problema (telefono bloccato, trasferimento file
+  non attivo, cavo, telefono usato da un'altra app, memoria non disponibile) è
+  spiegato con parole semplici, insieme a cosa fare.
+- **Preferiti**: aggiungi fino a 5 cartelle con la stella e aprile dalla barra
+  laterale.
+- **Filtri**: per data (modifica o creazione, intervalli rapidi, formato
+  gg/mm/aaaa) e per tipo di file.
+- **Trasferimenti più chiari**: fasi visibili (controllo, preparazione,
+  trasferimento), velocità, file corrente e avanzamento fluido.
+- **Italiano e inglese**, con scelta del carattere dell'interfaccia.
+
+### Scaricare e installare
+
+**Requisiti:** Mac con Apple Silicon (M1 o successivo). Sviluppata e provata su
+macOS 26 Tahoe.
+
+1. Scarica **`OpenMTP-Refined-4.0.0-arm64.dmg`** dall'
+   [ultima release](https://github.com/phantumblade/OpenMTP-Refined/releases/latest).
+2. Apri il DMG e trascina **OpenMTP** nella cartella **Applicazioni**.
+3. Apri OpenMTP da Applicazioni. La prima volta macOS mostra un avviso, perché
+   l'app non è notarizzata da Apple (serve un account sviluppatore a
+   pagamento). Fai clic su **Fine**.
+4. Apri **Impostazioni di Sistema → Privacy e sicurezza**, scorri in basso e fai
+   clic su **Apri comunque** accanto al messaggio di OpenMTP, poi conferma con
+   la password.
+
+Serve farlo una sola volta. Se macOS dice che l'app "è danneggiata", esegui nel
+Terminale il comando qui sotto e riaprila:
 
 ```bash
-yarn lint-styles
+xattr -dr com.apple.quarantine /Applications/OpenMTP.app
 ```
 
-Genera i bundle di produzione:
+### Collegare il telefono
 
-```bash
-yarn build
-```
+1. Usa un cavo USB **dati** (molti cavi di ricarica portano solo corrente).
+2. **Sblocca** il telefono e tieni lo schermo acceso.
+3. Apri la tendina delle notifiche, tocca la notifica **USB** e scegli
+   **Trasferimento file**.
+4. Se il telefono chiede di **consentire l'accesso ai dati**, tocca **Consenti**.
+5. Chiudi Android File Transfer, Acquisizione Immagine o Foto se sono aperti,
+   poi fai clic su **Riprova la connessione** in OpenMTP.
 
-## Prova manuale consigliata
+### Problemi frequenti
 
-Usare inizialmente file di prova o copie, non l'unica copia di fotografie e
-video importanti.
+| Messaggio                                        | Cosa fare                                                                                                         |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| _Il Mac non vede il telefono_                    | Prova un altro cavo dati o porta USB e scegli **Trasferimento file** sul telefono.                                |
+| _Nessun telefono in modalità Trasferimento file_ | Tocca la notifica USB sul telefono e scegli **Trasferimento file**.                                               |
+| _Il telefono è bloccato_                         | Sblocca il telefono, tocca **Consenti** se richiesto e tienilo sbloccato finché compaiono i file.                 |
+| _Un’altra app sta usando il telefono_            | Chiudi Android File Transfer, Acquisizione Immagine, Foto o Smart Switch e riprova.                               |
+| _Il telefono non ha risposto_                    | Scollega il cavo, sblocca il telefono, ricollegalo e riprova.                                                     |
+| Continua a non funzionare                        | In **Impostazioni → Generali → Connessione al telefono** passa da **Kalam** a **Legacy** (o viceversa) e riprova. |
 
-1. Avviare l'app con `yarn dev`.
-2. Collegare il telefono sbloccato con modalità USB **Trasferimento file**.
-3. Verificare che marca e modello del dispositivo siano riconosciuti.
-4. Aprire cartelle grandi in vista griglia e lista.
-5. Provare ricerca, selezione multipla e navigazione da tastiera.
-6. Trasferire una piccola cartella dal Mac al telefono.
-7. Trasferire la stessa cartella dal telefono al Mac.
-8. Scollegare il telefono e controllare che i contenuti MTP scompaiano.
-9. Ricollegarlo e verificare che la sessione venga ricreata correttamente.
+Il pulsante **Guida** nella schermata di connessione apre un aiuto più
+dettagliato.
 
-## Pacchetto macOS locale
+---
 
-Per generare un pacchetto di sviluppo non notarizzato:
+## Credits and license
 
-```bash
-yarn package-mac-without-notarize
-```
+OpenMTP was created by [Ganesh Rathinavel](https://github.com/ganeshrvel) and is
+released under the MIT license. OpenMTP Refined, by
+[Andrea Perini](https://github.com/phantumblade), keeps the original history and
+copyright and is released under the same license.
 
-Gli artefatti vengono salvati nella directory ignorata `release/`. Un pacchetto
-non firmato è destinato esclusivamente ai test locali.
+- [LICENSE](LICENSE) · [NOTICE.md](NOTICE.md) · [CHANGELOG.md](CHANGELOG.md)
+- Third-party assets (Material Symbols, Catppuccin icons, Phosphor, Lucide,
+  shape-morph, Faculty Glyphic): see [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES)
+- Security reports: [SECURITY.md](SECURITY.md)
 
-## Roadmap prima del DMG pubblico
-
-- Migrare a una versione Electron supportata.
-- Eseguire regressioni su Intel e Apple Silicon.
-- Verificare Samsung e almeno un dispositivo Android di un altro produttore.
-- Sostituire l'icona privata con un'identità originale e documentata.
-- Configurare aggiornamenti, firma Developer ID e notarizzazione.
-- Verificare il DMG in un account macOS pulito.
-
-## Sicurezza e privacy
-
-Non inserire nel repository log non censurati, serial number, percorsi
-personali, token, certificati o screenshot con dati privati. Le vulnerabilità
-devono essere segnalate seguendo [SECURITY.md](SECURITY.md).
-
-## Crediti e licenza
-
-OpenMTP è stato creato da
-[Ganesh Rathinavel](https://github.com/ganeshrvel) ed è distribuito con licenza
-MIT. Questo fork conserva la cronologia e il copyright originale; le modifiche
-sono distribuite con la stessa licenza.
-
-- [LICENSE](LICENSE)
-- [NOTICE.md](NOTICE.md)
-- [Licenze degli asset di terze parti](THIRD_PARTY_NOTICES)
-- [CHANGELOG.md](CHANGELOG.md)
-
-OpenMTP e questo fork non sono prodotti ufficiali di Google, Samsung, Apple o
-dei produttori dei dispositivi supportati.
+OpenMTP Refined is not affiliated with Google, Samsung or Apple.
