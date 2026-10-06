@@ -1,64 +1,76 @@
 import React, { PureComponent } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import {
-  BugReport as BugReportIcon,
-  Build as BuildIcon,
-  SystemUpdate,
-} from '../../../components/m3/symbolIcons';
+import MaterialSymbol from '../../../components/m3/MaterialSymbol';
 import { styles } from '../styles/WhatsNew';
 import { APP_NAME, APP_VERSION } from '../../../constants/meta';
-import { isKalamModeSupported } from '../../../helpers/binaries';
-import { MTP_MODE } from '../../../enums';
+import { translate } from '../../../i18n';
+
+const HIGHLIGHTS = [
+  {
+    icon: 'palette',
+    title: 'A brand new Material 3 Expressive design',
+    description:
+      'Google colors with light and dark themes, new icons and animations.',
+  },
+  {
+    icon: 'cable',
+    title: 'A more reliable phone connection',
+    description:
+      'OpenMTP frees the phone from the macOS apps that grab it and no longer gets stuck loading.',
+  },
+  {
+    icon: 'help',
+    title: 'Errors explained in plain words',
+    description:
+      'Each connection problem tells you what happened and what to do.',
+  },
+  {
+    icon: 'star',
+    title: 'Favorite folders',
+    description: 'Star up to 5 folders and open them from the side menu.',
+  },
+  {
+    icon: 'filter_alt',
+    title: 'Filters by date and file type',
+    description: 'Quick ranges and the date format of your language.',
+  },
+  {
+    icon: 'swap_vert',
+    title: 'Clearer transfers',
+    description: 'Phases, speed, current file and a smooth progress bar.',
+  },
+];
 
 class WhatsNew extends PureComponent {
   render() {
-    const isKalamModeDisabled = !isKalamModeSupported();
-    const { classes: styles, hideTitle } = this.props;
+    const { classes: styles, hideTitle, appLanguage } = this.props;
+    const t = (key, values) => translate(appLanguage, key, values);
 
     return (
       <div className={styles.root}>
         {hideTitle ? null : (
-          <Typography
-            variant="body1"
-            className={styles.title}
-            color="secondary"
-          >
-            What&apos;s new in {APP_NAME}-{APP_VERSION}?
+          <Typography variant="body1" className={styles.title}>
+            {t("What's new in {name} {version}", {
+              name: APP_NAME,
+              version: APP_VERSION,
+            })}
           </Typography>
         )}
 
-        <List>
-          <ListItem>
-            <ListItemIcon>
-              <BugReportIcon htmlColor="#FF0000" />
-            </ListItemIcon>
-            <ListItemText primary="Fixes a bug which caused slow data transfer speed" />
-          </ListItem>
-
-          {isKalamModeDisabled && (
-            <ListItem>
-              <ListItemIcon>
-                <SystemUpdate htmlColor="#fa4d0a" />
-              </ListItemIcon>
-              <ListItemText
-                primary={`We have now officially retired the support for '${MTP_MODE.kalam}' Kernel on macOS 10.13 (OS X El High Sierra) and lower`}
-                secondary={`However the '${MTP_MODE.legacy}' MTP mode will continue working on these outdated machines`}
-              />
-            </ListItem>
-          )}
-
-          <ListItem>
-            <ListItemIcon>
-              <BuildIcon />
-            </ListItemIcon>
-            <ListItemText primary="Other UI optimization and performance improvements" />
-          </ListItem>
-        </List>
+        <ul className={styles.list}>
+          {HIGHLIGHTS.map(({ icon, title, description }) => (
+            <li key={icon} className={styles.item}>
+              <span className={styles.itemIcon}>
+                <MaterialSymbol name={icon} size={22} />
+              </span>
+              <span className={styles.itemText}>
+                <span className={styles.itemTitle}>{t(title)}</span>
+                <span className={styles.itemDescription}>{t(description)}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
     );
   }

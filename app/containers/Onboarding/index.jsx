@@ -7,15 +7,18 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
-import Divider from '@material-ui/core/Divider';
 import { styles } from './styles';
 import { setOnboarding } from '../Settings/actions';
 import { withReducer } from '../../store/reducers/withReducer';
 import reducers from '../Alerts/reducers';
-import { makeFreshInstall, makeOnboarding } from '../Settings/selectors';
+import {
+  makeAppLanguage,
+  makeFreshInstall,
+  makeOnboarding,
+} from '../Settings/selectors';
 import WhatsNew from './components/WhatsNew';
-import Features from './components/Features';
 import { latestUpdatePushVersion } from '../../constants/onboarding';
+import { translate } from '../../i18n';
 
 class Onboarding extends PureComponent {
   constructor(props) {
@@ -46,8 +49,9 @@ class Onboarding extends PureComponent {
   };
 
   render() {
-    const { classes: styles } = this.props;
+    const { classes: styles, appLanguage } = this.props;
     const { fireOnboarding } = this.state;
+    const t = (key) => translate(appLanguage, key);
 
     return (
       <Dialog
@@ -55,18 +59,16 @@ class Onboarding extends PureComponent {
         disableEscapeKeyDown
         className={styles.root}
         fullWidth
-        maxWidth="md"
+        maxWidth="sm"
         scroll="paper"
         aria-labelledby="onboaring-dialogbox"
         onClose={() => this._handleClose()}
         open={fireOnboarding}
       >
-        <DialogTitle>Release at a Glance!</DialogTitle>
+        <DialogTitle>{t('Welcome to OpenMTP Refined')}</DialogTitle>
         <DialogContent>
           <div className={styles.contentBox}>
-            <WhatsNew hideTitle={false} />
-            <Divider className={styles.divider} />
-            <Features hideTitle={false} />
+            <WhatsNew hideTitle={false} appLanguage={appLanguage} />
           </div>
         </DialogContent>
         <DialogActions>
@@ -75,7 +77,7 @@ class Onboarding extends PureComponent {
             color="primary"
             className={styles.btnPositive}
           >
-            Close
+            {t('Close')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -99,6 +101,7 @@ const mapStateToProps = (state, __) => {
   return {
     onboarding: makeOnboarding(state),
     freshInstall: makeFreshInstall(state),
+    appLanguage: makeAppLanguage(state),
   };
 };
 

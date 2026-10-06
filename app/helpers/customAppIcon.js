@@ -2,7 +2,7 @@ import { spawn } from 'child_process';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { app } from 'electron';
+import { app, nativeImage } from 'electron';
 import { log } from '../utils/log';
 
 // macOS 26 draws bundle icons that don't fill the standard squircle (like our
@@ -23,6 +23,9 @@ function run(argv) {
   }
 }
 `;
+
+const LSREGISTER =
+  '/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister';
 
 const appBundlePath = () =>
   path.resolve(path.dirname(app.getPath('exe')), '..', '..');
@@ -49,8 +52,20 @@ export function applyCustomAppIcon() {
 
     const icon = path.join(bundle, 'Contents', 'Resources', 'icon.icns');
 
+    if (!fs.existsSync(icon)) {
+      return;
+    }
+
+    // The Dock picked the bundle icon (boxed) at launch: show the tilted
+    // artwork for this session too.
+    const dockImage = nativeImage.createFromPath(icon);
+
+    if (!dockImage.isEmpty()) {
+      app.dock.setIcon(dockImage);
+    }
+
     // Finder stores a custom icon in this file inside the bundle
-    if (fs.existsSync(path.join(bundle, 'Icon\r')) || !fs.existsSync(icon)) {
+    if (fs.existsSync(path.join(bundle, 'Icon\r'))) {
       return;
     }
 
@@ -67,7 +82,15 @@ export function applyCustomAppIcon() {
     child.on('close', (code) => {
       if (code !== 0) {
         log.info(`custom app icon not applied: ${stderr.trim()}`);
+
+        return;
       }
+
+      // refresh Launchpad, Spotlight and the Dock's stored icon
+      spawn(LSREGISTER, ['-f', bundle], { stdio: 'ignore' }).on(
+        'error',
+        () => {}
+      );
     });
     child.on('error', () => {});
     child.stdin.end(SET_ICON_SCRIPT);

@@ -113,6 +113,18 @@ export const m3Type = {
     fontWeight: 700,
     letterSpacing: '0.007em',
   },
+  labelMedium: {
+    fontSize: 12,
+    lineHeight: '16px',
+    fontWeight: 500,
+    letterSpacing: '0.04em',
+  },
+  labelSmall: {
+    fontSize: 11,
+    lineHeight: '16px',
+    fontWeight: 500,
+    letterSpacing: '0.045em',
+  },
 };
 
 // Mixes [color] (hex) into an rgba() of the given opacity, for state layers.

@@ -1,3 +1,5 @@
+import { m3Shape, m3Type } from '../../../styles/m3/tokens';
+
 export const styles = (theme) => {
   return {
     listsWrapper: {
@@ -142,38 +144,41 @@ export const styles = (theme) => {
       margin: '8px 16px',
       opacity: 0.4,
     },
+    // M3 filled card holding the app identity and the GitHub link
     footerBlock: {
-      marginTop: 'auto',
-      padding: '12px 10px 12px 18px',
-      borderTop: `1px solid ${theme.palette.m3.outlineVariant}`,
+      margin: 'auto 12px 12px',
+      padding: '10px 6px 10px 12px',
       display: 'flex',
       alignItems: 'center',
       gap: 12,
-      backgroundColor: theme.palette.m3.surfaceContainerLow,
+      borderRadius: m3Shape.large,
+      backgroundColor: theme.palette.m3.surfaceContainerHighest,
+      color: theme.palette.m3.onSurface,
     },
-    footerIconWrapper: {
-      width: 32,
-      height: 32,
-      borderRadius: 10,
-      backgroundColor: theme.palette.m3.primary,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      color: '#fff',
+    footerAppIcon: {
+      width: 40,
+      height: 40,
       flexShrink: 0,
+      objectFit: 'contain',
     },
     footerMeta: {
       display: 'flex',
       flexDirection: 'column',
+      minWidth: 0,
     },
     footerAppName: {
-      fontSize: 12,
-      fontWeight: 700,
-      color: theme.palette.text.primary,
+      ...m3Type.titleSmall,
+      display: 'flex',
+      alignItems: 'baseline',
+      gap: 6,
+    },
+    footerVersion: {
+      ...m3Type.labelMedium,
+      color: theme.palette.m3.primary,
     },
     footerAppSub: {
-      fontSize: 10,
-      color: theme.palette.text.secondary,
+      ...m3Type.bodySmall,
+      color: theme.palette.m3.onSurfaceVariant,
     },
   };
 };

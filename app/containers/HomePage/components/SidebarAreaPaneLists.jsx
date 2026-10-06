@@ -30,6 +30,7 @@ import { translate } from '../../../i18n';
 import { APP_NAME, APP_VERSION } from '../../../constants/meta';
 import { fileExistsSync } from '../../../helpers/fileOps';
 import GithubBadge from '../../../components/GithubBadge';
+import { imgsrc } from '../../../utils/imgsrc';
 import { FAVORITE_FOLDERS_MAX } from '../../../helpers/favoriteFolders';
 
 class SidebarAreaPaneLists extends PureComponent {
@@ -344,12 +345,15 @@ class SidebarAreaPaneLists extends PureComponent {
 
         {/* Footer Block */}
         <div className={styles.footerBlock}>
-          <div className={styles.footerIconWrapper}>
-            <PhoneAndroidIcon style={{ fontSize: 16 }} />
-          </div>
+          <img
+            className={styles.footerAppIcon}
+            src={imgsrc('app-icon.png')}
+            alt=""
+          />
           <div className={styles.footerMeta}>
             <span className={styles.footerAppName}>
-              {`${APP_NAME} v${APP_VERSION}`}
+              {APP_NAME}
+              <span className={styles.footerVersion}>{`v${APP_VERSION}`}</span>
             </span>
             <span className={styles.footerAppSub}>
               {isItalian ? 'Ottimizzato per macOS' : 'Crafted for macOS'}

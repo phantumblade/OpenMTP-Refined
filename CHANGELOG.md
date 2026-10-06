@@ -27,7 +27,9 @@ Silicon Macs.
   picker and the date format of the app language; file type filter with chips.
 - Redesigned settings dialog with tabs, icons and grouped sections, plus a
   choice of interface font (including Faculty Glyphic).
-- GitHub card in the sidebar footer with the project's links and statistics.
+- GitHub card in the sidebar footer with the project's links and statistics,
+  next to the app icon and version.
+- Welcome dialog listing what's new in 4.0, in Italian and English.
 - Verification scripts for favorites, USB owners, error messages, the loading
   indicator and date formats.
 
@@ -50,7 +52,7 @@ Silicon Macs.
 - Device button in the toolbar now offers refresh and storage actions.
 - Selection, grid and list styling follow Material 3.
 - The DMG ships a cleanly signed app; on macOS 26 the app applies its tilted
-  icon as a Finder custom icon at first launch.
+  icon as a Finder custom icon at first launch and shows it in the Dock.
 - Reorganized toolbar, footer, sidebar and connection guidance.
 - Improved device identity and disconnect-state handling.
 - Reworked transfer preparation, retry and recovery states.
@@ -61,7 +63,7 @@ Silicon Macs.
 ### Fixed
 
 - Endless loading when a connection attempt was slow or interrupted.
-- Folder and file icons using the light set in dark mode.
+- Phone status button truncating "Connecting to your phone…".
 - Connection screen overflowing narrow panes.
 - Webpack builds on Node.js 17 and newer.
 - Stale phone contents remaining visible after a disconnect.

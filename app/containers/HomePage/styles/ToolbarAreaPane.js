@@ -65,7 +65,7 @@ export const styles = (theme) => {
       alignItems: 'center',
       gap: 6,
       minWidth: 0,
-      maxWidth: 260,
+      maxWidth: 360,
       height: 32,
       marginLeft: 8,
       padding: '0 14px 0 8px',

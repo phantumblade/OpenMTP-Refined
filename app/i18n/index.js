@@ -1,6 +1,28 @@
 import { APP_LANGUAGE_TYPE, DEVICE_TYPE } from '../enums';
 
 const italian = {
+  'Welcome to OpenMTP Refined': 'Benvenuto in OpenMTP Refined',
+  "What's new in {name} {version}": 'Novità di {name} {version}',
+  'A brand new Material 3 Expressive design':
+    'Un design Material 3 Expressive tutto nuovo',
+  'Google colors with light and dark themes, new icons and animations.':
+    'Colori Google con tema chiaro e scuro, nuove icone e animazioni.',
+  'A more reliable phone connection':
+    'Una connessione al telefono più affidabile',
+  'OpenMTP frees the phone from the macOS apps that grab it and no longer gets stuck loading.':
+    'OpenMTP libera il telefono dalle app di macOS che lo occupano e non resta più bloccato in caricamento.',
+  'Errors explained in plain words': 'Errori spiegati con parole semplici',
+  'Each connection problem tells you what happened and what to do.':
+    'Ogni problema di connessione ti dice cosa è successo e cosa fare.',
+  'Favorite folders': 'Cartelle preferite',
+  'Star up to 5 folders and open them from the side menu.':
+    'Aggiungi fino a 5 cartelle con la stella e aprile dal menu laterale.',
+  'Filters by date and file type': 'Filtri per data e tipo di file',
+  'Quick ranges and the date format of your language.':
+    'Intervalli rapidi e il formato data della tua lingua.',
+  'Clearer transfers': 'Trasferimenti più chiari',
+  'Phases, speed, current file and a smooth progress bar.':
+    'Fasi, velocità, file corrente e una barra di avanzamento fluida.',
   Settings: 'Impostazioni',
   General: 'Generali',
   'File Manager': 'Gestione file',
