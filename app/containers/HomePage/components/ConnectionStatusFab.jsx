@@ -1,9 +1,8 @@
 import React, { PureComponent } from 'react';
-import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import MaterialSymbol from '../../../components/m3/MaterialSymbol';
 import AngryFaceAnimation from '../../../components/m3/AngryFaceAnimation';
-import { styles } from '../styles/ConnectionStatusFab';
+import { styles, STATUS_EXIT_MS } from '../styles/ConnectionStatusFab';
 
 // Declares one problem; the FAB shows the first one among its children.
 export function ConnectionStatusItem() {
@@ -25,88 +24,142 @@ const firstStatus = (children) => {
     : null;
 };
 
-// The connection problem as a Material 3 extended FAB floating at the bottom
-// of the phone pane: it pops in when a problem appears, and opens into a card
-// with the explanation, the steps and the actions.
+// Space the floating card keeps free under the pane's content.
+const SPACE_PROPERTY = '--status-fab-space';
+const SPACE_GAP = 40;
+
+// The connection problem as a large Material 3 extended FAB floating at the
+// bottom of the phone pane. It always shows the whole message (title,
+// explanation, actions), grows in when a problem appears and shrinks away
+// when it is solved or closed.
 class ConnectionStatusFab extends PureComponent {
   constructor(props) {
     super(props);
 
-    this.state = { expanded: Boolean(firstStatus(props.children)?.actions) };
+    this.dockRef = React.createRef();
+    this.cardRef = React.createRef();
+    this.state = { dismissedKey: null, leaving: null };
+  }
+
+  componentDidMount() {
+    this.observeCard();
   }
 
   componentDidUpdate(prevProps) {
     const { children } = this.props;
+    const { dismissedKey } = this.state;
+    const previous = firstStatus(prevProps.children);
     const status = firstStatus(children);
 
-    // a new problem starts collapsed, unless it needs the user to act
-    if (firstStatus(prevProps.children)?.key !== status?.key) {
-      // eslint-disable-next-line react/no-did-update-set-state
-      this.setState({ expanded: Boolean(status?.actions) });
+    // the problem went away: let the card leave instead of vanishing
+    if (previous && !status && previous.key !== dismissedKey) {
+      this.leave(previous);
     }
+
+    // a closed problem shows again if it comes back later
+    if (!status && dismissedKey) {
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({ dismissedKey: null });
+    }
+
+    this.observeCard();
   }
 
-  toggle = () => {
-    this.setState(({ expanded }) => ({ expanded: !expanded }));
+  componentWillUnmount() {
+    clearTimeout(this.leaveTimer);
+    this.resizeObserver?.disconnect();
+    this.setSpace(0);
+  }
+
+  setSpace = (height) => {
+    const cell = this.dockRef.current?.parentElement;
+
+    cell?.style.setProperty(
+      SPACE_PROPERTY,
+      `${height > 0 ? Math.ceil(height) + SPACE_GAP : 0}px`
+    );
+  };
+
+  observeCard = () => {
+    const card = this.cardRef.current;
+
+    if (card === this.observedCard) {
+      return;
+    }
+
+    this.resizeObserver?.disconnect();
+    this.observedCard = card;
+
+    if (!card) {
+      this.setSpace(0);
+
+      return;
+    }
+
+    if (!this.resizeObserver) {
+      this.resizeObserver = new ResizeObserver(([entry]) => {
+        this.setSpace(entry.target.offsetHeight);
+      });
+    }
+
+    this.resizeObserver.observe(card);
+  };
+
+  leave = (status) => {
+    clearTimeout(this.leaveTimer);
+    this.setState({ leaving: status });
+    this.leaveTimer = setTimeout(() => {
+      this.setState({ leaving: null });
+    }, STATUS_EXIT_MS);
+  };
+
+  dismiss = (status) => {
+    this.setState({ dismissedKey: status.key });
+    this.leave(status);
   };
 
   render() {
-    const { classes: styles, children, closeLabel, detailsLabel } = this.props;
-    const { expanded } = this.state;
-    const status = firstStatus(children);
-
-    if (!status) {
-      return null;
-    }
+    const { classes: styles, children, closeLabel } = this.props;
+    const { dismissedKey, leaving } = this.state;
+    const current = firstStatus(children);
+    const visible = current && current.key !== dismissedKey ? current : null;
+    const status = visible || leaving;
 
     return (
-      <div className={styles.dock}>
-        <div className={styles.anchor} key={status.key}>
-          {expanded ? (
+      <div className={styles.dock} ref={this.dockRef}>
+        {status && (
+          <div className={styles.anchor}>
             <section
-              className={styles.card}
+              key={status.key}
+              ref={visible ? this.cardRef : undefined}
+              className={visible ? styles.card : styles.cardLeaving}
               role="alert"
               aria-labelledby={`status-${status.key}`}
             >
-              <div className={styles.cardHeader}>
-                <AngryFaceAnimation size={44} className={styles.face} />
-                <h3 id={`status-${status.key}`} className={styles.cardTitle}>
+              <AngryFaceAnimation size={48} className={styles.face} />
+              <div className={styles.content}>
+                <h3 id={`status-${status.key}`} className={styles.title}>
                   {status.title}
                 </h3>
-                <button
-                  type="button"
-                  className={styles.close}
-                  aria-label={closeLabel}
-                  onClick={this.toggle}
-                >
-                  <MaterialSymbol name="close" size={22} />
-                </button>
+                {status.body && (
+                  <div className={styles.body}>{status.body}</div>
+                )}
+                {status.actions && (
+                  <div className={styles.actions}>{status.actions}</div>
+                )}
               </div>
-              {status.body && (
-                <div className={styles.cardBody}>{status.body}</div>
-              )}
-              {status.actions && (
-                <div className={styles.cardActions}>{status.actions}</div>
-              )}
+              <button
+                type="button"
+                className={styles.close}
+                aria-label={closeLabel}
+                disabled={!visible}
+                onClick={() => this.dismiss(status)}
+              >
+                <MaterialSymbol name="close" size={22} />
+              </button>
             </section>
-          ) : (
-            <button
-              type="button"
-              className={classNames(styles.fab)}
-              aria-expanded={false}
-              aria-label={`${status.title}. ${detailsLabel}`}
-              onClick={this.toggle}
-            >
-              <AngryFaceAnimation size={28} className={styles.face} />
-              <span className={styles.fabLabel}>{status.title}</span>
-              <MaterialSymbol
-                name="expand_less"
-                size={22}
-                className={styles.fabChevron}
-              />
-            </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     );
   }

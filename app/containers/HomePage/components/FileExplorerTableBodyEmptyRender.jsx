@@ -407,10 +407,7 @@ class FileExplorerTableBodyEmptyRender extends PureComponent {
               </div>
             </div>
             {/* connection problems: extended FAB at the bottom of the pane */}
-            <ConnectionStatusFab
-              closeLabel={t('Close')}
-              detailsLabel={t('Show details')}
-            >
+            <ConnectionStatusFab closeLabel={t('Close')}>
               {/* exact owner of the phone's USB interface, read from macOS */}
               {blockers.length > 0 &&
                 errorCard({

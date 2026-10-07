@@ -3,19 +3,14 @@ import classNames from 'classnames';
 import Popover from '@material-ui/core/Popover';
 import { withStyles } from '@material-ui/core/styles';
 import MaterialSymbol from './MaterialSymbol';
-import {
-  alphaHex,
-  m3Elevation,
-  m3Shape,
-  m3State,
-  m3Type,
-} from '../../styles/m3/tokens';
+import { alphaHex, m3Shape, m3State, m3Type } from '../../styles/m3/tokens';
 
 // Material 3 Expressive menu with groups (Compose SegmentedMenuTokens /
 // MenuDefaults): each group is its own surface, 2dp apart, with 16dp outer
 // and 8dp inner corners; 44dp items with a 20dp leading icon, a bodyLarge
 // label and the keyboard shortcut as trailing text; the selected item uses
-// the tertiary container.
+// the tertiary container. One drop shadow follows the outline of all the
+// groups, so the gaps read as cuts in a single menu rather than as boxes.
 
 const EMPHASIZED_DECELERATE = 'cubic-bezier(0.05, 0.7, 0.1, 1)';
 
@@ -34,11 +29,12 @@ const styles = (theme) => {
       flexDirection: 'column',
       gap: 2,
       minWidth: 220,
-      maxWidth: 320,
       padding: 0,
       margin: 0,
       outline: 'none',
       transformOrigin: 'top left',
+      filter:
+        'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15))',
       animation: `$open 300ms ${EMPHASIZED_DECELERATE} both`,
       '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
     },
@@ -46,9 +42,14 @@ const styles = (theme) => {
       from: {
         opacity: 0,
         transform: 'scale(0.92)',
-        clipPath: 'inset(0 0 60% 0)',
+        clipPath: 'inset(-16px -16px 60% -16px)',
       },
-      to: { opacity: 1, transform: 'none', clipPath: 'inset(0 0 0 0)' },
+      // the clip stays outside the menu so it never cuts the shadow
+      to: {
+        opacity: 1,
+        transform: 'none',
+        clipPath: 'inset(-16px -16px -16px -16px)',
+      },
     },
     group: {
       display: 'flex',
@@ -56,7 +57,6 @@ const styles = (theme) => {
       padding: '4px 0',
       borderRadius: m3Shape.small,
       backgroundColor: m3.surfaceContainerLow,
-      boxShadow: m3Elevation.level2,
       '&:first-child': {
         borderTopLeftRadius: m3Shape.large,
         borderTopRightRadius: m3Shape.large,
@@ -114,9 +114,6 @@ const styles = (theme) => {
     },
     label: {
       flex: 1,
-      minWidth: 0,
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',
     },
     shortcut: {

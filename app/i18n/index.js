@@ -1,7 +1,6 @@
 import { APP_LANGUAGE_TYPE, DEVICE_TYPE } from '../enums';
 
 const italian = {
-  'Show details': 'Mostra i dettagli',
   'Sort by': 'Ordina per',
   '{field}, {direction}. Click to reverse':
     '{field}, {direction}. Clic per invertire',

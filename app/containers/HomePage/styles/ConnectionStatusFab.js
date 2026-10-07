@@ -6,13 +6,46 @@ import {
   m3Type,
 } from '../../../styles/m3/tokens';
 
-// Extended FAB (Compose ExtendedFabSmallTokens): 56dp, 16dp corners, 16dp
-// side padding, 24dp icon, level 3 elevation; error container colours since
-// it reports a problem. It opens into an extra-large-corner card.
+// Large extended FAB (Compose ExtendedFabLargeTokens): 28dp corners, 24dp
+// padding, level 3 elevation; error container colours since it reports a
+// problem. It carries the whole message, so it never needs to be opened.
+// Enter: grow from the bottom edge with the emphasized decelerate curve;
+// exit: the same path back, faster, with emphasized accelerate.
 const EMPHASIZED_DECELERATE = 'cubic-bezier(0.05, 0.7, 0.1, 1)';
+const EMPHASIZED_ACCELERATE = 'cubic-bezier(0.3, 0, 0.8, 0.15)';
+const STATUS_ENTER_MS = 450;
+
+export const STATUS_EXIT_MS = 200;
+
+const hidden = {
+  opacity: 0,
+  transform: 'translateY(24px) scale(0.8)',
+  clipPath: 'inset(40% 15% 0 15% round 28px)',
+};
+const shown = {
+  opacity: 1,
+  transform: 'none',
+  clipPath: 'inset(-24px -24px -24px -24px round 28px)',
+};
 
 export const styles = (theme) => {
   const { m3 } = theme.palette;
+
+  const card = {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: 16,
+    width: '100%',
+    maxWidth: 600,
+    minHeight: 96,
+    padding: '20px 12px 20px 20px',
+    boxSizing: 'border-box',
+    borderRadius: m3Shape.extraLarge,
+    backgroundColor: m3.errorContainer,
+    color: m3.onErrorContainer,
+    boxShadow: m3Elevation.level3,
+    transformOrigin: 'bottom center',
+  };
 
   return {
     // zero-height sticky strip at the bottom of the scrolling pane
@@ -34,93 +67,48 @@ export const styles = (theme) => {
       pointerEvents: 'none',
       '& > *': { pointerEvents: 'auto' },
     },
-    fab: {
-      ...m3Type.labelLarge,
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 12,
-      maxWidth: '100%',
-      height: 56,
-      padding: '0 16px',
-      border: 'none',
-      borderRadius: m3Shape.large,
-      backgroundColor: m3.errorContainer,
-      color: m3.onErrorContainer,
-      boxShadow: m3Elevation.level3,
-      fontFamily: 'inherit',
-      fontSize: 15,
-      cursor: 'pointer',
-      outline: 'none',
-      transformOrigin: 'bottom center',
-      animation: `$fabIn 350ms ${EMPHASIZED_DECELERATE} both`,
-      transition: 'box-shadow 150ms linear',
-      '&:hover': {
-        boxShadow: `${m3Elevation.level3}, inset 0 0 0 100px ${alphaHex(
-          m3.onErrorContainer,
-          m3State.hover
-        )}`,
-      },
-      '&:focus-visible': {
-        outline: `3px solid ${m3.secondary}`,
-        outlineOffset: 2,
-      },
+    card: {
+      ...card,
+      animation: `$statusIn ${STATUS_ENTER_MS}ms ${EMPHASIZED_DECELERATE} both`,
       '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
     },
-    '@keyframes fabIn': {
-      from: { opacity: 0, transform: 'translateY(16px) scale(0.6)' },
-      to: { opacity: 1, transform: 'none' },
+    cardLeaving: {
+      ...card,
+      pointerEvents: 'none',
+      animation: `$statusOut ${STATUS_EXIT_MS}ms ${EMPHASIZED_ACCELERATE} both`,
+      '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
     },
+    '@keyframes statusIn': { from: hidden, to: shown },
+    '@keyframes statusOut': { from: shown, to: hidden },
     face: {
       flexShrink: 0,
       color: m3.error,
     },
-    fabLabel: {
-      minWidth: 0,
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      whiteSpace: 'nowrap',
-      fontWeight: 600,
-    },
-    fabChevron: {
-      flexShrink: 0,
-      marginLeft: -4,
-      opacity: 0.8,
-    },
-    card: {
-      width: '100%',
-      maxWidth: 560,
-      padding: '16px 16px 20px 20px',
-      boxSizing: 'border-box',
-      borderRadius: m3Shape.extraLarge,
-      backgroundColor: m3.errorContainer,
-      color: m3.onErrorContainer,
-      boxShadow: m3Elevation.level3,
-      transformOrigin: 'bottom center',
-      animation: `$cardIn 400ms ${EMPHASIZED_DECELERATE} both`,
-      '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
-    },
-    '@keyframes cardIn': {
-      from: {
-        opacity: 0,
-        transform: 'scale(0.85)',
-        clipPath: 'inset(70% 20% 0 20% round 16px)',
-      },
-      to: {
-        opacity: 1,
-        transform: 'none',
-        clipPath: 'inset(0 0 0 0 round 28px)',
-      },
-    },
-    cardHeader: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: 14,
-    },
-    cardTitle: {
-      ...m3Type.titleMedium,
+    content: {
       flex: 1,
+      minWidth: 0,
+      alignSelf: 'center',
+    },
+    title: {
+      ...m3Type.titleMedium,
       margin: 0,
+      fontSize: 17,
       fontWeight: 600,
+    },
+    body: {
+      ...m3Type.bodyMedium,
+      marginTop: 4,
+      '& ol': {
+        margin: '8px 0 0',
+        paddingLeft: 20,
+      },
+      '& li': { margin: '2px 0' },
+    },
+    actions: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: 8,
+      marginTop: 14,
     },
     close: {
       display: 'grid',
@@ -128,6 +116,7 @@ export const styles = (theme) => {
       flexShrink: 0,
       width: 40,
       height: 40,
+      marginTop: -8,
       border: 'none',
       borderRadius: 20,
       backgroundColor: 'transparent',
@@ -136,21 +125,10 @@ export const styles = (theme) => {
       '&:hover': {
         backgroundColor: alphaHex(m3.onErrorContainer, m3State.hover),
       },
-    },
-    cardBody: {
-      ...m3Type.bodyMedium,
-      margin: '8px 0 0 58px',
-      '& ol': {
-        margin: '8px 0 0',
-        paddingLeft: 20,
+      '&:focus-visible': {
+        outline: `3px solid ${m3.secondary}`,
+        outlineOffset: 2,
       },
-      '& li': { margin: '2px 0' },
-    },
-    cardActions: {
-      display: 'flex',
-      flexWrap: 'wrap',
-      gap: 8,
-      margin: '14px 0 0 58px',
     },
   };
 };
