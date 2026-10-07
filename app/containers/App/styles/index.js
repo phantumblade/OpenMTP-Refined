@@ -10,6 +10,10 @@ import {
   m3State,
   m3Type,
 } from '../../../styles/m3/tokens';
+import M3DialogTransition, {
+  DIALOG_ENTER_MS,
+  DIALOG_EXIT_MS,
+} from '../../../components/m3/M3DialogTransition';
 
 // --md-sys-color-* CSS custom properties for the Material 3 colour roles.
 const m3CssVariables = (tokens) =>
@@ -350,23 +354,33 @@ const m3ComponentOverrides = (m3) => ({
     label: { ...m3Type.bodyLarge, color: m3.onSurface },
   },
   // M3 menu
+  // Material 3 Expressive menu (Compose SegmentedMenuTokens), same as the
+  // app's own M3Menu: large corners, 44dp items, tertiary selection
   MuiMenu: {
     paper: {
-      borderRadius: m3Shape.medium,
-      backgroundColor: m3.surfaceContainer,
+      borderRadius: m3Shape.large,
+      backgroundColor: m3.surfaceContainerLow,
       boxShadow: m3Elevation.level2,
     },
-    list: { padding: '8px 0' },
+    list: { padding: '4px 0' },
   },
   MuiMenuItem: {
     root: {
-      ...m3Type.labelLarge,
-      minHeight: 48,
-      padding: '0 16px',
+      ...m3Type.bodyLarge,
+      minHeight: 44,
+      margin: '0 4px',
+      padding: '0 12px',
+      borderRadius: m3Shape.extraSmall,
       color: m3.onSurface,
+      transition: 'background-color 120ms linear, border-radius 200ms ease',
+      '&:hover': {
+        backgroundColor: alphaHex(m3.onSurface, m3State.hover),
+        borderRadius: m3Shape.medium,
+      },
       '&$selected, &$selected:hover': {
-        backgroundColor: m3.secondaryContainer,
-        color: m3.onSecondaryContainer,
+        borderRadius: m3Shape.medium,
+        backgroundColor: m3.tertiaryContainer,
+        color: m3.onTertiaryContainer,
       },
     },
   },
@@ -407,6 +421,14 @@ export const materialUiTheme = ({ ...args }) => {
       useNextVariants: true,
       fontSize: variables().sizes.regularFontSize,
       fontFamily,
+    },
+
+    props: {
+      // Material 3 dialog motion for every dialog in the app
+      MuiDialog: {
+        TransitionComponent: M3DialogTransition,
+        transitionDuration: { enter: DIALOG_ENTER_MS, exit: DIALOG_EXIT_MS },
+      },
     },
 
     overrides: {

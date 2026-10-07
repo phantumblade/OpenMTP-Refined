@@ -123,6 +123,7 @@
     "react-router": "^5.3.4",
     "react-router-dom": "^5.3.4",
     "react-router-redux": "^5.0.0-alpha.9",
+    "react-transition-group": "4.4.1",
     "redux": "^4.2.1",
     "redux-thunk": "^2.4.2",
     "regenerator-runtime": "^0.14.1",

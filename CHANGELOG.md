@@ -39,6 +39,14 @@ Silicon Macs.
   free space, measured like Finder.
 - The app starts in the Mac's language (Italian or English) and the first
   launch shows only the welcome dialog, without opening Settings behind it.
+- Right-click menu rebuilt as a Material 3 Expressive menu: grouped
+  sections, icons and keyboard shortcuts (replaces the native macOS menu).
+- Sorting as a Material 3 connected button group: the active field shows an
+  arrow that flips to reverse the order and moves smoothly to the new field.
+- Connection problems appear as an extended FAB floating at the bottom of the
+  phone pane, opening into a card with the explanation and actions.
+- Every dialog opens and closes with the Material 3 motion (slide and grow,
+  500ms in / 150ms out, as in Material Web).
 - Welcome dialog listing what's new in 4.0 as Material 3 segmented lists
   grouped by topic, in Italian and English.
 - Verification scripts for favorites, USB owners, error messages, the loading

@@ -1,6 +1,13 @@
 import { APP_LANGUAGE_TYPE, DEVICE_TYPE } from '../enums';
 
 const italian = {
+  'Show details': 'Mostra i dettagli',
+  'Sort by': 'Ordina per',
+  '{field}, {direction}. Click to reverse':
+    '{field}, {direction}. Clic per invertire',
+  ascending: 'crescente',
+  descending: 'decrescente',
+  Actions: 'Azioni',
   'No favorites yet': 'Ancora nessun preferito',
   'Fewer connection hiccups': 'Meno intoppi nel collegamento',
   'When the macOS Photos service holds on to your phone, OpenMTP releases it for you.':

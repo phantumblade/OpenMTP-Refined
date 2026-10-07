@@ -112,9 +112,10 @@ import {
 } from '../../../helpers/fileTransfer';
 import { logTransferEvent } from '../../../helpers/fileTransferLogger';
 import { isSameUsbDevice } from '../../../helpers/deviceInfo';
+import M3Menu from '../../../components/m3/M3Menu';
 
 const remote = getRemoteWindow();
-const { Menu, getCurrentWindow } = remote;
+const { getCurrentWindow } = remote;
 
 let allowFileDropFlag = false;
 const activeTransferSessions = new Set();
@@ -131,6 +132,8 @@ class FileExplorer extends Component {
     this.filesDragGhostImg = this._createDragIcon();
 
     this.initialState = {
+      // M3 context menu: { anchorPosition, items } or null
+      contextMenu: null,
       togglePasteConfirmDialog: false,
       toggleDialog: {
         rename: {
@@ -156,8 +159,6 @@ class FileExplorer extends Component {
     this.state = {
       ...this.initialState,
     };
-
-    this.electronMenu = new Menu();
 
     this.keyedAcceleratorList = {
       shift: false,
@@ -1009,10 +1010,48 @@ class FileExplorer extends Component {
     });
   };
 
-  fireElectronMenu(menuItems) {
-    this.electronMenu = Menu.buildFromTemplate(menuItems);
-    this.electronMenu.popup(remote.getCurrentWindow());
-  }
+  // M3 menu groups: edit, clipboard, location (with macOS shortcuts)
+  contextMenuGroups = (items) => {
+    const meta = {
+      rename: { icon: 'edit', shortcut: '⌘D', group: 0 },
+      newFolder: { icon: 'create_new_folder', shortcut: '⌘N', group: 0 },
+      copy: { icon: 'content_copy', shortcut: '⌘C', group: 1 },
+      copyToQueue: { icon: 'playlist_add', shortcut: '⇧⌘C', group: 1 },
+      paste: { icon: 'content_paste', shortcut: '⌘V', group: 1 },
+      showInEnclosingFolder: { icon: 'folder_open', group: 2 },
+      favorite: { icon: 'star', group: 2 },
+    };
+    const groups = [[], [], []];
+
+    items.forEach((item) => {
+      const info = meta[item.id] || { group: 2 };
+
+      groups[info.group].push({
+        id: item.id,
+        label: item.label,
+        icon: info.icon,
+        shortcut: info.shortcut,
+        enabled: item.enabled,
+        selected: item.selected,
+        onClick: item.click,
+      });
+    });
+
+    return groups;
+  };
+
+  openContextMenu = (event, items) => {
+    this.setState({
+      contextMenu: {
+        anchorPosition: { top: event.clientY, left: event.clientX },
+        groups: this.contextMenuGroups(items),
+      },
+    });
+  };
+
+  closeContextMenu = () => {
+    this.setState({ contextMenu: null });
+  };
 
   _handleContextMenuClick = (
     event,
@@ -1031,6 +1070,12 @@ class FileExplorer extends Component {
     }
 
     if (event.type === 'contextmenu') {
+      // the event bubbles from the item to the list: the innermost handler
+      // (the one that knows the item) opens the menu, the others skip it
+      if (event.nativeEvent?.openmtpContextMenuOpened) {
+        return null;
+      }
+
       if (
         _target === 'tableWrapperTarget' &&
         event.target !== event.currentTarget &&
@@ -1045,7 +1090,14 @@ class FileExplorer extends Component {
         { ...tableData }
       );
 
-      this.fireElectronMenu(contextMenuActiveList);
+      event.preventDefault();
+
+      if (event.nativeEvent) {
+        // eslint-disable-next-line no-param-reassign
+        event.nativeEvent.openmtpContextMenuOpened = true;
+      }
+
+      this.openContextMenu(event, contextMenuActiveList);
 
       return null;
     }
@@ -1069,6 +1121,7 @@ class FileExplorer extends Component {
       switch (a) {
         case 'rename':
           contextMenuActiveList.push({
+            id: a,
             label: translate(appLanguage, item.label),
             enabled: Object.keys(rowData).length > 0,
             data: rowData,
@@ -1086,6 +1139,7 @@ class FileExplorer extends Component {
         case 'copy':
         case 'copyToQueue':
           contextMenuActiveList.push({
+            id: a,
             label: translate(appLanguage, item.label),
             enabled: queue.selected.length > 0,
             click: () => {
@@ -1101,6 +1155,7 @@ class FileExplorer extends Component {
 
         case 'paste':
           contextMenuActiveList.push({
+            id: a,
             label: translate(appLanguage, item.label),
             enabled:
               fileTransferClipboard.queue.length > 0 &&
@@ -1119,6 +1174,7 @@ class FileExplorer extends Component {
 
         case 'newFolder':
           contextMenuActiveList.push({
+            id: a,
             label: translate(appLanguage, item.label),
             data: tableData,
             click: () => {
@@ -1134,6 +1190,7 @@ class FileExplorer extends Component {
           break;
         case 'showInEnclosingFolder':
           contextMenuActiveList.push({
+            id: a,
             label: translate(appLanguage, item.label),
             enabled: Object.keys(rowData).length > 0,
             data: rowData,
@@ -1164,8 +1221,10 @@ class FileExplorer extends Component {
           }
 
           contextMenuActiveList.push({
+            id: a,
             label: translate(appLanguage, label, { max: FAVORITE_FOLDERS_MAX }),
             enabled: isFolder && !isFull,
+            selected: isFavorite,
             data: rowData,
             click: () => {
               this._handleContextMenuListActions({
@@ -2405,8 +2464,12 @@ class FileExplorer extends Component {
       appThemeMode,
       folderAccess,
     } = this.props;
-    const { toggleDialog, togglePasteConfirmDialog, directoryGeneratedTime } =
-      this.state;
+    const {
+      toggleDialog,
+      togglePasteConfirmDialog,
+      directoryGeneratedTime,
+      contextMenu,
+    } = this.state;
     const { rename, newFolder } = toggleDialog;
     const togglePasteDialog =
       deviceType === DEVICE_TYPE.mtp && fileTransferProgess.toggle;
@@ -2471,6 +2534,13 @@ class FileExplorer extends Component {
           bodyText="Replace and merge the existing items?"
           trigger={togglePasteConfirmDialog}
           onClickHandler={this._handlePasteConfirm}
+        />
+        <M3Menu
+          open={Boolean(contextMenu)}
+          anchorPosition={contextMenu?.anchorPosition}
+          groups={contextMenu?.groups}
+          ariaLabel={translate(appLanguage, 'Actions')}
+          onClose={this.closeContextMenu}
         />
         <FileExplorerBodyRender
           deviceType={deviceType}

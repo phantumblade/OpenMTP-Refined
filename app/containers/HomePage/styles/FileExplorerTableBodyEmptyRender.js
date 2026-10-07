@@ -25,7 +25,10 @@ export const styles = (theme) => {
     pane: {
       display: 'flex',
       justifyContent: 'center',
-      padding: '32px 24px',
+      // fill the visible pane so the status FAB floats at its bottom
+      minHeight: 'calc(100vh - 262px)',
+      boxSizing: 'border-box',
+      padding: '32px 24px 104px',
       color: m3.onSurface,
     },
     // Two columns when the pane is wide enough (status + steps side by side),

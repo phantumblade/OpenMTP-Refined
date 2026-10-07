@@ -3,11 +3,13 @@ import { ipcRenderer } from 'electron';
 import { withStyles } from '@material-ui/core/styles';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-import classNames from 'classnames';
 import AngryFaceAnimation from '../../../components/m3/AngryFaceAnimation';
 import M3Button from '../../../components/m3/M3Button';
 import M3MorphingHero from '../../../components/m3/M3MorphingHero';
 import StableText from '../../../components/m3/StableText';
+import ConnectionStatusFab, {
+  ConnectionStatusItem,
+} from './ConnectionStatusFab';
 import M3Shape from '../../../components/m3/M3Shape';
 import MaterialSymbol from '../../../components/m3/MaterialSymbol';
 import { styles } from '../styles/FileExplorerTableBodyEmptyRender';
@@ -272,18 +274,15 @@ class FileExplorerTableBodyEmptyRender extends PureComponent {
       const noPhoneOnUsb = !isConnecting && phonesOnUsb === 0;
       const isBusy = isConnecting || quittingPid !== null;
 
-      const errorCard = ({ key, visual, title, body, actions }) => (
-        <div
+      // each problem becomes an entry of the floating status FAB
+      const errorCard = ({ key, title, body, actions }) => (
+        <ConnectionStatusItem
           key={key}
-          className={classNames(styles.statusCard, styles.statusError)}
-        >
-          {visual}
-          <div className={styles.statusText}>
-            <div className={styles.statusTitle}>{title}</div>
-            {body && <div className={styles.statusBody}>{body}</div>}
-            {actions && <div className={styles.statusActions}>{actions}</div>}
-          </div>
-        </div>
+          statusKey={key}
+          title={title}
+          body={body}
+          actions={actions}
+        />
       );
 
       // the animated angry face is the visual for every connection problem
@@ -405,131 +404,100 @@ class FileExplorerTableBodyEmptyRender extends PureComponent {
                     ))}
                   </ol>
                 </div>
-
-                {/* full-width status banner under both columns */}
-                <div className={styles.statusRow}>
-                  {/* exact owner of the phone's USB interface, read from macOS */}
-                  {blockers.length > 0 &&
-                    errorCard({
-                      key: 'blockers',
-                      visual: errorShape('block'),
-                      title: t('The phone is in use by: {apps}', {
-                        apps: blockers
-                          .map(({ displayName }) => t(displayName))
-                          .join(', '),
-                      }),
-                      body: blockers.every(({ releasable }) => releasable)
-                        ? t(
-                            'It is the macOS Photos / Image Capture service: OpenMTP can free the phone for you.'
-                          )
-                        : t(
-                            'Close it so OpenMTP can use the phone. It will be asked to quit normally, like with ⌘Q.'
-                          ),
-                      actions: blockers.map((blocker) => (
-                        <M3Button
-                          key={blocker.pid}
-                          variant="error"
-                          icon={
-                            blocker.releasable ? 'lock_open_right' : 'close'
-                          }
-                          disabled={isBusy}
-                          onClick={() => this._handleQuitBlocker(blocker)}
-                        >
-                          {blocker.releasable
-                            ? t('Free the phone and try again')
-                            : t('Close {app} and try again', {
-                                app: t(blocker.displayName),
-                              })}
-                        </M3Button>
-                      )),
-                    })}
-
-                  {quitFailedName &&
-                    errorCard({
-                      key: 'quit-failed',
-                      visual: errorShape('error'),
-                      title: t(
-                        '{app} did not quit. Close it manually, then try again.',
-                        { app: t(quitFailedName) }
-                      ),
-                    })}
-
-                  {noPhoneOnUsb &&
-                    errorCard({
-                      key: 'no-phone',
-                      visual: (
-                        <AngryFaceAnimation
-                          size={72}
-                          className={styles.statusFace}
-                          aria-label={t('The Mac does not see the phone')}
-                        />
-                      ),
-                      title: t('The Mac does not see the phone'),
-                      body: t(
-                        'Check the cable and choose File Transfer in the USB notification on the phone.'
-                      ),
-                    })}
-
-                  {connectionDetail &&
-                    blockers.length < 1 &&
-                    !noPhoneOnUsb &&
-                    errorCard({
-                      key: 'detail',
-                      visual: errorShape(connectionDetail.symbol),
-                      title: t(connectionDetail.title),
-                      body: (
-                        <>
-                          {t(connectionDetail.body)}
-                          {connectionDetail.steps.length > 0 && (
-                            <ol className={styles.statusSteps}>
-                              {connectionDetail.steps.map((step) => (
-                                <li key={step}>{t(step)}</li>
-                              ))}
-                            </ol>
-                          )}
-                          {connectionDetail.technicalDetail && (
-                            <span className={styles.technicalDetail}>
-                              {t('Technical detail')}:{' '}
-                              {connectionDetail.technicalDetail}
-                            </span>
-                          )}
-                        </>
-                      ),
-                    })}
-
-                  {!isConnecting &&
-                    !connectionDetail &&
-                    blockers.length < 1 &&
-                    phonesOnUsb > 0 && (
-                      <div
-                        className={classNames(
-                          styles.statusCard,
-                          styles.statusOk
-                        )}
-                      >
-                        <M3Shape
-                          shape="Circle"
-                          size={48}
-                          color="currentColor"
-                          className={styles.statusShape}
-                        >
-                          <MaterialSymbol
-                            name="check"
-                            size={26}
-                            weight={600}
-                            className={styles.statusIcon}
-                          />
-                        </M3Shape>
-                        <div className={styles.statusText}>
-                          <div className={styles.statusTitle}>
-                            {t('No other app is using the phone')}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                </div>
               </div>
             </div>
+            {/* connection problems: extended FAB at the bottom of the pane */}
+            <ConnectionStatusFab
+              closeLabel={t('Close')}
+              detailsLabel={t('Show details')}
+            >
+              {/* exact owner of the phone's USB interface, read from macOS */}
+              {blockers.length > 0 &&
+                errorCard({
+                  key: 'blockers',
+                  visual: errorShape('block'),
+                  title: t('The phone is in use by: {apps}', {
+                    apps: blockers
+                      .map(({ displayName }) => t(displayName))
+                      .join(', '),
+                  }),
+                  body: blockers.every(({ releasable }) => releasable)
+                    ? t(
+                        'It is the macOS Photos / Image Capture service: OpenMTP can free the phone for you.'
+                      )
+                    : t(
+                        'Close it so OpenMTP can use the phone. It will be asked to quit normally, like with ⌘Q.'
+                      ),
+                  actions: blockers.map((blocker) => (
+                    <M3Button
+                      key={blocker.pid}
+                      variant="error"
+                      icon={blocker.releasable ? 'lock_open_right' : 'close'}
+                      disabled={isBusy}
+                      onClick={() => this._handleQuitBlocker(blocker)}
+                    >
+                      {blocker.releasable
+                        ? t('Free the phone and try again')
+                        : t('Close {app} and try again', {
+                            app: t(blocker.displayName),
+                          })}
+                    </M3Button>
+                  )),
+                })}
+
+              {quitFailedName &&
+                errorCard({
+                  key: 'quit-failed',
+                  visual: errorShape('error'),
+                  title: t(
+                    '{app} did not quit. Close it manually, then try again.',
+                    { app: t(quitFailedName) }
+                  ),
+                })}
+
+              {noPhoneOnUsb &&
+                errorCard({
+                  key: 'no-phone',
+                  visual: (
+                    <AngryFaceAnimation
+                      size={72}
+                      className={styles.statusFace}
+                      aria-label={t('The Mac does not see the phone')}
+                    />
+                  ),
+                  title: t('The Mac does not see the phone'),
+                  body: t(
+                    'Check the cable and choose File Transfer in the USB notification on the phone.'
+                  ),
+                })}
+
+              {connectionDetail &&
+                blockers.length < 1 &&
+                !noPhoneOnUsb &&
+                errorCard({
+                  key: 'detail',
+                  visual: errorShape(connectionDetail.symbol),
+                  title: t(connectionDetail.title),
+                  body: (
+                    <>
+                      {t(connectionDetail.body)}
+                      {connectionDetail.steps.length > 0 && (
+                        <ol className={styles.statusSteps}>
+                          {connectionDetail.steps.map((step) => (
+                            <li key={step}>{t(step)}</li>
+                          ))}
+                        </ol>
+                      )}
+                      {connectionDetail.technicalDetail && (
+                        <span className={styles.technicalDetail}>
+                          {t('Technical detail')}:{' '}
+                          {connectionDetail.technicalDetail}
+                        </span>
+                      )}
+                    </>
+                  ),
+                })}
+            </ConnectionStatusFab>
           </TableCell>
         </TableRow>
       );
