@@ -13,7 +13,8 @@ Silicon Macs.
 ### Added
 
 - Material 3 Expressive design system: Google color scheme generated from the
-  brand color (light and dark), Material Symbols icons, shape and motion
+  brand blue, with a warm tertiary from the app icon's orange for favorites
+  and selected menu items (light and dark), Material Symbols icons, shape and motion
   tokens, M3 buttons, dialogs, tabs, switches, menus, tooltips and snackbars.
 - Morphing loading indicator and wavy progress bar ported from Jetpack
   Compose, with smoothed transfer progress. The connection screen's shape

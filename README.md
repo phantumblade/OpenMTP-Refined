@@ -34,9 +34,11 @@ wrong.
 | -------------------------------------------------------- | ---------------------------------------------------------------- |
 | ![Date range filter](docs/images/readme/date-filter.png) | ![Sidebar with favorite folders](docs/images/readme/sidebar.png) |
 
-| Settings                                            | Dark theme                                           |
-| --------------------------------------------------- | ---------------------------------------------------- |
-| ![Settings dialog](docs/images/readme/settings.png) | ![Dark theme](docs/images/readme/dual-pane-dark.png) |
+| Context menu                                                 | Settings                                            |
+| ------------------------------------------------------------ | --------------------------------------------------- |
+| ![Grouped context menu](docs/images/readme/context-menu.png) | ![Settings dialog](docs/images/readme/settings.png) |
+
+![Dark theme](docs/images/readme/dual-pane-dark.png)
 
 > Screenshots use a demo account and demo file names.
 

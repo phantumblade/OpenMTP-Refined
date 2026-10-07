@@ -190,6 +190,10 @@ export const styles = (theme) => {
     itemIcon: {
       flexShrink: 0,
     },
+    // favourites wear the tertiary accent, like the star on pinned folders
+    favoriteIcon: {
+      color: m3.tertiary,
+    },
     itemLock: {
       flexShrink: 0,
       color: m3.onSurfaceVariant,

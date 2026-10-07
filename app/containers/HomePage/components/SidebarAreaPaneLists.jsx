@@ -112,6 +112,8 @@ class SidebarAreaPaneLists extends PureComponent {
     trailing,
     locked = false,
     className,
+    iconClassName,
+    iconFill,
   }) => {
     const { classes: styles } = this.props;
 
@@ -131,8 +133,8 @@ class SidebarAreaPaneLists extends PureComponent {
           <MaterialSymbol
             name={icon}
             size={24}
-            fill={active ? 1 : 0}
-            className={styles.itemIcon}
+            fill={active || iconFill ? 1 : 0}
+            className={classNames(styles.itemIcon, iconClassName)}
           />
           <span className={styles.itemLabel}>{label}</span>
           {locked && (
@@ -233,7 +235,9 @@ class SidebarAreaPaneLists extends PureComponent {
             >
               {this.renderItem({
                 key,
-                icon: 'folder',
+                icon: 'star',
+                iconFill: true,
+                iconClassName: styles.favoriteIcon,
                 label: item.name,
                 active: currentBrowsePath === item.path,
                 disabled: !exists,
