@@ -36,8 +36,29 @@ JXA
 # The DMG gets the cleanly signed bundle: Finder icon metadata would break the
 # signature for downloaded copies. The app attaches the icon to itself at first
 # launch (app/helpers/customAppIcon.js); the local install gets it right away.
-npx electron-builder --config electron-builder-config.js build --mac dmg zip \
+npx electron-builder --config electron-builder-config.js build --mac zip \
   --prepackaged "$APP" --publish never
+
+# The DMG is made with a current dmgbuild: the copy bundled with
+# electron-builder 23 writes a background reference that Finder on macOS 26
+# can't resolve, so the install window showed no background.
+DMGBUILD_VENV=tmp/dmgbuild-venv
+if [ ! -x "$DMGBUILD_VENV/bin/dmgbuild" ]; then
+  python3 -m venv "$DMGBUILD_VENV"
+  "$DMGBUILD_VENV/bin/pip" install --quiet 'dmgbuild==1.6.7'
+fi
+VERSION=$(node -p "require('./package.json').version")
+DMG="dist/openmtp-${VERSION}-mac-$(uname -m | sed 's/x86_64/x64/').dmg"
+rm -f "$DMG"
+"$DMGBUILD_VENV/bin/dmgbuild" -s build/dmg/dmgbuild-settings.py \
+  -D app="$APP" "OpenMTP ${VERSION}" "$DMG"
+
+# NO_INSTALL=1 leaves /Applications alone (e.g. while testing a fresh install)
+if [ "${NO_INSTALL:-0}" = "1" ]; then
+  echo
+  echo "Built (not installed): $DMG"
+  exit 0
+fi
 
 # Install as the only copy in /Applications so Spotlight/Launchpad always open
 # the latest build (the DMG and ZIP in dist/ still contain it).

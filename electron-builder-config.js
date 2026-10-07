@@ -94,15 +94,27 @@ module.exports = () => {
       icon: 'build/icon.icns',
       binaries: ['dist/mas/OpenMTP.app/Contents/Resources/bin/mtp-cli'],
     },
+    // The local build (scripts/build-local-mac.sh) makes the DMG with
+    // dmgbuild and build/dmg/dmgbuild-settings.py; this block mirrors it for
+    // electron-builder's own DMG target. build/dmg/background.tiff holds the
+    // 1x and 2x art (made from build/dmg/background.html). Finder always draws
+    // icon labels in black on a DMG background, so the art stays light.
     dmg: {
+      background: 'build/dmg/background.tiff',
+      iconSize: 100,
+      iconTextSize: 13,
+      window: {
+        width: 640,
+        height: 400,
+      },
       contents: [
         {
-          x: 130,
-          y: 220,
+          x: 170,
+          y: 196,
         },
         {
-          x: 410,
-          y: 220,
+          x: 470,
+          y: 196,
           type: 'link',
           path: '/Applications',
         },
