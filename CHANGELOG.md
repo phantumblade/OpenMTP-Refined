@@ -92,6 +92,11 @@ Silicon Macs.
 
 ### Fixed
 
+- Phones with many files now connect reliably right after being plugged in.
+  macOS starts listing every file on the phone as soon as it appears; the
+  phone stays busy until that list is done, and OpenMTP used to give up and
+  reset the USB connection, which started the listing again. OpenMTP now
+  waits for the phone instead, and explains the wait on screen.
 - The search bar sits above the scrolling area, so the scrollbar no longer
   runs past it and the column headers keep their size while scrolling.
 - Phone connection: macOS restarts ptpcamerad within a second and it took
