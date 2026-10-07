@@ -67,6 +67,14 @@ export const styles = (theme) => {
       marginBottom: 20,
       color: m3.primaryContainer,
     },
+    srOnly: {
+      position: 'absolute',
+      width: 1,
+      height: 1,
+      overflow: 'hidden',
+      clip: 'rect(0 0 0 0)',
+      whiteSpace: 'nowrap',
+    },
     heroIcon: {
       color: m3.onPrimaryContainer,
     },

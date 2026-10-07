@@ -15,6 +15,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import MaterialSymbol from '../../../components/m3/MaterialSymbol';
 import M3Shape from '../../../components/m3/M3Shape';
+import FolderAccessSettings from './FolderAccessSettings';
 import { DEVICES_LABEL } from '../../../constants';
 import {
   DEVICE_TYPE,
@@ -665,6 +666,20 @@ export default class SettingsDialog extends PureComponent {
               })}
 
             {/* ----- Privacy Tab ----- */}
+            {tabIndex === this.tabBodyRenderTabIndex(3) &&
+              this.renderSection({
+                icon: 'folder_managed',
+                title: t('Folder access'),
+                description: t(
+                  'macOS protects some folders and asks before an app opens them. Choose which ones OpenMTP can use: it asks only when you open them.'
+                ),
+                children: (
+                  <FolderAccessSettings
+                    styles={styles}
+                    appLanguage={appLanguage}
+                  />
+                ),
+              })}
             {tabIndex === this.tabBodyRenderTabIndex(3) &&
               this.renderSection({
                 icon: 'policy',

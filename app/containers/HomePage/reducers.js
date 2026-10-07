@@ -276,6 +276,7 @@ export const initialState = {
     },
   },
 
+  folderAccessRequest: null,
   filesDrag: {
     sourceDeviceType: null,
     destinationDeviceType: null,
@@ -417,6 +418,9 @@ export default function Home(state = initialState, action) {
           ...initialState.fileTransfer,
         },
       };
+
+    case actionTypes.SET_FOLDER_ACCESS_REQUEST:
+      return { ...state, folderAccessRequest: payload };
 
     case actionTypes.SET_FILES_DRAG:
       return {

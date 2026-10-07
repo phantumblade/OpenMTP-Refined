@@ -46,6 +46,8 @@ export const initialState = {
   },
   // local folders pinned to the sidebar: [{ path, name }]
   favoriteFolders: [],
+  // OpenMTP's choice per macOS-protected folder (see helpers/folderAccess)
+  folderAccess: {},
 };
 
 export default function Settings(state = initialState, action) {

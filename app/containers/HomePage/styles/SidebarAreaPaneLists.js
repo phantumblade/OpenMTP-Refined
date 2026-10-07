@@ -23,11 +23,17 @@ export const styles = (theme) => {
       color: m3.onSurface,
       userSelect: 'none',
     },
-    headerBlock: {
+    // M3 filled card for "This Mac", matching the footer card
+    macCard: {
+      margin: '12px 12px 4px',
+      padding: '16px 16px 14px',
+      borderRadius: m3Shape.large,
+      backgroundColor: m3.surfaceContainerHighest,
+    },
+    macCardHeader: {
       display: 'flex',
       alignItems: 'center',
       gap: 14,
-      padding: '24px 24px 8px 28px',
     },
     headerShape: {
       color: m3.primaryContainer,
@@ -39,43 +45,48 @@ export const styles = (theme) => {
       minWidth: 0,
     },
     headerTitle: {
-      ...m3Type.titleLarge,
-      fontWeight: 500,
+      ...m3Type.titleMedium,
       color: m3.onSurface,
     },
     headerSubtitle: {
       ...m3Type.bodyMedium,
       color: m3.onSurfaceVariant,
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
     },
-    modeChipRow: {
-      padding: '4px 28px 8px',
+    // M3 linear progress: 4dp active and track, 4dp gap, stop indicator
+    diskTrack: {
+      display: 'flex',
+      gap: 4,
+      height: 4,
+      marginTop: 16,
     },
-    // M3 assist chip: 32dp, 8dp corners, outline, 18dp leading icon
-    modeChip: {
-      ...m3Type.labelLarge,
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 8,
-      height: 32,
-      padding: '0 16px 0 8px',
-      border: `1px solid ${m3.outlineVariant}`,
-      borderRadius: m3Shape.small,
-      backgroundColor: 'transparent',
-      color: m3.onSurface,
-      fontFamily: 'inherit',
-      cursor: 'pointer',
-      outline: 'none',
-      transition: `background-color ${m3Motion.defaultEffects}`,
-      '&:hover': {
-        backgroundColor: alphaHex(m3.onSurface, m3State.hover),
-      },
-      '&:focus-visible': {
-        outline: `3px solid ${m3.secondary}`,
-        outlineOffset: 2,
-      },
+    diskUsed: {
+      flexShrink: 0,
+      minWidth: 4,
+      borderRadius: 2,
+      backgroundColor: m3.primary,
     },
-    modeChipIcon: {
-      color: m3.primary,
+    diskFree: {
+      position: 'relative',
+      flex: 1,
+      borderRadius: 2,
+      backgroundColor: m3.secondaryContainer,
+    },
+    diskStop: {
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      width: 4,
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: m3.primary,
+    },
+    diskLabel: {
+      ...m3Type.bodySmall,
+      marginTop: 8,
+      color: m3.onSurfaceVariant,
     },
     contentScrollArea: {
       flex: 1,
@@ -158,6 +169,10 @@ export const styles = (theme) => {
     },
     itemIcon: {
       flexShrink: 0,
+    },
+    itemLock: {
+      flexShrink: 0,
+      color: m3.onSurfaceVariant,
     },
     itemLabel: {
       flex: 1,

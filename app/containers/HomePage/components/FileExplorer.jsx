@@ -48,6 +48,7 @@ import {
 } from '../selectors';
 import {
   makeAppThemeMode,
+  makeFolderAccess,
   makeEnableStatusBar,
   makeEnableUsbHotplug,
   makeFileExplorerListingType,
@@ -2402,6 +2403,7 @@ class FileExplorer extends Component {
       hideHiddenFiles,
       storageId,
       appThemeMode,
+      folderAccess,
     } = this.props;
     const { toggleDialog, togglePasteConfirmDialog, directoryGeneratedTime } =
       this.state;
@@ -2483,6 +2485,7 @@ class FileExplorer extends Component {
           favoritePaths={this.getFavoritePaths()}
           appLanguage={appLanguage}
           appThemeMode={appThemeMode}
+          folderAccess={folderAccess}
           searchStorageId={storageId}
           searchIgnoreHidden={hideHiddenFiles[deviceType]}
           filesDrag={filesDrag}
@@ -3305,6 +3308,7 @@ const mapStateToProps = (state, _) => {
     fileExplorerListingType: makeFileExplorerListingType(state),
     focussedFileExplorerDeviceType: makeFocussedFileExplorerDeviceType(state),
     appThemeMode: makeAppThemeMode(state),
+    folderAccess: makeFolderAccess(state),
     mtpMode: makeMtpMode(state),
     enableUsbHotplug: makeEnableUsbHotplug(state),
     showDirectoriesFirst: makeShowDirectoriesFirst(state),

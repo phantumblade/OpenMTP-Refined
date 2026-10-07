@@ -8,6 +8,7 @@ import { PlayArrow as PlayArrowIcon } from '../../../components/m3/symbolIcons';
 import { springTruncate } from '../../../utils/funcs';
 import { FILE_EXPLORER_GRID_TRUNCATE_MAX_CHARS } from '../../../constants';
 import FavoriteStar from '../../../components/FavoriteStar';
+import MaterialSymbol from '../../../components/m3/MaterialSymbol';
 import { styles } from '../styles/FileExplorerTableBodyGridRender';
 import { imgsrc } from '../../../utils/imgsrc';
 import {
@@ -345,10 +346,16 @@ class FileExplorerTableBodyGridRender extends PureComponent {
       deviceType,
       currentBrowsePath,
       appThemeMode,
+      isLocked,
     } = this.props;
 
     return (
       <div className={styles.fileTypeIconWrapper}>
+        {isLocked && (
+          <span className={styles.lockBadge} aria-label="locked">
+            <MaterialSymbol name="lock" size={16} fill={1} weight={600} />
+          </span>
+        )}
         <img
           src={imgsrc(
             getFolderIcon({

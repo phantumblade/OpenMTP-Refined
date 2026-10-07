@@ -1,12 +1,12 @@
 import React, { PureComponent } from 'react';
 import classNames from 'classnames';
+import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import Tooltip from '@material-ui/core/Tooltip';
 import MaterialSymbol from '../../../components/m3/MaterialSymbol';
 import M3Shape from '../../../components/m3/M3Shape';
-import SlotText from '../../../components/SlotText';
 import { styles } from '../styles/SidebarAreaPaneLists';
-import { quickHash, capitalize } from '../../../utils/funcs';
+import { quickHash } from '../../../utils/funcs';
 import { analyticsService } from '../../../services/analytics';
 import { EVENT_TYPE } from '../../../enums/events';
 import { translate } from '../../../i18n';
@@ -15,6 +15,12 @@ import { fileExistsSync } from '../../../helpers/fileOps';
 import GithubBadge from '../../../components/GithubBadge';
 import { imgsrc } from '../../../utils/imgsrc';
 import { FAVORITE_FOLDERS_MAX } from '../../../helpers/favoriteFolders';
+import { formatStorageSize, getDiskSpace } from '../../../helpers/diskSpace';
+import {
+  canReadWithoutAsking,
+  isFolderLocked,
+} from '../../../helpers/folderAccess';
+import { makeFolderAccess } from '../../Settings/selectors';
 
 const LOCATION_ICONS = {
   Home: 'home',
@@ -26,7 +32,8 @@ const LOCATION_ICONS = {
 
 // Material 3 navigation drawer (Compose NavigationDrawerTokens): pill items
 // inset by 12dp, secondary container active indicator, titleSmall section
-// headlines and labelLarge labels.
+// headlines and labelLarge labels. It belongs to the Mac pane, so it only
+// lists Mac locations and actions; phone actions live on the phone pane.
 class SidebarAreaPaneLists extends PureComponent {
   _handleListDirectory = ({ filePath, deviceType, isSidemenu }) => {
     const { onClickHandler, onToggleDrawer } = this.props;
@@ -66,6 +73,7 @@ class SidebarAreaPaneLists extends PureComponent {
     disabled = false,
     onClick,
     trailing,
+    locked = false,
     className,
   }) => {
     const { classes: styles } = this.props;
@@ -88,6 +96,14 @@ class SidebarAreaPaneLists extends PureComponent {
             className={styles.itemIcon}
           />
           <span className={styles.itemLabel}>{label}</span>
+          {locked && (
+            <MaterialSymbol
+              name="lock"
+              size={18}
+              className={styles.itemLock}
+              aria-label="locked"
+            />
+          )}
         </button>
         {trailing}
       </li>
@@ -95,7 +111,8 @@ class SidebarAreaPaneLists extends PureComponent {
   };
 
   renderLocations = (listData) => {
-    const { currentBrowsePath, appLanguage, deviceType } = this.props;
+    const { currentBrowsePath, appLanguage, deviceType, folderAccess } =
+      this.props;
 
     return listData.map((item) =>
       this.renderItem({
@@ -104,6 +121,7 @@ class SidebarAreaPaneLists extends PureComponent {
         label: translate(appLanguage, item.label),
         active: currentBrowsePath === item.path,
         disabled: !item.enabled,
+        locked: isFolderLocked(item.path, folderAccess),
         onClick: () =>
           this._handleListDirectory({
             filePath: item.path,
@@ -122,6 +140,7 @@ class SidebarAreaPaneLists extends PureComponent {
       deviceType,
       favoriteFolders = [],
       onRemoveFavoriteFolder,
+      folderAccess,
     } = this.props;
 
     if (favoriteFolders.length < 1) {
@@ -138,7 +157,9 @@ class SidebarAreaPaneLists extends PureComponent {
     return (
       <ul className={styles.list}>
         {favoriteFolders.map((item) => {
-          const exists = fileExistsSync(item.path);
+          // checking a path inside a protected folder would make macOS ask
+          const readable = canReadWithoutAsking(item.path, folderAccess);
+          const exists = readable ? fileExistsSync(item.path) : true;
           const key = quickHash(item.path);
 
           return (
@@ -156,6 +177,7 @@ class SidebarAreaPaneLists extends PureComponent {
                 label: item.name,
                 active: currentBrowsePath === item.path,
                 disabled: !exists,
+                locked: isFolderLocked(item.path, folderAccess),
                 className: classNames(styles.favoriteItem, {
                   [styles.favoriteMissing]: !exists,
                 }),
@@ -197,17 +219,77 @@ class SidebarAreaPaneLists extends PureComponent {
     );
   };
 
+  // "This Mac": the volume of the open folder and its free space, as an M3
+  // filled card with a linear progress indicator.
+  renderMacCard = () => {
+    const { classes: styles, currentBrowsePath, appLanguage } = this.props;
+    const t = (key, values) => translate(appLanguage, key, values);
+    const disk = getDiskSpace(currentBrowsePath);
+    const usedRatio = disk
+      ? Math.min(1, Math.max(0, 1 - disk.freeBytes / disk.totalBytes))
+      : 0;
+
+    return (
+      <div className={styles.macCard}>
+        <div className={styles.macCardHeader}>
+          <M3Shape
+            shape="Cookie9Sided"
+            size={48}
+            color="currentColor"
+            className={styles.headerShape}
+          >
+            <MaterialSymbol
+              name="laptop_mac"
+              size={26}
+              fill={1}
+              className={styles.headerIcon}
+            />
+          </M3Shape>
+          <div className={styles.headerText}>
+            <div className={styles.headerTitle}>{t('This Mac')}</div>
+            <div className={styles.headerSubtitle}>
+              {disk ? disk.volumeName : t('Local files')}
+            </div>
+          </div>
+        </div>
+        {disk && (
+          <>
+            <div
+              className={styles.diskTrack}
+              role="meter"
+              aria-label={t('Used space')}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(usedRatio * 100)}
+            >
+              <span
+                className={styles.diskUsed}
+                style={{ width: `${usedRatio * 100}%` }}
+              />
+              <span className={styles.diskFree}>
+                <span className={styles.diskStop} />
+              </span>
+            </div>
+            <div className={styles.diskLabel}>
+              {t('{free} free of {total}', {
+                free: formatStorageSize(disk.freeBytes, appLanguage),
+                total: formatStorageSize(disk.totalBytes, appLanguage),
+              })}
+            </div>
+          </>
+        )}
+      </div>
+    );
+  };
+
   render() {
     const {
       classes: styles,
       favoriteFolders = [],
       sidebarFavouriteList,
       appLanguage,
-      mtpMode,
       onOpenSettings,
       onRefresh,
-      onSelectStorage,
-      onSelectMtpMode,
     } = this.props;
 
     const { top: sidebarTop, bottom: sidebarBottom } = sidebarFavouriteList;
@@ -219,16 +301,6 @@ class SidebarAreaPaneLists extends PureComponent {
         label: isItalian ? 'Aggiorna elenco' : 'Refresh list',
         action: onRefresh,
       },
-      onSelectStorage && {
-        icon: 'sd_card',
-        label: isItalian ? 'Cambia memoria' : 'Select storage',
-        action: onSelectStorage,
-      },
-      onSelectMtpMode && {
-        icon: 'bolt',
-        label: isItalian ? 'Modalità MTP' : 'MTP mode',
-        action: onSelectMtpMode,
-      },
       onOpenSettings && {
         icon: 'tune',
         label: isItalian ? 'Impostazioni' : 'Settings',
@@ -238,47 +310,7 @@ class SidebarAreaPaneLists extends PureComponent {
 
     return (
       <nav className={styles.listsWrapper}>
-        <div className={styles.headerBlock}>
-          <M3Shape
-            shape="Cookie9Sided"
-            size={48}
-            color="currentColor"
-            className={styles.headerShape}
-          >
-            <MaterialSymbol
-              name="mobile"
-              size={26}
-              fill={1}
-              className={styles.headerIcon}
-            />
-          </M3Shape>
-          <div className={styles.headerText}>
-            <div className={styles.headerTitle}>{APP_NAME}</div>
-            <div className={styles.headerSubtitle}>
-              {isItalian
-                ? 'Trasferimento file Android per macOS'
-                : 'Android File Transfer for macOS'}
-            </div>
-          </div>
-        </div>
-
-        {mtpMode && (
-          <div className={styles.modeChipRow}>
-            <button
-              type="button"
-              className={styles.modeChip}
-              onClick={() => this._handleAction(onSelectMtpMode)}
-            >
-              <MaterialSymbol
-                name="bolt"
-                size={18}
-                fill={1}
-                className={styles.modeChipIcon}
-              />
-              <SlotText text={`${capitalize(mtpMode)} Mode`} />
-            </button>
-          </div>
-        )}
+        {this.renderMacCard()}
 
         <div className={styles.contentScrollArea}>
           {this.renderSection({
@@ -344,4 +376,10 @@ class SidebarAreaPaneLists extends PureComponent {
   }
 }
 
-export default withStyles(styles)(SidebarAreaPaneLists);
+const mapStateToProps = (state) => ({
+  folderAccess: makeFolderAccess(state),
+});
+
+export default connect(mapStateToProps)(
+  withStyles(styles)(SidebarAreaPaneLists)
+);

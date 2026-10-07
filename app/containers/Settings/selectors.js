@@ -65,6 +65,10 @@ export const makeAppLanguage = createSelector(make, (state) =>
   state ? state.appLanguage : initialState.appLanguage
 );
 
+export const makeFolderAccess = createSelector(make, (state) =>
+  state ? state.folderAccess : initialState.folderAccess
+);
+
 export const makeAppFontFamily = createSelector(make, (state) =>
   state ? state.appFontFamily : initialState.appFontFamily
 );

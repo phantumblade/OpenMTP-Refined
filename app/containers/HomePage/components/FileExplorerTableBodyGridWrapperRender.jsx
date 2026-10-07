@@ -18,6 +18,8 @@ import FileExplorerTableGridRender from './FileExplorerTableBodyGridRender';
 import { styles } from '../styles/FileExplorerTableBodyGridWrapperRender';
 import { calculateGridWindow } from '../../../utils/virtualWindow';
 import { getFileCategory } from '../../../helpers/fileExplorerIcons';
+import { isFolderLocked } from '../../../helpers/folderAccess';
+import { DEVICE_TYPE } from '../../../enums';
 
 const ITEM_WIDTH = 118;
 const ITEM_HEIGHT = 155;
@@ -335,12 +337,24 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
                 onTableDoubleClick={onTableDoubleClick}
                 multiSelectMode={multiSelectMode}
                 appThemeMode={appThemeMode}
+                isLocked={this.isLocked(item)}
                 currentBrowsePath={currentBrowsePath}
               />
             ))}
         </Fragment>
       );
     });
+  };
+
+  // folders closed to OpenMTP (by the user or macOS) get a lock badge
+  isLocked = (item) => {
+    const { deviceType, folderAccess } = this.props;
+
+    return (
+      deviceType === DEVICE_TYPE.local &&
+      Boolean(item.isFolder) &&
+      isFolderLocked(item.path, folderAccess)
+    );
   };
 
   render() {
@@ -413,6 +427,7 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
                 onTableDoubleClick={onTableDoubleClick}
                 multiSelectMode={multiSelectMode}
                 appThemeMode={appThemeMode}
+                isLocked={this.isLocked(item)}
                 currentBrowsePath={currentBrowsePath}
               />
             ))}

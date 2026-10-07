@@ -35,10 +35,25 @@ export const styles = (theme) => {
     },
     tableCell: tableCellFileExplorerTableRowsRender,
     fileTypeIconWrapper: {
+      position: 'relative',
       paddingTop: 5,
       paddingBottom: 5,
       paddingLeft: 2,
       textAlign: 'center',
+    },
+    // folder closed to OpenMTP (macOS permission)
+    lockBadge: {
+      position: 'absolute',
+      right: -4,
+      bottom: 2,
+      display: 'grid',
+      placeItems: 'center',
+      width: 16,
+      height: 16,
+      borderRadius: 8,
+      backgroundColor: theme.palette.m3.secondaryContainer,
+      color: theme.palette.m3.onSecondaryContainer,
+      boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
     },
     fileTypeIcon: {
       verticalAlign: `middle`,

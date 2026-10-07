@@ -116,7 +116,7 @@ export class FileExplorerLocalDataSource {
       return true;
     }
 
-    const { askForFoldersAccess, askForPhotosAccess } = await import(
+    const { askForFoldersAccess } = await import(
       // eslint-disable-next-line import/no-unresolved
       'node-mac-permissions'
     );
@@ -133,9 +133,9 @@ export class FileExplorerLocalDataSource {
       result = await askForFoldersAccess('downloads');
     } else if (filePath.startsWith(PATHS.documentsDir)) {
       result = await askForFoldersAccess('documents');
-    } else if (filePath.startsWith(PATHS.picturesDir)) {
-      result = await askForPhotosAccess();
     }
+    // ~/Pictures is an ordinary folder: browsing it needs no Photos library
+    // permission, so OpenMTP no longer asks for one.
 
     if (undefinedOrNull(result)) {
       return true;

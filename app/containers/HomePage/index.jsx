@@ -6,6 +6,7 @@ import FileExplorer from './components/FileExplorer';
 import ToolbarAreaPane from './components/ToolbarAreaPane';
 import { styles } from './styles';
 import Onboarding from '../Onboarding';
+import FolderAccessDialog from './components/FolderAccessDialog';
 import { DEVICE_TYPE, MTP_MODE } from '../../enums';
 import {
   makeMtpMode,
@@ -67,6 +68,7 @@ class Home extends PureComponent {
     return (
       <Fragment>
         <Onboarding />
+        <FolderAccessDialog />
         <div className={styles.root}>
           <div className={styles.grid}>{panes}</div>
         </div>

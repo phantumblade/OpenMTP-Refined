@@ -72,11 +72,16 @@ module.exports = () => {
       entitlementsInherit: './build/entitlements.mac.plist',
       extendInfo: {
         LSMinimumSystemVersion: '10.11.0',
-        NSDesktopFolderUsageDescription: 'Desktop folder access',
-        NSDocumentsFolderUsageDescription: 'Documents folder access',
-        NSDownloadsFolderUsageDescription: 'Downloads folder access',
-        NSRemovableVolumesUsageDescription: 'Removable Disk access',
-        NSPhotoLibraryUsageDescription: 'Photo library access',
+        NSDesktopFolderUsageDescription:
+          'OpenMTP shows your Desktop files only when you open the Desktop folder, so you can copy them to or from your phone.',
+        NSDocumentsFolderUsageDescription:
+          'OpenMTP shows your Documents only when you open that folder, so you can copy files to or from your phone.',
+        NSDownloadsFolderUsageDescription:
+          'OpenMTP shows your Downloads only when you open that folder, so you can copy files to or from your phone.',
+        NSRemovableVolumesUsageDescription:
+          'OpenMTP shows the files on an external or removable disk only when you open it, so you can copy them to or from your phone.',
+        NSNetworkVolumesUsageDescription:
+          'OpenMTP shows the files on a network disk only when you open it, so you can copy them to or from your phone.',
       },
       target: {
         target: 'default',

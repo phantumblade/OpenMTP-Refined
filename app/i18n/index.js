@@ -1,6 +1,46 @@
 import { APP_LANGUAGE_TYPE, DEVICE_TYPE } from '../enums';
 
 const italian = {
+  Documents: 'Documenti',
+  'Let OpenMTP open “{name}”?': 'Vuoi che OpenMTP apra “{name}”?',
+  'macOS protects this folder. When you continue, macOS asks whether OpenMTP can open it: choose Allow.':
+    'macOS protegge questa cartella. Quando continui, macOS ti chiede se OpenMTP può aprirla: scegli Consenti.',
+  '“{name}” is closed to OpenMTP': '“{name}” è chiusa per OpenMTP',
+  'You chose not to let OpenMTP open this folder. You can allow it now, or later in Settings → Privacy.':
+    'Hai scelto di non far aprire questa cartella a OpenMTP. Puoi consentirlo ora o in seguito da Impostazioni → Privacy.',
+  'macOS blocked “{name}”': 'macOS ha bloccato “{name}”',
+  'Open System Settings → Privacy & Security → Files and Folders, turn on this folder for OpenMTP, then try again.':
+    'Apri Impostazioni di Sistema → Privacy e sicurezza → File e cartelle, attiva questa cartella per OpenMTP e riprova.',
+  'OpenMTP reads it only when you open it, to show and copy your files.':
+    'OpenMTP la legge solo quando la apri, per mostrare e copiare i tuoi file.',
+  'Nothing leaves your Mac except the files you copy to your phone.':
+    'Dal Mac non esce nulla, tranne i file che copi sul telefono.',
+  "Don't allow": 'Non consentire',
+  'Not now': 'Non ora',
+  'System Settings': 'Impostazioni di Sistema',
+  Allow: 'Consenti',
+  Continue: 'Continua',
+  'External and removable disks': 'Dischi esterni e rimovibili',
+  'Folder access': 'Accesso alle cartelle',
+  'macOS protects some folders and asks before an app opens them. Choose which ones OpenMTP can use: it asks only when you open them.':
+    'macOS protegge alcune cartelle e chiede il permesso prima che un’app le apra. Scegli quali può usare OpenMTP: le chiede solo quando le apri.',
+  'OpenMTP explains and asks you first': 'OpenMTP ti spiega e chiede prima',
+  Allowed: 'Consentito',
+  'Blocked by macOS': 'Bloccato da macOS',
+  'Not used by OpenMTP': 'Non usata da OpenMTP',
+  "Don't use": 'Non usare',
+  'Allowed by Full Disk Access': 'Consentito dall’accesso completo al disco',
+  'Full Disk Access': 'Accesso completo al disco',
+  'On: OpenMTP can open every folder without asking.':
+    'Attivo: OpenMTP può aprire ogni cartella senza chiedere.',
+  'Optional, not needed. Lets OpenMTP open every folder without asking.':
+    'Facoltativo, non necessario. Permette a OpenMTP di aprire ogni cartella senza chiedere.',
+  '{count} results in “{folder}” and subfolders':
+    '{count} risultati in “{folder}” e sottocartelle',
+  'This Mac': 'Questo Mac',
+  'Local files': 'File locali',
+  'Used space': 'Spazio usato',
+  '{free} free of {total}': '{free} liberi su {total}',
   "Here's what's new in version {version}.":
     'Ecco cosa cambia nella versione {version}.',
   'Get started': 'Inizia',

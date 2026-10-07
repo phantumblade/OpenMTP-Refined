@@ -121,6 +121,7 @@ export const styles = (theme) => {
       display: 'flex',
       flexShrink: 0,
       alignItems: 'center',
+      gap: 8,
     },
     rowSelect: {
       minWidth: 240,

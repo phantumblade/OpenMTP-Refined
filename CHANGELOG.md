@@ -31,6 +31,12 @@ Silicon Macs.
   choice of interface font (including Faculty Glyphic).
 - GitHub card in the sidebar footer with the project's links and statistics,
   next to the app icon and version.
+- Folder access: OpenMTP explains each macOS-protected folder (Desktop,
+  Documents, Downloads, external disks) before macOS asks, lets the user
+  allow or close it, shows a lock on closed folders, never scans them while
+  searching, and lists every choice in Settings → Privacy.
+- "This Mac" card in the side menu with the disk of the open folder and its
+  free space, measured like Finder.
 - Welcome dialog listing what's new in 4.0 as Material 3 segmented lists
   grouped by topic, in Italian and English.
 - Verification scripts for favorites, USB owners, error messages, the loading
@@ -53,6 +59,10 @@ Silicon Macs.
   the macOS services that claim it (ptpcamerad, Image Capture) before each
   attempt, and USB hotplug events ignored right after a connection attempt.
 - Device button in the toolbar now offers refresh and storage actions.
+- Search bar and results restyled as the Material 3 search bar and docked
+  search view, with the searched folder shown above the results.
+- The connection screen keeps its height while connecting; the new text
+  fades in instead of pushing the layout.
 - Side menu rebuilt as a Material 3 navigation drawer (pill items, secondary
   container indicator, section headlines, MTP mode chip).
 - Selection, grid and list styling follow Material 3.
@@ -67,6 +77,10 @@ Silicon Macs.
 
 ### Fixed
 
+- Opening ~/Pictures asked for Photos library access, which browsing the
+  folder does not need; the request and its entitlement are gone.
+- Side menu actions for the phone (storage, MTP mode) that did nothing when
+  opened from the Mac pane are removed there.
 - Endless loading when a connection attempt was slow or interrupted.
 - Phone status button truncating "Connecting to your phone…".
 - Connection screen overflowing narrow panes.

@@ -81,6 +81,22 @@ this in Terminal and open it again:
 xattr -dr com.apple.quarantine /Applications/OpenMTP.app
 ```
 
+## Privacy and folder access
+
+OpenMTP does not ask for any permission when it starts. macOS protects a few
+locations — **Desktop**, **Documents**, **Downloads** and **external disks** —
+and asks before an app opens them. OpenMTP explains each request first and lets
+you decide folder by folder:
+
+- **Continue** — macOS shows its own prompt; choose **Allow**.
+- **Not now** — nothing changes, OpenMTP asks again next time.
+- **Don't allow** — the folder shows a lock and OpenMTP never opens or searches it.
+
+You can change every choice in **Settings → Privacy → Folder access**. If macOS
+denied access, OpenMTP takes you straight to **System Settings → Privacy &
+Security → Files and Folders**. Full Disk Access is optional and never needed.
+Nothing leaves your Mac except the files you copy to your phone.
+
 ## Connect your phone
 
 1. Use a **data** USB cable (many charging cables carry power only).
@@ -183,6 +199,24 @@ Terminale il comando qui sotto e riaprila:
 ```bash
 xattr -dr com.apple.quarantine /Applications/OpenMTP.app
 ```
+
+### Privacy e accesso alle cartelle
+
+OpenMTP non chiede nessun permesso all'avvio. macOS protegge alcune posizioni —
+**Scrivania**, **Documenti**, **Download** e **dischi esterni** — e chiede il
+permesso prima che un'app le apra. OpenMTP spiega ogni richiesta prima e ti fa
+decidere cartella per cartella:
+
+- **Continua** — macOS mostra la sua richiesta: scegli **Consenti**.
+- **Non ora** — non cambia nulla, OpenMTP te lo richiede la prossima volta.
+- **Non consentire** — la cartella mostra un lucchetto e OpenMTP non la apre né
+  la cerca mai.
+
+Puoi cambiare ogni scelta in **Impostazioni → Privacy → Accesso alle cartelle**.
+Se macOS ha negato l'accesso, OpenMTP ti porta direttamente in **Impostazioni di
+Sistema → Privacy e sicurezza → File e cartelle**. L'accesso completo al disco è
+facoltativo e non serve mai. Dal Mac non esce nulla, tranne i file che copi sul
+telefono.
 
 ### Collegare il telefono
 

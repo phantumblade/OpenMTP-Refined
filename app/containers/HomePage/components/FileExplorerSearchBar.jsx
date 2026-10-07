@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import IconButton from '@material-ui/core/IconButton';
 import InputBase from '@material-ui/core/InputBase';
 import Tooltip from '@material-ui/core/Tooltip';
@@ -21,8 +20,10 @@ import { getFileIcon, getFolderIcon } from '../../../helpers/fileExplorerIcons';
 import { imgsrc } from '../../../utils/imgsrc';
 import { translate } from '../../../i18n';
 import { isTransferPhaseActive } from '../../../helpers/fileTransfer';
+import { canReadWithoutAsking } from '../../../helpers/folderAccess';
 import FileExplorerDateFilter from './FileExplorerDateFilter';
 import FileExplorerTypeFilter from './FileExplorerTypeFilter';
+import M3LoadingIndicator from '../../../components/m3/M3LoadingIndicator';
 
 class FileExplorerSearchBar extends PureComponent {
   constructor(props) {
@@ -150,7 +151,16 @@ class FileExplorerSearchBar extends PureComponent {
       activeIndex: -1,
     });
 
+    const { folderAccess } = this.props;
     const listFiles = async (filePath) => {
+      // never let a search make macOS ask for a protected folder
+      if (
+        deviceType === DEVICE_TYPE.local &&
+        !canReadWithoutAsking(filePath, folderAccess)
+      ) {
+        return [];
+      }
+
       const { data, error } = await fileExplorerController.listFilesForSearch({
         deviceType,
         filePath,
@@ -325,10 +335,21 @@ class FileExplorerSearchBar extends PureComponent {
         isTransferPhaseActive(fileTransferProgress?.phase));
     const showMinimumHint =
       query.length > 0 && query.trim().length < FILE_SEARCH_MIN_QUERY_LENGTH;
+    const { rootPath } = this.props;
+    const scopeName =
+      !rootPath || rootPath === '/'
+        ? t('Root')
+        : rootPath.split('/').filter(Boolean).pop();
 
     return (
       <div className={styles.root}>
-        <div className={styles.inputShell}>
+        <div
+          className={
+            isOpen
+              ? `${styles.inputShell} ${styles.inputShellOpen}`
+              : styles.inputShell
+          }
+        >
           <SearchIcon className={styles.searchIcon} />
           <InputBase
             value={query}
@@ -351,9 +372,9 @@ class FileExplorerSearchBar extends PureComponent {
             onKeyDown={this.handleKeyDown}
           />
           {isSearching && (
-            <CircularProgress
-              size={16}
-              thickness={5}
+            <M3LoadingIndicator
+              size={32}
+              color="var(--md-sys-color-primary)"
               className={styles.progress}
               aria-label={t('Searching')}
             />
@@ -409,7 +430,12 @@ class FileExplorerSearchBar extends PureComponent {
                 !isSearching &&
                 hasSearched && (
                   <>
-                    {t('{count} results', { count: results.length })}
+                    <span className={styles.resultsScope}>
+                      {t('{count} results in “{folder}” and subfolders', {
+                        count: results.length,
+                        folder: scopeName,
+                      })}
+                    </span>
                     <span>
                       {t('{count} folders scanned', {
                         count: directoriesScanned,

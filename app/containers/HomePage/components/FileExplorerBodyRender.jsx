@@ -423,6 +423,7 @@ class FileExplorerBodyRender extends PureComponent {
       appThemeMode,
       searchStorageId,
       searchIgnoreHidden,
+      folderAccess,
       onSearchResultOpen,
       onPaste,
       ...parentProps
@@ -474,6 +475,7 @@ class FileExplorerBodyRender extends PureComponent {
             deviceType={deviceType}
             storageId={searchStorageId}
             ignoreHidden={searchIgnoreHidden}
+            folderAccess={folderAccess}
             mtpDevice={mtpDevice}
             fileTransferProgress={fileTransferProgress}
             appLanguage={appLanguage}
@@ -494,6 +496,7 @@ class FileExplorerBodyRender extends PureComponent {
             onContextMenuClick={onContextMenuClick}
             mtpDevice={mtpDevice}
             appLanguage={appLanguage}
+            folderAccess={folderAccess}
             {...parentProps}
             directoryLists={filteredDirectoryLists}
             onSelectAllClick={this.handleSelectAllVisible}

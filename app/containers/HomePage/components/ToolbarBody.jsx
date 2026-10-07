@@ -256,11 +256,8 @@ export default class ToolbarAreaPane extends PureComponent {
             deviceType={deviceType}
             currentBrowsePath={currentBrowsePath[deviceType]}
             appLanguage={appLanguage}
-            mtpMode={mtpMode}
             onOpenSettings={() => onToolbarAction('settings', false)}
             onRefresh={() => onToolbarAction('refresh', false)}
-            onSelectStorage={() => onToolbarAction('storage', false)}
-            onSelectMtpMode={() => onToolbarAction('mtpMode', false)}
             onToggleDrawer={onToggleDrawer}
           />
         </Drawer>

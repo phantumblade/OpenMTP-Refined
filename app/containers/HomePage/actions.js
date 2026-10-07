@@ -16,6 +16,14 @@ import { DEVICES_DEFAULT_PATH } from '../../constants';
 import { analyticsService } from '../../services/analytics';
 import { isTransferPhaseActive } from '../../helpers/fileTransfer';
 import { logTransferEvent } from '../../helpers/fileTransferLogger';
+import { settingsStorage } from '../../helpers/storageHelper';
+import {
+  FOLDER_ACCESS,
+  folderAccessStatus,
+  hasFullDiskAccess,
+  isPermissionError,
+  protectedFolderFor,
+} from '../../helpers/folderAccess';
 
 const prefix = '@@Home';
 const listDirectoryRequestVersion = {
@@ -64,9 +72,37 @@ const actionTypesList = [
   'SET_FILES_DRAG',
   'CLEAR_FILES_DRAG',
   'RESET_MTP_SESSION',
+  'SET_FOLDER_ACCESS_REQUEST',
 ];
 
 export const actionTypes = prefixer(prefix, actionTypesList);
+
+// A protected folder OpenMTP must explain before macOS asks for it:
+// { folderId, filePath, ignoreHidden, status } or null.
+export function setFolderAccessRequest(request) {
+  return {
+    type: actionTypes.SET_FOLDER_ACCESS_REQUEST,
+    payload: request,
+  };
+}
+
+// Stores OpenMTP's choice for a protected folder. Dispatched as the Settings
+// action directly: importing the Settings actions here would be circular.
+export function saveFolderAccess(folderId, status) {
+  return (dispatch, getState) => {
+    const value = {
+      ...(getState().Settings?.folderAccess || {}),
+      [folderId]: status,
+    };
+
+    dispatch({
+      type: '@@Settings/COMMON_SETTINGS',
+      deviceType: null,
+      payload: { key: 'folderAccess', value },
+    });
+    settingsStorage.setItems({ folderAccess: value });
+  };
+}
 
 export function setFocussedFileExplorerDeviceType(data) {
   return {
@@ -854,7 +890,7 @@ export function churnLocalBuffer({
 }
 
 export function listDirectory(
-  { filePath, ignoreHidden, onError, onSuccess },
+  { filePath, ignoreHidden, onError, onSuccess, skipAccessCheck = false },
   deviceType,
   getState
 ) {
@@ -873,6 +909,33 @@ export function listDirectory(
     switch (deviceType) {
       case DEVICE_TYPE.local:
         return async (dispatch) => {
+          // explain macOS-protected folders before macOS asks for them
+          const protectedFolder = protectedFolderFor(filePath);
+          const accessStatus = protectedFolder
+            ? folderAccessStatus(
+                getState().Settings?.folderAccess,
+                protectedFolder.id
+              )
+            : null;
+
+          if (
+            protectedFolder &&
+            accessStatus !== FOLDER_ACCESS.allowed &&
+            !skipAccessCheck &&
+            !hasFullDiskAccess()
+          ) {
+            dispatch(
+              setFolderAccessRequest({
+                folderId: protectedFolder.id,
+                filePath,
+                ignoreHidden,
+                status: accessStatus,
+              })
+            );
+
+            return;
+          }
+
           const {
             error: localError,
             stderr: localStderr,
@@ -886,6 +949,22 @@ export function listDirectory(
           });
 
           if (requestVersion !== listDirectoryRequestVersion[deviceType]) {
+            return;
+          }
+
+          if (localError && protectedFolder && isPermissionError(localError)) {
+            dispatch(
+              saveFolderAccess(protectedFolder.id, FOLDER_ACCESS.denied)
+            );
+            dispatch(
+              setFolderAccessRequest({
+                folderId: protectedFolder.id,
+                filePath,
+                ignoreHidden,
+                status: FOLDER_ACCESS.denied,
+              })
+            );
+
             return;
           }
 
@@ -903,6 +982,12 @@ export function listDirectory(
             );
 
             return;
+          }
+
+          if (protectedFolder && accessStatus !== FOLDER_ACCESS.allowed) {
+            dispatch(
+              saveFolderAccess(protectedFolder.id, FOLDER_ACCESS.allowed)
+            );
           }
 
           dispatch(actionListDirectory(localData, deviceType), getState);

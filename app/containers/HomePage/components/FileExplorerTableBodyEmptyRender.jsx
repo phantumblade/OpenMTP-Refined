@@ -7,6 +7,7 @@ import classNames from 'classnames';
 import AngryFaceAnimation from '../../../components/m3/AngryFaceAnimation';
 import M3Button from '../../../components/m3/M3Button';
 import M3MorphingHero from '../../../components/m3/M3MorphingHero';
+import StableText from '../../../components/m3/StableText';
 import M3Shape from '../../../components/m3/M3Shape';
 import MaterialSymbol from '../../../components/m3/MaterialSymbol';
 import { styles } from '../styles/FileExplorerTableBodyEmptyRender';
@@ -316,22 +317,41 @@ class FileExplorerTableBodyEmptyRender extends PureComponent {
                     </M3MorphingHero>
                   </div>
 
-                  <h2 className={styles.headline} aria-live="polite">
-                    {isConnecting
-                      ? t('Connecting to your phone…')
-                      : t('Connect your Android phone')}
-                  </h2>
-                  <p className={styles.supporting}>
-                    {isConnecting
-                      ? t(
-                          connectingSeconds >= SLOW_CONNECTION_HINT_SECONDS
-                            ? 'The phone is not answering yet. If it is locked, unlock it and tap Allow if it asks for access.'
-                            : 'Keep the phone unlocked. This can take a few seconds.'
-                        )
-                      : t(
-                          'Connect your phone via USB and select File Transfer (MTP) mode.'
-                        )}
-                  </p>
+                  <StableText
+                    as="h2"
+                    className={styles.headline}
+                    active={isConnecting ? 1 : 0}
+                    variants={[
+                      t('Connect your Android phone'),
+                      t('Connecting to your phone…'),
+                    ]}
+                  />
+                  <StableText
+                    as="p"
+                    className={styles.supporting}
+                    active={
+                      // eslint-disable-next-line no-nested-ternary
+                      !isConnecting
+                        ? 0
+                        : connectingSeconds >= SLOW_CONNECTION_HINT_SECONDS
+                        ? 2
+                        : 1
+                    }
+                    variants={[
+                      t(
+                        'Connect your phone via USB and select File Transfer (MTP) mode.'
+                      ),
+                      t(
+                        'Keep the phone unlocked. This can take a few seconds.'
+                      ),
+                      t(
+                        'The phone is not answering yet. If it is locked, unlock it and tap Allow if it asks for access.'
+                      ),
+                    ]}
+                  />
+                  <span className={styles.srOnly} aria-live="polite">
+                    {isConnecting ? t('Connecting to your phone…') : ''}
+                  </span>
 
                   <div className={styles.actions}>
                     <M3Button
