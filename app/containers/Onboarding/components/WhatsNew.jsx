@@ -14,15 +14,15 @@ const SECTIONS = [
     items: [
       {
         icon: 'link',
-        title: 'A more reliable phone connection',
+        title: 'Fewer connection hiccups',
         description:
-          'OpenMTP frees the phone from the macOS apps that grab it and no longer gets stuck loading.',
+          'When the macOS Photos service holds on to your phone, OpenMTP releases it for you.',
       },
       {
         icon: 'help',
-        title: 'Errors explained in plain words',
+        title: 'Clear help when something goes wrong',
         description:
-          'Each connection problem tells you what happened and what to do.',
+          'If the connection fails, OpenMTP tells you why and what to do next.',
       },
     ],
   },
@@ -33,17 +33,31 @@ const SECTIONS = [
       {
         icon: 'star',
         title: 'Favorite folders',
-        description: 'Star up to 5 folders and open them from the side menu.',
+        description: 'Keep up to 5 folders one click away in the side menu.',
       },
       {
         icon: 'filter_alt',
-        title: 'Filters by date and file type',
-        description: 'Quick ranges and the date format of your language.',
+        title: 'Filters by date and type',
+        description:
+          "Find yesterday's photos or only the videos, with dates in your language's format.",
       },
       {
         icon: 'swap_vert',
-        title: 'Clearer transfers',
-        description: 'Phases, speed, current file and a smooth progress bar.',
+        title: 'Transfers you can follow',
+        description:
+          'See each step, the speed and the file being copied, on a smooth progress bar.',
+      },
+    ],
+  },
+  {
+    icon: 'shield_lock',
+    title: 'Privacy',
+    items: [
+      {
+        icon: 'folder_managed',
+        title: 'You decide which folders OpenMTP opens',
+        description:
+          'Before macOS asks for Desktop, Documents or Downloads, OpenMTP explains why. Change it anytime in Settings.',
       },
     ],
   },
@@ -53,14 +67,15 @@ const SECTIONS = [
     items: [
       {
         icon: 'brush',
-        title: 'A brand new Material 3 Expressive design',
+        title: 'Material 3 Expressive design',
         description:
-          'Google colors with light and dark themes, new icons and animations.',
+          "Google's colors, shapes and motion, in light and dark themes.",
       },
       {
         icon: 'translate',
-        title: 'Italian and English',
-        description: 'Choose the language and the interface font in Settings.',
+        title: 'In your language',
+        description:
+          "OpenMTP starts in your Mac's language. You can change it, and the font, in Settings.",
       },
     ],
   },

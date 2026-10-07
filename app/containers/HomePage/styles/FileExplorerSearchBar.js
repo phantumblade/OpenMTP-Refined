@@ -12,11 +12,12 @@ export const styles = (theme) => {
 
   return {
     root: {
-      position: 'sticky',
-      top: 0,
+      position: 'relative',
       zIndex: 30,
       display: 'flex',
       alignItems: 'center',
+      height: 64,
+      boxSizing: 'border-box',
       padding: '8px 12px',
       backgroundColor: theme.palette.tableHeaderFooterBgColor,
       borderBottom: `1px solid ${theme.palette.fileExplorerThinLineDividerColor}`,

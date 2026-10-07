@@ -3,7 +3,7 @@ export const styles = (theme) => ({
     border: `unset`,
     backgroundColor: theme.palette.tableHeaderFooterBgColor,
     position: 'sticky',
-    top: 50,
+    top: 0,
     zIndex: 10,
   },
 });

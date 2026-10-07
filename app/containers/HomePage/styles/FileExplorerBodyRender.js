@@ -8,7 +8,8 @@ export const styles = (theme) => ({
   tableWrapper: {
     position: 'relative',
     ...mixins({ theme }).noOutline,
-    height: `calc(100vh - 120px)`,
+    // window minus toolbar, footer and the 64px search bar above this area
+    height: `calc(100vh - 184px)`,
     overflowY: 'auto',
     overflowX: 'auto',
     borderBottom: `solid 1px ${theme.palette.fileExplorerThinLineDividerColor}`,
@@ -17,7 +18,7 @@ export const styles = (theme) => ({
       backgroundColor: theme.palette.fileDrop,
     },
     [`&.statusBarActive`]: {
-      height: `calc(100vh - 150px) !important`,
+      height: `calc(100vh - 214px) !important`,
     },
   },
 });

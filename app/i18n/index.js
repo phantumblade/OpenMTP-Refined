@@ -1,6 +1,33 @@
 import { APP_LANGUAGE_TYPE, DEVICE_TYPE } from '../enums';
 
 const italian = {
+  'No favorites yet': 'Ancora nessun preferito',
+  'Fewer connection hiccups': 'Meno intoppi nel collegamento',
+  'When the macOS Photos service holds on to your phone, OpenMTP releases it for you.':
+    'Se il servizio Foto di macOS tiene occupato il telefono, OpenMTP lo libera al posto tuo.',
+  'Clear help when something goes wrong': 'Aiuto chiaro quando qualcosa non va',
+  'If the connection fails, OpenMTP tells you why and what to do next.':
+    'Se il collegamento non riesce, OpenMTP ti dice perché e cosa fare.',
+  'Keep up to 5 folders one click away in the side menu.':
+    'Tieni fino a 5 cartelle a portata di clic nel menu laterale.',
+  'Filters by date and type': 'Filtri per data e tipo',
+  "Find yesterday's photos or only the videos, with dates in your language's format.":
+    'Trova le foto di ieri o solo i video, con le date nel formato italiano.',
+  'Transfers you can follow': 'Trasferimenti sotto controllo',
+  'See each step, the speed and the file being copied, on a smooth progress bar.':
+    'Vedi ogni fase, la velocità e il file in copia, con una barra che avanza fluida.',
+  'You decide which folders OpenMTP opens':
+    'Decidi tu quali cartelle apre OpenMTP',
+  'Before macOS asks for Desktop, Documents or Downloads, OpenMTP explains why. Change it anytime in Settings.':
+    'Prima che macOS chieda l’accesso a Scrivania, Documenti o Download, OpenMTP ti spiega perché. Puoi cambiare idea quando vuoi nelle Impostazioni.',
+  'Material 3 Expressive design': 'Design Material 3 Expressive',
+  "Google's colors, shapes and motion, in light and dark themes.":
+    'Colori, forme e animazioni di Google, con tema chiaro e scuro.',
+  'In your language': 'Nella tua lingua',
+  "OpenMTP starts in your Mac's language. You can change it, and the font, in Settings.":
+    'OpenMTP parte nella lingua del tuo Mac. Puoi cambiarla, insieme al carattere, nelle Impostazioni.',
+  "Here's what's new in version {version}.":
+    'Ecco le novità della versione {version}.',
   Documents: 'Documenti',
   'Let OpenMTP open “{name}”?': 'Vuoi che OpenMTP apra “{name}”?',
   'macOS protects this folder. When you continue, macOS asks whether OpenMTP can open it: choose Allow.':
@@ -41,35 +68,11 @@ const italian = {
   'Local files': 'File locali',
   'Used space': 'Spazio usato',
   '{free} free of {total}': '{free} liberi su {total}',
-  "Here's what's new in version {version}.":
-    'Ecco cosa cambia nella versione {version}.',
   'Get started': 'Inizia',
   'Files and transfers': 'File e trasferimenti',
   'Look and feel': 'Aspetto',
-  'Italian and English': 'Italiano e inglese',
-  'Choose the language and the interface font in Settings.':
-    'Scegli la lingua e il carattere dell’interfaccia nelle Impostazioni.',
   'Welcome to OpenMTP Refined': 'Benvenuto in OpenMTP Refined',
-  'A brand new Material 3 Expressive design':
-    'Un design Material 3 Expressive tutto nuovo',
-  'Google colors with light and dark themes, new icons and animations.':
-    'Colori Google con tema chiaro e scuro, nuove icone e animazioni.',
-  'A more reliable phone connection':
-    'Una connessione al telefono più affidabile',
-  'OpenMTP frees the phone from the macOS apps that grab it and no longer gets stuck loading.':
-    'OpenMTP libera il telefono dalle app di macOS che lo occupano e non resta più bloccato in caricamento.',
-  'Errors explained in plain words': 'Errori spiegati con parole semplici',
-  'Each connection problem tells you what happened and what to do.':
-    'Ogni problema di connessione ti dice cosa è successo e cosa fare.',
   'Favorite folders': 'Cartelle preferite',
-  'Star up to 5 folders and open them from the side menu.':
-    'Aggiungi fino a 5 cartelle con la stella e aprile dal menu laterale.',
-  'Filters by date and file type': 'Filtri per data e tipo di file',
-  'Quick ranges and the date format of your language.':
-    'Intervalli rapidi e il formato data della tua lingua.',
-  'Clearer transfers': 'Trasferimenti più chiari',
-  'Phases, speed, current file and a smooth progress bar.':
-    'Fasi, velocità, file corrente e una barra di avanzamento fluida.',
   Settings: 'Impostazioni',
   General: 'Generali',
   'File Manager': 'Gestione file',

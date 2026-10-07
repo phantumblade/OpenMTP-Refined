@@ -3,13 +3,13 @@ import {
   DEVICE_TYPE,
   FILE_EXPLORER_VIEW_TYPE,
   APP_THEME_MODE_TYPE,
-  APP_LANGUAGE_TYPE,
   APP_FONT_FAMILY_TYPE,
   MTP_MODE,
   FILE_TRANSFER_DIRECTION,
 } from '../../enums';
 import { checkIf } from '../../utils/checkIf';
 import { isPrereleaseVersion } from '../../utils/funcs';
+import { detectSystemLanguage } from '../../helpers/systemLanguage';
 
 export const initialState = {
   freshInstall: 0,
@@ -33,7 +33,8 @@ export const initialState = {
     [DEVICE_TYPE.mtp]: FILE_EXPLORER_VIEW_TYPE.grid,
   },
   appThemeMode: APP_THEME_MODE_TYPE.auto,
-  appLanguage: APP_LANGUAGE_TYPE.english,
+  // first launch follows the Mac's language; later the saved choice wins
+  appLanguage: detectSystemLanguage(),
   appFontFamily: APP_FONT_FAMILY_TYPE.system,
   showLocalPane: true,
   showLocalPaneOnLeftSide: true,

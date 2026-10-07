@@ -201,10 +201,32 @@ export const styles = (theme) => {
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',
     },
-    emptyHint: {
-      ...m3Type.bodyMedium,
-      margin: 0,
-      padding: '0 24px 8px 16px',
+    emptyCard: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 14,
+      margin: '0 4px 4px',
+      padding: '12px 16px 12px 12px',
+      borderRadius: m3Shape.large,
+      backgroundColor: m3.surfaceContainer,
+    },
+    emptyShape: {
+      color: m3.tertiaryContainer,
+    },
+    emptyIcon: {
+      color: m3.onTertiaryContainer,
+    },
+    emptyText: {
+      display: 'flex',
+      flexDirection: 'column',
+      minWidth: 0,
+    },
+    emptyTitle: {
+      ...m3Type.labelLarge,
+      color: m3.onSurface,
+    },
+    emptyBody: {
+      ...m3Type.bodySmall,
       color: m3.onSurfaceVariant,
     },
     favoriteItem: {

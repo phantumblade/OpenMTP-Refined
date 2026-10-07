@@ -183,13 +183,34 @@ class SidebarAreaPaneLists extends PureComponent {
     } = this.props;
 
     if (favoriteFolders.length < 1) {
+      // M3 empty state: what the section is for and how to fill it
       return (
-        <p className={styles.emptyHint}>
-          {translate(
-            appLanguage,
-            'Right-click a folder and choose Add to Favorites.'
-          )}
-        </p>
+        <div className={styles.emptyCard}>
+          <M3Shape
+            shape="Cookie4Sided"
+            size={40}
+            color="currentColor"
+            className={styles.emptyShape}
+          >
+            <MaterialSymbol
+              name="star"
+              size={22}
+              fill={1}
+              className={styles.emptyIcon}
+            />
+          </M3Shape>
+          <div className={styles.emptyText}>
+            <span className={styles.emptyTitle}>
+              {translate(appLanguage, 'No favorites yet')}
+            </span>
+            <span className={styles.emptyBody}>
+              {translate(
+                appLanguage,
+                'Right-click a folder and choose Add to Favorites.'
+              )}
+            </span>
+          </div>
+        </div>
       );
     }
 

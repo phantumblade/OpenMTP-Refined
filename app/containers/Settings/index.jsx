@@ -217,7 +217,8 @@ class Settings extends Component {
       enablePrereleaseUpdates,
       ...parentProps
     } = this.props;
-    const showSettings = toggleSettings || freshInstall !== 0;
+    // the welcome dialog greets new users; settings open only when asked
+    const showSettings = Boolean(toggleSettings);
 
     return (
       <SettingsDialog

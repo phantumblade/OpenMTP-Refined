@@ -37,6 +37,8 @@ Silicon Macs.
   searching, and lists every choice in Settings → Privacy.
 - "This Mac" card in the side menu with the disk of the open folder and its
   free space, measured like Finder.
+- The app starts in the Mac's language (Italian or English) and the first
+  launch shows only the welcome dialog, without opening Settings behind it.
 - Welcome dialog listing what's new in 4.0 as Material 3 segmented lists
   grouped by topic, in Italian and English.
 - Verification scripts for favorites, USB owners, error messages, the loading
@@ -79,6 +81,8 @@ Silicon Macs.
 
 ### Fixed
 
+- The search bar sits above the scrolling area, so the scrollbar no longer
+  runs past it and the column headers keep their size while scrolling.
 - Phone connection: macOS restarts ptpcamerad within a second and it took
   the phone back before OpenMTP had claimed it (the native layer ignores a
   failed claim, so the session then timed out). OpenMTP now keeps it away for

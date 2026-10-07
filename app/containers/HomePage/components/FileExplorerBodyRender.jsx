@@ -454,6 +454,26 @@ class FileExplorerBodyRender extends PureComponent {
         elevation={0}
         square
       >
+        {/* outside the scroll area: the scrollbar starts below it */}
+        <FileExplorerSearchBar
+          rootPath={currentBrowsePath[deviceType]}
+          rootNodes={directoryLists[deviceType].nodes}
+          deviceType={deviceType}
+          storageId={searchStorageId}
+          ignoreHidden={searchIgnoreHidden}
+          folderAccess={folderAccess}
+          mtpDevice={mtpDevice}
+          fileTransferProgress={fileTransferProgress}
+          appLanguage={appLanguage}
+          appThemeMode={appThemeMode}
+          onOpenResult={onSearchResultOpen}
+          dateFilter={dateFilter}
+          creationDateAvailable={deviceType === DEVICE_TYPE.local}
+          onDateFilterChange={this.handleDateFilterChange}
+          fileTypeFilter={fileTypeFilter}
+          fileTypeOptions={this.getFileTypeOptions()}
+          onFileTypeFilterChange={this.handleFileTypeFilterChange}
+        />
         <div
           tabIndex={-1}
           id={this.fileExplorerBodyWrapperId}
@@ -469,25 +489,6 @@ class FileExplorerBodyRender extends PureComponent {
           onDrop={this._handleOnDrop}
           onDragLeave={this._handleExternalFileDragLeave}
         >
-          <FileExplorerSearchBar
-            rootPath={currentBrowsePath[deviceType]}
-            rootNodes={directoryLists[deviceType].nodes}
-            deviceType={deviceType}
-            storageId={searchStorageId}
-            ignoreHidden={searchIgnoreHidden}
-            folderAccess={folderAccess}
-            mtpDevice={mtpDevice}
-            fileTransferProgress={fileTransferProgress}
-            appLanguage={appLanguage}
-            appThemeMode={appThemeMode}
-            onOpenResult={onSearchResultOpen}
-            dateFilter={dateFilter}
-            creationDateAvailable={deviceType === DEVICE_TYPE.local}
-            onDateFilterChange={this.handleDateFilterChange}
-            fileTypeFilter={fileTypeFilter}
-            fileTypeOptions={this.getFileTypeOptions()}
-            onFileTypeFilterChange={this.handleFileTypeFilterChange}
-          />
           <FileExplorerTableBodyRender
             getTableData={this.tableData}
             scrollContainerId={this.fileExplorerBodyWrapperId}
