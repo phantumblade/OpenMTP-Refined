@@ -8,7 +8,7 @@ import { Morph, getShape, toPathD } from 'shape-morph';
 // a constant 360deg / 4666ms rotation. Shapes and morphing come from
 // shape-morph, a port of androidx.graphics.shapes.
 
-const INDETERMINATE_SHAPES = [
+export const INDETERMINATE_SHAPES = [
   'SoftBurst',
   'Cookie9Sided',
   'Pentagon',
@@ -18,7 +18,7 @@ const INDETERMINATE_SHAPES = [
   'Oval',
 ];
 
-const MORPH_INTERVAL_MS = 650;
+export const MORPH_INTERVAL_MS = 650;
 const GLOBAL_ROTATION_MS = 4666;
 const QUARTER_ROTATION = 90;
 
@@ -63,6 +63,7 @@ export const getMorphSequence = () => {
     });
 
     cachedSequence = {
+      polygons,
       morphs: polygons.map(
         (polygon, index) =>
           new Morph(polygon, polygons[(index + 1) % polygons.length])
@@ -74,7 +75,7 @@ export const getMorphSequence = () => {
   return cachedSequence;
 };
 
-const cubicsBoundsCenter = (cubics) => {
+export const cubicsBoundsCenter = (cubics) => {
   let minX = Infinity;
   let minY = Infinity;
   let maxX = -Infinity;
@@ -93,20 +94,22 @@ const cubicsBoundsCenter = (cubics) => {
 };
 
 // State of the indeterminate animation [elapsedMs] after it started.
+// Compose stops each spring once it is within 0.1 of its target and snaps to
+// it, which makes the shape and the rotation jump (up to 9deg) every 650ms.
+// Here each spring keeps running until the next morph starts, when only
+// ~0.4% of the motion is left, so the hand-over is invisible.
 export const frameAt = (elapsedMs, sequenceLength, rotate) => {
   const cycle = Math.floor(elapsedMs / MORPH_INTERVAL_MS);
   const inCycle = elapsedMs - cycle * MORPH_INTERVAL_MS;
-  const springRunning = inCycle < SPRING_END_MS;
-  const progress = springRunning ? springValue(inCycle / 1000) : 0;
-  const morphIndex = (springRunning ? cycle : cycle + 1) % sequenceLength;
-  const targetAngle =
-    QUARTER_ROTATION * ((springRunning ? cycle + 1 : cycle + 2) % 4);
+  const progress = springValue(inCycle / 1000);
+  const targetAngle = QUARTER_ROTATION * ((cycle + 1) % 4);
   const globalRotation = rotate
     ? ((elapsedMs % GLOBAL_ROTATION_MS) / GLOBAL_ROTATION_MS) * 360
     : 0;
 
   return {
-    morphIndex,
+    morphIndex: cycle % sequenceLength,
+    inCycle,
     progress,
     rotation: progress * QUARTER_ROTATION + targetAngle + globalRotation,
   };

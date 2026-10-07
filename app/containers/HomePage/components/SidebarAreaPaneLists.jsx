@@ -1,26 +1,9 @@
 import React, { PureComponent } from 'react';
+import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
-import {
-  Close as CloseIcon,
-  Computer as ComputerIcon,
-  DesktopMac as DesktopMacIcon,
-  FlashOn as FlashOnIcon,
-  FolderOutlined as FolderIcon,
-  GetApp as GetAppIcon,
-  Home as HomeIcon,
-  PhoneAndroid as PhoneAndroidIcon,
-  Refresh as RefreshIcon,
-  Storage as StorageIcon,
-  Tune as TuneIcon,
-} from '../../../components/m3/symbolIcons';
+import MaterialSymbol from '../../../components/m3/MaterialSymbol';
+import M3Shape from '../../../components/m3/M3Shape';
 import SlotText from '../../../components/SlotText';
 import { styles } from '../styles/SidebarAreaPaneLists';
 import { quickHash, capitalize } from '../../../utils/funcs';
@@ -33,6 +16,17 @@ import GithubBadge from '../../../components/GithubBadge';
 import { imgsrc } from '../../../utils/imgsrc';
 import { FAVORITE_FOLDERS_MAX } from '../../../helpers/favoriteFolders';
 
+const LOCATION_ICONS = {
+  Home: 'home',
+  Desktop: 'desktop_mac',
+  Downloads: 'download',
+  'Removable Disks': 'hard_drive',
+  Root: 'computer',
+};
+
+// Material 3 navigation drawer (Compose NavigationDrawerTokens): pill items
+// inset by 12dp, secondary container active indicator, titleSmall section
+// headlines and labelLarge labels.
 class SidebarAreaPaneLists extends PureComponent {
   _handleListDirectory = ({ filePath, deviceType, isSidemenu }) => {
     const { onClickHandler, onToggleDrawer } = this.props;
@@ -64,53 +58,59 @@ class SidebarAreaPaneLists extends PureComponent {
     }
   };
 
-  renderFavorites = (listData) => {
-    const {
-      classes: styles,
-      currentBrowsePath,
-      appLanguage,
-      deviceType,
-    } = this.props;
-
-    const icons = {
-      Home: <HomeIcon />,
-      Desktop: <DesktopMacIcon />,
-      Downloads: <GetAppIcon />,
-      'Removable Disks': <StorageIcon />,
-      Root: <ComputerIcon />,
-    };
+  renderItem = ({
+    key,
+    icon,
+    label,
+    active = false,
+    disabled = false,
+    onClick,
+    trailing,
+    className,
+  }) => {
+    const { classes: styles } = this.props;
 
     return (
-      <List component="nav" dense className={styles.listNav}>
-        {listData.map((item) => {
-          const isSelected = currentBrowsePath === item.path;
+      <li key={key} className={styles.itemRow}>
+        <button
+          type="button"
+          className={classNames(styles.item, className, {
+            [styles.itemActive]: active,
+          })}
+          aria-current={active ? 'page' : undefined}
+          aria-disabled={disabled || undefined}
+          onClick={disabled ? undefined : onClick}
+        >
+          <MaterialSymbol
+            name={icon}
+            size={24}
+            fill={active ? 1 : 0}
+            className={styles.itemIcon}
+          />
+          <span className={styles.itemLabel}>{label}</span>
+        </button>
+        {trailing}
+      </li>
+    );
+  };
 
-          return (
-            <ListItem
-              key={quickHash(item.path)}
-              button
-              selected={isSelected}
-              disabled={!item.enabled}
-              className={styles.listItem}
-              onClick={() =>
-                this._handleListDirectory({
-                  filePath: item.path,
-                  deviceType,
-                  isSidemenu: true,
-                })
-              }
-            >
-              <ListItemIcon className={styles.listItemIcon}>
-                {icons[item.label] || <StorageIcon />}
-              </ListItemIcon>
-              <ListItemText
-                className={styles.listItemText}
-                primary={translate(appLanguage, item.label)}
-              />
-            </ListItem>
-          );
-        })}
-      </List>
+  renderLocations = (listData) => {
+    const { currentBrowsePath, appLanguage, deviceType } = this.props;
+
+    return listData.map((item) =>
+      this.renderItem({
+        key: quickHash(item.path),
+        icon: LOCATION_ICONS[item.label] || 'hard_drive',
+        label: translate(appLanguage, item.label),
+        active: currentBrowsePath === item.path,
+        disabled: !item.enabled,
+        onClick: () =>
+          this._handleListDirectory({
+            filePath: item.path,
+            deviceType,
+            isSidemenu: true,
+          }),
+      })
     );
   };
 
@@ -126,75 +126,74 @@ class SidebarAreaPaneLists extends PureComponent {
 
     if (favoriteFolders.length < 1) {
       return (
-        <div className={styles.emptyHint}>
+        <p className={styles.emptyHint}>
           {translate(
             appLanguage,
             'Right-click a folder and choose Add to Favorites.'
           )}
-        </div>
+        </p>
       );
     }
 
     return (
-      <List component="nav" dense className={styles.listNav}>
+      <ul className={styles.list}>
         {favoriteFolders.map((item) => {
           const exists = fileExistsSync(item.path);
+          const key = quickHash(item.path);
 
           return (
             <Tooltip
-              key={quickHash(item.path)}
+              key={key}
               title={
                 exists ? item.path : translate(appLanguage, 'Folder not found')
               }
               placement="right"
               enterDelay={600}
             >
-              <ListItem
-                button
-                selected={currentBrowsePath === item.path}
-                aria-disabled={!exists}
-                className={`${styles.listItem} ${styles.favoriteItem} ${
-                  exists ? '' : styles.favoriteMissing
-                }`}
-                onClick={() => {
-                  if (!exists) {
-                    return;
-                  }
-
+              {this.renderItem({
+                key,
+                icon: 'folder',
+                label: item.name,
+                active: currentBrowsePath === item.path,
+                disabled: !exists,
+                className: classNames(styles.favoriteItem, {
+                  [styles.favoriteMissing]: !exists,
+                }),
+                onClick: () =>
                   this._handleListDirectory({
                     filePath: item.path,
                     deviceType,
                     isSidemenu: true,
-                  });
-                }}
-              >
-                <ListItemIcon className={styles.listItemIcon}>
-                  <FolderIcon />
-                </ListItemIcon>
-                <ListItemText
-                  className={styles.listItemText}
-                  primary={item.name}
-                  primaryTypographyProps={{ noWrap: true }}
-                />
-                {onRemoveFavoriteFolder && (
-                  <IconButton
-                    size="small"
-                    aria-label={translate(appLanguage, 'Remove from Favorites')}
+                  }),
+                trailing: onRemoveFavoriteFolder && (
+                  <button
+                    type="button"
                     className={styles.favoriteRemove}
-                    onMouseDown={(event) => event.stopPropagation()}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      onRemoveFavoriteFolder(item.path);
-                    }}
+                    aria-label={translate(appLanguage, 'Remove from Favorites')}
+                    onClick={() => onRemoveFavoriteFolder(item.path)}
                   >
-                    <CloseIcon fontSize="inherit" />
-                  </IconButton>
-                )}
-              </ListItem>
+                    <MaterialSymbol name="close" size={18} />
+                  </button>
+                ),
+              })}
             </Tooltip>
           );
         })}
-      </List>
+      </ul>
+    );
+  };
+
+  renderSection = ({ title, badge, children }) => {
+    const { classes: styles } = this.props;
+
+    return (
+      <section className={styles.section}>
+        <h3 className={styles.sectionHeadline}>
+          <span>{title}</span>
+          {badge && <span className={styles.sectionBadge}>{badge}</span>}
+        </h3>
+        {children}
+      </section>
     );
   };
 
@@ -214,133 +213,112 @@ class SidebarAreaPaneLists extends PureComponent {
     const { top: sidebarTop, bottom: sidebarBottom } = sidebarFavouriteList;
     const isItalian = appLanguage === 'it';
 
+    const tools = [
+      onRefresh && {
+        icon: 'refresh',
+        label: isItalian ? 'Aggiorna elenco' : 'Refresh list',
+        action: onRefresh,
+      },
+      onSelectStorage && {
+        icon: 'sd_card',
+        label: isItalian ? 'Cambia memoria' : 'Select storage',
+        action: onSelectStorage,
+      },
+      onSelectMtpMode && {
+        icon: 'bolt',
+        label: isItalian ? 'Modalità MTP' : 'MTP mode',
+        action: onSelectMtpMode,
+      },
+      onOpenSettings && {
+        icon: 'tune',
+        label: isItalian ? 'Impostazioni' : 'Settings',
+        action: onOpenSettings,
+      },
+    ].filter(Boolean);
+
     return (
-      <div className={styles.listsWrapper}>
-        {/* Header Block */}
+      <nav className={styles.listsWrapper}>
         <div className={styles.headerBlock}>
-          <div className={styles.headerTitleRow}>
-            <PhoneAndroidIcon className={styles.headerIcon} />
-            <div>
-              <div className={styles.headerTitle}>{APP_NAME}</div>
-              <div className={styles.headerSubtitle}>
-                {isItalian
-                  ? 'Trasferimento File Android per macOS'
-                  : 'Android File Transfer for macOS'}
-              </div>
+          <M3Shape
+            shape="Cookie9Sided"
+            size={48}
+            color="currentColor"
+            className={styles.headerShape}
+          >
+            <MaterialSymbol
+              name="mobile"
+              size={26}
+              fill={1}
+              className={styles.headerIcon}
+            />
+          </M3Shape>
+          <div className={styles.headerText}>
+            <div className={styles.headerTitle}>{APP_NAME}</div>
+            <div className={styles.headerSubtitle}>
+              {isItalian
+                ? 'Trasferimento file Android per macOS'
+                : 'Android File Transfer for macOS'}
             </div>
           </div>
-          {mtpMode && (
-            <div className={styles.modeBadge}>
-              <span className={styles.modeBadgeDot} />
-              <SlotText text={`${capitalize(mtpMode)} Mode`} />
-            </div>
-          )}
         </div>
 
-        {/* Content Scroll Area */}
+        {mtpMode && (
+          <div className={styles.modeChipRow}>
+            <button
+              type="button"
+              className={styles.modeChip}
+              onClick={() => this._handleAction(onSelectMtpMode)}
+            >
+              <MaterialSymbol
+                name="bolt"
+                size={18}
+                fill={1}
+                className={styles.modeChipIcon}
+              />
+              <SlotText text={`${capitalize(mtpMode)} Mode`} />
+            </button>
+          </div>
+        )}
+
         <div className={styles.contentScrollArea}>
-          {/* Posizioni Rapide / Favorites */}
-          <Typography variant="caption" className={styles.sectionCaption}>
-            {isItalian ? 'Posizioni Rapide' : 'Quick Access'}
-          </Typography>
-          {sidebarTop &&
-            sidebarTop.length > 0 &&
-            this.renderFavorites(sidebarTop)}
-          {sidebarBottom && sidebarBottom.length > 0 && (
-            <>
-              <Divider className={styles.sectionDivider} />
-              {this.renderFavorites(sidebarBottom)}
-            </>
-          )}
+          {this.renderSection({
+            title: isItalian ? 'Posizioni rapide' : 'Quick access',
+            children: (
+              <ul className={styles.list}>
+                {sidebarTop && this.renderLocations(sidebarTop)}
+                {sidebarBottom && this.renderLocations(sidebarBottom)}
+              </ul>
+            ),
+          })}
 
-          <Divider className={styles.sectionDivider} />
+          <hr className={styles.divider} />
 
-          {/* Preferiti / Favorites */}
-          <Typography
-            variant="caption"
-            component="div"
-            className={`${styles.sectionCaption} ${styles.sectionCaptionRow}`}
-          >
-            <span>{translate(appLanguage, 'Favorites')}</span>
-            {favoriteFolders.length > 0 && (
-              <span className={styles.sectionCount}>
-                {`${favoriteFolders.length}/${FAVORITE_FOLDERS_MAX}`}
-              </span>
-            )}
-          </Typography>
-          {this.renderFavoriteFolders()}
+          {this.renderSection({
+            title: translate(appLanguage, 'Favorites'),
+            badge:
+              favoriteFolders.length > 0
+                ? `${favoriteFolders.length}/${FAVORITE_FOLDERS_MAX}`
+                : null,
+            children: this.renderFavoriteFolders(),
+          })}
 
-          <Divider className={styles.sectionDivider} />
+          <hr className={styles.divider} />
 
-          {/* Strumenti & Azioni / Tools & Actions */}
-          <Typography variant="caption" className={styles.sectionCaption}>
-            {isItalian ? 'Strumenti & Azioni' : 'Tools & Actions'}
-          </Typography>
-          <List component="nav" dense className={styles.listNav}>
-            {onRefresh && (
-              <ListItem
-                button
-                className={styles.listItem}
-                onClick={() => this._handleAction(onRefresh)}
-              >
-                <ListItemIcon className={styles.listItemIcon}>
-                  <RefreshIcon />
-                </ListItemIcon>
-                <ListItemText
-                  className={styles.listItemText}
-                  primary={isItalian ? 'Aggiorna Elenco' : 'Refresh List'}
-                />
-              </ListItem>
-            )}
-
-            {onSelectStorage && (
-              <ListItem
-                button
-                className={styles.listItem}
-                onClick={() => this._handleAction(onSelectStorage)}
-              >
-                <ListItemIcon className={styles.listItemIcon}>
-                  <StorageIcon />
-                </ListItemIcon>
-                <ListItemText
-                  className={styles.listItemText}
-                  primary={isItalian ? 'Cambia Memoria' : 'Select Storage'}
-                />
-              </ListItem>
-            )}
-
-            {onSelectMtpMode && (
-              <ListItem
-                button
-                className={styles.listItem}
-                onClick={() => this._handleAction(onSelectMtpMode)}
-              >
-                <ListItemIcon className={styles.listItemIcon}>
-                  <FlashOnIcon />
-                </ListItemIcon>
-                <ListItemText
-                  className={styles.listItemText}
-                  primary={isItalian ? 'Modalità MTP' : 'MTP Mode'}
-                />
-              </ListItem>
-            )}
-
-            {onOpenSettings && (
-              <ListItem
-                button
-                className={styles.listItem}
-                onClick={() => this._handleAction(onOpenSettings)}
-              >
-                <ListItemIcon className={styles.listItemIcon}>
-                  <TuneIcon />
-                </ListItemIcon>
-                <ListItemText
-                  className={styles.listItemText}
-                  primary={isItalian ? 'Impostazioni' : 'Settings'}
-                />
-              </ListItem>
-            )}
-          </List>
+          {this.renderSection({
+            title: isItalian ? 'Strumenti e azioni' : 'Tools and actions',
+            children: (
+              <ul className={styles.list}>
+                {tools.map((tool) =>
+                  this.renderItem({
+                    key: tool.icon,
+                    icon: tool.icon,
+                    label: tool.label,
+                    onClick: () => this._handleAction(tool.action),
+                  })
+                )}
+              </ul>
+            ),
+          })}
         </div>
 
         {/* Footer Block */}
@@ -361,7 +339,7 @@ class SidebarAreaPaneLists extends PureComponent {
           </div>
           <GithubBadge appLanguage={appLanguage} />
         </div>
-      </div>
+      </nav>
     );
   }
 }

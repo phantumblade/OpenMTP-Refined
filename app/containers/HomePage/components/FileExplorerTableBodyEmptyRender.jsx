@@ -6,7 +6,7 @@ import TableRow from '@material-ui/core/TableRow';
 import classNames from 'classnames';
 import AngryFaceAnimation from '../../../components/m3/AngryFaceAnimation';
 import M3Button from '../../../components/m3/M3Button';
-import M3LoadingIndicator from '../../../components/m3/M3LoadingIndicator';
+import M3MorphingHero from '../../../components/m3/M3MorphingHero';
 import M3Shape from '../../../components/m3/M3Shape';
 import MaterialSymbol from '../../../components/m3/MaterialSymbol';
 import { styles } from '../styles/FileExplorerTableBodyEmptyRender';
@@ -301,29 +301,19 @@ class FileExplorerTableBodyEmptyRender extends PureComponent {
               <div className={styles.layout}>
                 <div className={styles.column}>
                   <div className={styles.hero}>
-                    {isConnecting ? (
-                      <M3LoadingIndicator
-                        size={104}
-                        contained
-                        color="var(--md-sys-color-on-primary-container)"
-                        containerColor="var(--md-sys-color-primary-container)"
-                        aria-label={t('Connecting to your phone…')}
+                    <M3MorphingHero
+                      loading={isConnecting}
+                      size={104}
+                      aria-label={t('Connecting to your phone…')}
+                    >
+                      <MaterialSymbol
+                        name="mobile"
+                        size={48}
+                        fill={1}
+                        weight={500}
+                        className={styles.heroIcon}
                       />
-                    ) : (
-                      <M3Shape
-                        shape="Cookie9Sided"
-                        size={104}
-                        color="currentColor"
-                      >
-                        <MaterialSymbol
-                          name="mobile"
-                          size={48}
-                          fill={1}
-                          weight={500}
-                          className={styles.heroIcon}
-                        />
-                      </M3Shape>
-                    )}
+                    </M3MorphingHero>
                   </div>
 
                   <h2 className={styles.headline} aria-live="polite">

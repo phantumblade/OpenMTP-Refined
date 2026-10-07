@@ -231,6 +231,11 @@ export default class ToolbarAreaPane extends PureComponent {
           open={toggleDrawer}
           onClose={onToggleDrawer(false)}
           anchor={!showLocalPaneOnLeftSide ? 'right' : 'left'}
+          classes={{
+            paper: showLocalPaneOnLeftSide
+              ? styles.drawerPaper
+              : styles.drawerPaperRight,
+          }}
         >
           <div
             tabIndex={0}

@@ -1,148 +1,213 @@
-import { m3Shape, m3Type } from '../../../styles/m3/tokens';
+import {
+  alphaHex,
+  m3Motion,
+  m3Shape,
+  m3State,
+  m3Type,
+} from '../../../styles/m3/tokens';
 
+// Material 3 navigation drawer, coloured and shaped with the Compose
+// NavigationDrawerTokens values; items use the compact 48dp desktop height
+// so every destination fits without scrolling on a laptop screen.
 export const styles = (theme) => {
+  const { m3 } = theme.palette;
+
   return {
     listsWrapper: {
       display: 'flex',
       flexDirection: 'column',
       height: '100%',
-      width: 270,
+      width: 320,
       boxSizing: 'border-box',
-      backgroundColor: theme.palette.background.paper,
-      color: theme.palette.text.primary,
+      backgroundColor: m3.surfaceContainerLow,
+      color: m3.onSurface,
       userSelect: 'none',
     },
     headerBlock: {
-      padding: '22px 18px 14px 18px',
-      borderBottom: `1px solid ${theme.palette.divider}`,
-    },
-    headerTitleRow: {
       display: 'flex',
       alignItems: 'center',
-      gap: 10,
+      gap: 14,
+      padding: '24px 24px 8px 28px',
+    },
+    headerShape: {
+      color: m3.primaryContainer,
     },
     headerIcon: {
-      fontSize: 24,
-      color: theme.palette.secondary.main,
+      color: m3.onPrimaryContainer,
+    },
+    headerText: {
+      minWidth: 0,
     },
     headerTitle: {
-      fontSize: 17,
-      fontWeight: 700,
-      letterSpacing: '-0.01em',
-      color: theme.palette.text.primary,
+      ...m3Type.titleLarge,
+      fontWeight: 500,
+      color: m3.onSurface,
     },
     headerSubtitle: {
-      fontSize: 11,
-      color: theme.palette.text.secondary,
-      marginTop: 2,
+      ...m3Type.bodyMedium,
+      color: m3.onSurfaceVariant,
     },
-    modeBadge: {
+    modeChipRow: {
+      padding: '4px 28px 8px',
+    },
+    // M3 assist chip: 32dp, 8dp corners, outline, 18dp leading icon
+    modeChip: {
+      ...m3Type.labelLarge,
       display: 'inline-flex',
       alignItems: 'center',
-      gap: 5,
-      marginTop: 10,
-      padding: '3px 9px',
-      borderRadius: 12,
-      fontSize: 10,
-      fontWeight: 600,
-      backgroundColor:
-        theme.palette.toolbarButtonActive || 'rgba(0, 122, 245, 0.12)',
-      color: theme.palette.secondary.main,
+      gap: 8,
+      height: 32,
+      padding: '0 16px 0 8px',
+      border: `1px solid ${m3.outlineVariant}`,
+      borderRadius: m3Shape.small,
+      backgroundColor: 'transparent',
+      color: m3.onSurface,
+      fontFamily: 'inherit',
+      cursor: 'pointer',
+      outline: 'none',
+      transition: `background-color ${m3Motion.defaultEffects}`,
+      '&:hover': {
+        backgroundColor: alphaHex(m3.onSurface, m3State.hover),
+      },
+      '&:focus-visible': {
+        outline: `3px solid ${m3.secondary}`,
+        outlineOffset: 2,
+      },
     },
-    modeBadgeDot: {
-      width: 6,
-      height: 6,
-      borderRadius: '50%',
-      backgroundColor: '#2e9d62',
+    modeChipIcon: {
+      color: m3.primary,
     },
     contentScrollArea: {
       flex: 1,
+      minHeight: 0,
       overflowY: 'auto',
-      paddingTop: 8,
       paddingBottom: 8,
     },
-    sectionCaption: {
-      fontSize: 10,
-      fontWeight: 700,
-      textTransform: 'uppercase',
-      letterSpacing: '0.08em',
-      color: theme.palette.text.secondary,
-      padding: '12px 18px 4px 18px',
+    section: {
+      padding: '0 12px',
     },
-    listNav: {
-      padding: '0 8px',
-    },
-    listItem: {
-      borderRadius: 7,
-      margin: '2px 0',
-      padding: '6px 12px',
-      transition: 'background-color 140ms ease, color 140ms ease',
-      '&:hover': {
-        backgroundColor: theme.palette.toolbarButtonHover,
-      },
-      '&.Mui-selected': {
-        backgroundColor: `${
-          theme.palette.toolbarButtonActive || 'rgba(0, 122, 245, 0.12)'
-        } !important`,
-        color: `${theme.palette.secondary.main} !important`,
-        fontWeight: 600,
-        '& $listItemIcon': {
-          color: theme.palette.secondary.main,
-        },
-      },
-    },
-    listItemIcon: {
-      minWidth: 32,
-      color: theme.palette.text.secondary,
-    },
-    listItemText: {
-      '& span': {
-        fontSize: 13,
-        fontWeight: 500,
-      },
-    },
-    sectionCaptionRow: {
+    sectionHeadline: {
+      ...m3Type.titleSmall,
       display: 'flex',
-      alignItems: 'baseline',
+      alignItems: 'center',
       justifyContent: 'space-between',
+      height: 40,
+      margin: 0,
+      padding: '4px 24px 0 16px',
+      color: m3.onSurfaceVariant,
     },
-    sectionCount: {
-      fontWeight: 600,
-      letterSpacing: 0,
-      opacity: 0.8,
+    sectionBadge: {
+      ...m3Type.labelLarge,
+      color: m3.onSurfaceVariant,
     },
-    emptyHint: {
-      padding: '4px 18px 8px 18px',
-      fontSize: 11,
-      lineHeight: 1.45,
-      color: theme.palette.text.secondary,
+    list: {
+      margin: 0,
+      padding: 0,
+      listStyle: 'none',
     },
-    favoriteItem: {
-      paddingRight: 6,
+    itemRow: {
+      position: 'relative',
       '&:hover $favoriteRemove, &:focus-within $favoriteRemove': {
         opacity: 1,
       },
     },
-    favoriteMissing: {
-      cursor: 'default',
-      '& $listItemIcon, & $listItemText': {
-        opacity: 0.45,
+    item: {
+      ...m3Type.labelLarge,
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12,
+      width: '100%',
+      height: 48,
+      padding: '0 24px 0 16px',
+      border: 'none',
+      borderRadius: m3Shape.full,
+      backgroundColor: 'transparent',
+      color: m3.onSurfaceVariant,
+      fontFamily: 'inherit',
+      textAlign: 'left',
+      cursor: 'pointer',
+      outline: 'none',
+      transition: `background-color ${m3Motion.defaultEffects}, color ${m3Motion.defaultEffects}`,
+      '&:hover': {
+        backgroundColor: alphaHex(m3.onSurface, m3State.hover),
+        color: m3.onSurface,
+      },
+      '&:active': {
+        backgroundColor: alphaHex(m3.onSurface, m3State.pressed),
+      },
+      '&:focus-visible': {
+        outline: `3px solid ${m3.secondary}`,
+        outlineOffset: -3,
+      },
+      '&[aria-disabled]': {
+        cursor: 'default',
+        backgroundColor: 'transparent',
       },
     },
+    itemActive: {
+      backgroundColor: m3.secondaryContainer,
+      color: m3.onSecondaryContainer,
+      '&:hover': {
+        backgroundColor: m3.secondaryContainer,
+        color: m3.onSecondaryContainer,
+        boxShadow: `inset 0 0 0 100px ${alphaHex(
+          m3.onSecondaryContainer,
+          m3State.hover
+        )}`,
+      },
+    },
+    itemIcon: {
+      flexShrink: 0,
+    },
+    itemLabel: {
+      flex: 1,
+      minWidth: 0,
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+    },
+    emptyHint: {
+      ...m3Type.bodyMedium,
+      margin: 0,
+      padding: '0 24px 8px 16px',
+      color: m3.onSurfaceVariant,
+    },
+    favoriteItem: {
+      paddingRight: 52,
+    },
+    favoriteMissing: {
+      opacity: 0.38,
+    },
+    // M3 standard icon button, shown on hover
     favoriteRemove: {
-      marginLeft: 4,
-      padding: 3,
-      fontSize: 14,
+      position: 'absolute',
+      top: 4,
+      right: 8,
+      display: 'grid',
+      placeItems: 'center',
+      width: 40,
+      height: 40,
+      border: 'none',
+      borderRadius: 20,
+      backgroundColor: 'transparent',
+      color: m3.onSurfaceVariant,
+      cursor: 'pointer',
       opacity: 0,
-      color: theme.palette.text.secondary,
-      transition: 'opacity 140ms ease',
+      outline: 'none',
+      transition: `opacity ${m3Motion.defaultEffects}, background-color ${m3Motion.defaultEffects}`,
+      '&:hover': {
+        backgroundColor: alphaHex(m3.onSurfaceVariant, m3State.hover),
+      },
       '&:focus-visible': {
         opacity: 1,
+        outline: `3px solid ${m3.secondary}`,
       },
     },
-    sectionDivider: {
-      margin: '8px 16px',
-      opacity: 0.4,
+    divider: {
+      height: 1,
+      margin: '6px 28px',
+      border: 'none',
+      backgroundColor: m3.outlineVariant,
     },
     // M3 filled card holding the app identity and the GitHub link
     footerBlock: {

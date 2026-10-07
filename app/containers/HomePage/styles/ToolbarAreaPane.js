@@ -1,5 +1,10 @@
 import { variables, mixins } from '../../../styles/js';
-import { m3Motion, m3Shape, m3Type } from '../../../styles/m3/tokens';
+import {
+  m3Elevation,
+  m3Motion,
+  m3Shape,
+  m3Type,
+} from '../../../styles/m3/tokens';
 
 export const styles = (theme) => {
   const { m3 } = theme.palette;
@@ -58,6 +63,19 @@ export const styles = (theme) => {
     activeNavBtn: {
       backgroundColor: `${theme.palette.toolbarButtonActive} !important`,
       color: `${theme.palette.secondary.main} !important`,
+    },
+    // M3 modal navigation drawer: large end corners, level 1 elevation
+    drawerPaper: {
+      overflow: 'hidden',
+      borderRadius: `0 ${m3Shape.large}px ${m3Shape.large}px 0`,
+      backgroundColor: m3.surfaceContainerLow,
+      boxShadow: m3Elevation.level1,
+    },
+    drawerPaperRight: {
+      overflow: 'hidden',
+      borderRadius: `${m3Shape.large}px 0 0 ${m3Shape.large}px`,
+      backgroundColor: m3.surfaceContainerLow,
+      boxShadow: m3Elevation.level1,
     },
     // phone status button (M3 Expressive tonal XS button)
     deviceButton: {

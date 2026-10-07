@@ -38,13 +38,23 @@ function main() {
     // rendering every frame must work
     assert.ok(morphs[frame.morphIndex].asCubics(frame.progress).length > 0);
 
-    // rotation moves forward (mod 360); when a spring ends slightly past its
-    // target it snaps back by a few degrees, exactly like Compose
+    // rotation is continuous: forward, or back by less than 1deg while the
+    // underdamped spring settles (no snap when a morph hands over)
     const delta = (((frame.rotation - previous.rotation) % 360) + 360) % 360;
 
-    assert.ok(delta < 45 || delta > 350, `rotation jump ${delta} at ${ms}ms`);
+    assert.ok(delta < 45 || delta > 359, `rotation jump ${delta} at ${ms}ms`);
     previous = frame;
   }
+
+  // at each hand-over the finished morph is within 1% of the next shape
+  const { morphIndex: lastIndex, progress: lastProgress } = frameAt(
+    649.9,
+    morphs.length,
+    true
+  );
+
+  assert.strictEqual(lastIndex, 0);
+  assert.ok(Math.abs(lastProgress - 1) < 0.01, `hand-over ${lastProgress}`);
 
   // eslint-disable-next-line no-console
   console.log('M3 loading indicator invariants: ok');

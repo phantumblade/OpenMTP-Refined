@@ -16,7 +16,9 @@ Silicon Macs.
   brand color (light and dark), Material Symbols icons, shape and motion
   tokens, M3 buttons, dialogs, tabs, switches, menus, tooltips and snackbars.
 - Morphing loading indicator and wavy progress bar ported from Jetpack
-  Compose, with smoothed transfer progress.
+  Compose, with smoothed transfer progress. The connection screen's shape
+  morphs into the loading indicator and back instead of being swapped, and
+  each morph hands over to the next without the snap Compose has.
 - Redesigned phone connection screen: actions, step-by-step guide and a
   full-width status banner, with an animated face for error states.
 - Plain-language explanations for connection errors (locked phone, File
@@ -51,6 +53,8 @@ Silicon Macs.
   the macOS services that claim it (ptpcamerad, Image Capture) before each
   attempt, and USB hotplug events ignored right after a connection attempt.
 - Device button in the toolbar now offers refresh and storage actions.
+- Side menu rebuilt as a Material 3 navigation drawer (pill items, secondary
+  container indicator, section headlines, MTP mode chip).
 - Selection, grid and list styling follow Material 3.
 - The DMG ships a cleanly signed app; on macOS 26 the app applies its tilted
   icon as a Finder custom icon at first launch and shows it in the Dock.
