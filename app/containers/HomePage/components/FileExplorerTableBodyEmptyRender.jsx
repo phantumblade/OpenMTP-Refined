@@ -344,7 +344,7 @@ class FileExplorerTableBodyEmptyRender extends PureComponent {
                         'Keep the phone unlocked. This can take a few seconds.'
                       ),
                       t(
-                        'The phone is not answering yet. If it is locked, unlock it and tap Allow if it asks for access.'
+                        'The phone is still getting ready. With many files this can take a minute or more: keep it unlocked, and tap Allow if it asks for access.'
                       ),
                     ]}
                   />

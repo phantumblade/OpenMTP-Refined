@@ -258,8 +258,8 @@ const italian = {
     'Conteggio degli elementi e selezione in fondo a ogni pannello.',
   'Keep OpenMTP up to date automatically.':
     'Mantieni OpenMTP aggiornato automaticamente.',
-  'The phone is not answering yet. If it is locked, unlock it and tap Allow if it asks for access.':
-    'Il telefono non risponde ancora. Se è bloccato, sbloccalo e tocca «Consenti» se chiede l’accesso.',
+  'The phone is still getting ready. With many files this can take a minute or more: keep it unlocked, and tap Allow if it asks for access.':
+    'Il telefono si sta ancora preparando. Con molti file può volerci anche più di un minuto: tienilo sbloccato e tocca «Consenti» se chiede l’accesso.',
   'Android shows its files only while the phone is unlocked and you have allowed access.':
     'Android mostra i file solo quando il telefono è sbloccato e hai dato il permesso di accesso.',
   'Unlock the phone screen.': 'Sblocca lo schermo del telefono.',

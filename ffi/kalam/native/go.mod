@@ -18,3 +18,7 @@ require (
 ///##### Use a local package
 // replace github.com/ganeshrvel/go-mtpfs vxxxxxx-xxxxxxxxxx
 // with ../go-mtpfs
+
+// OpenMTP: go-mtpfs with a session handshake that survives a host killed
+// mid-transaction (see third_party/go-mtpfs/mtp/robust.go)
+replace github.com/ganeshrvel/go-mtpfs => ./third_party/go-mtpfs

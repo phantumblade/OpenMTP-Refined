@@ -117,8 +117,11 @@ export class Kalam {
         errString.includes('ErrorDeviceSetup') ||
         errString.includes('ErrorMtpDetectFailed') ||
         errString.includes('ErrorDeviceLocked');
+      // the native layer already waited up to two minutes for the phone and
+      // then reset it once: retrying would only repeat that wait
+      const nativeGaveUp = errString.includes('after reset');
 
-      if (isTransientUsbError && attempt < maxAttempts) {
+      if (isTransientUsbError && !nativeGaveUp && attempt < maxAttempts) {
         log.info(
           `Kalam initialize transient USB error (attempt ${attempt}/${maxAttempts}): ${errString}. Retrying in ${
             attempt * 400
