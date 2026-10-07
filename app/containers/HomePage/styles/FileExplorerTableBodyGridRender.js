@@ -135,8 +135,8 @@ export const styles = (theme) => ({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: '50%',
-    color: theme.palette.secondary.contrastText,
-    backgroundColor: 'rgba(18, 22, 31, 0.72)',
+    color: theme.palette.m3.inverseOnSurface,
+    backgroundColor: alphaHex(theme.palette.m3.inverseSurface, 0.85),
     backdropFilter: 'blur(4px)',
     '& svg': {
       fontSize: 18,

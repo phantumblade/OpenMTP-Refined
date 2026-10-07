@@ -393,12 +393,18 @@ if (!isDeviceBootable) {
     app.quitting = true;
   });
 
+  let lastHighContrast = nativeTheme.shouldUseHighContrastColors;
+
   nativeTheme.on('updated', () => {
     const setting = settingsStorage.getItems(['appThemeMode']);
+    const contrastChanged =
+      nativeTheme.shouldUseHighContrastColors !== lastHighContrast;
 
-    // if the app theme is 'auto' and if the os theme has changed
-    // then refresh the app theme
-    if (setting.appThemeMode !== APP_THEME_MODE_TYPE.auto) {
+    lastHighContrast = nativeTheme.shouldUseHighContrastColors;
+
+    // refresh the app theme if it follows the os appearance, or if
+    // "Increase contrast" was switched on or off
+    if (setting.appThemeMode !== APP_THEME_MODE_TYPE.auto && !contrastChanged) {
       return;
     }
 

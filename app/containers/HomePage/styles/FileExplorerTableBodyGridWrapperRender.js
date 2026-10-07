@@ -52,11 +52,8 @@ export const styles = (theme) => ({
     fontWeight: 600,
     padding: '2px 7px',
     borderRadius: 10,
-    background:
-      theme.palette.type === 'dark'
-        ? 'rgba(255,255,255,0.1)'
-        : 'rgba(0,0,0,0.06)',
-    color: theme.palette.text.secondary,
+    background: theme.palette.m3.surfaceContainerHighest,
+    color: theme.palette.m3.onSurfaceVariant,
     marginLeft: 4,
   },
   sectionDividerLine: {

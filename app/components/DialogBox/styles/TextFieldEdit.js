@@ -1,5 +1,3 @@
-import styled from 'styled-components';
-import TextField from '@material-ui/core/TextField';
 import { mixins } from '../../../styles/js';
 
 export const styles = (theme) => ({
@@ -21,27 +19,19 @@ export const styles = (theme) => ({
   btnNegative: {
     ...mixins({ theme }).btnNegative,
   },
+  // M3 text field: on surface underline on hover, primary when focused
   textFieldRoot: {
-    '& .MuiFormLabel-root.Mui-error.Mui-focused': {
-      color: '#f44336',
+    '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
+      borderBottomColor: theme.palette.m3.onSurface,
+    },
+    '& .MuiInput-underline:after': {
+      borderBottom: `2px solid ${theme.palette.m3.primary}`,
     },
     '& .MuiFormLabel-root.Mui-focused': {
-      color: 'unset',
+      color: theme.palette.m3.primary,
+    },
+    '& .MuiFormLabel-root.Mui-error.Mui-focused': {
+      color: theme.palette.m3.error,
     },
   },
 });
-
-export const StyledTextField = styled(TextField)`
-  /* hover (double-ampersand needed for specificity reasons. */
-  && .MuiInput-underline:hover:before {
-    border-bottom: 1px solid rgba(0, 0, 0);
-  }
-  /* focused */
-  .MuiInput-underline:after {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.87);
-  }
-  /* focused */
-  .MuiInputLabel-root.MuiInput-focused {
-    color: #000;
-  }
-`;

@@ -34,6 +34,15 @@ export const getAppThemeMode = (appThemeModeSettings) => {
   }
 };
 
+// macOS "Increase contrast" (Accessibility > Display): the app then uses the
+// Material 3 high contrast scheme
+export const prefersHighContrast = () => {
+  const { shouldUseHighContrastColors } =
+    remote?.nativeTheme ?? nativeTheme ?? {};
+
+  return Boolean(shouldUseHighContrastColors);
+};
+
 export const getContrastingTheme = (appThemeMode) => {
   if (appThemeMode === APP_THEME_MODE_TYPE.dark) {
     return APP_THEME_MODE_TYPE.light;

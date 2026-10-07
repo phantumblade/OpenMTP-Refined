@@ -1,5 +1,6 @@
 import { variables, mixins } from '../../../styles/js';
 import {
+  alphaHex,
   m3Elevation,
   m3Motion,
   m3Shape,
@@ -178,7 +179,7 @@ export const styles = (theme) => {
       height: 5,
       marginTop: -5,
       overflow: 'hidden',
-      background: 'rgba(0, 176, 255, 0.22)',
+      background: alphaHex(theme.palette.m3.primary, 0.3),
     },
     menuButton: {
       width: 38,

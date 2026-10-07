@@ -1,7 +1,11 @@
 import { variables, mixins } from '../../../styles/js';
 import { commonThemes } from '../../../styles/js/mixins';
 import { getAppFontFamily } from '../../../helpers/fonts';
-import { m3ColorTokens } from '../../../styles/m3/colorTokens';
+import {
+  m3ColorTokens,
+  m3HighContrastColorTokens,
+} from '../../../styles/m3/colorTokens';
+import { prefersHighContrast } from '../../../helpers/theme';
 import {
   alphaHex,
   m3Elevation,
@@ -35,107 +39,58 @@ export const styles = (theme) => {
   };
 };
 
-export const getColorPalette = () => {
-  const lightPrimaryColor = '#fff';
-  const lightSecondaryColor = '#007af5';
+// Every colour the app paints comes from a Material 3 colour role (see
+// m3.material.io/styles/color/roles); the legacy palette keys below are kept
+// only as aliases of those roles so older styles follow the scheme too.
+const paletteFromM3 = (m3) => ({
+  primary: { main: m3.surface, contrastText: m3.onSurface },
+  secondary: { main: m3.primary, contrastText: m3.onPrimary },
+  error: { main: m3.error, contrastText: m3.onError },
+  background: { default: m3.surface, paper: m3.surface },
+  text: {
+    primary: m3.onSurface,
+    secondary: m3.onSurfaceVariant,
+    disabled: alphaHex(m3.onSurface, 0.38),
+  },
+  action: {
+    active: m3.onSurfaceVariant,
+    hover: alphaHex(m3.onSurface, m3State.hover),
+    selected: alphaHex(m3.onSurface, m3State.pressed),
+    disabled: alphaHex(m3.onSurface, 0.38),
+    disabledBackground: alphaHex(m3.onSurface, 0.12),
+  },
+  divider: m3.outlineVariant,
+  snackbar: { error: m3.error },
+  btnTextColor: m3.onPrimary,
+  fileColor: m3.onSurface,
+  tableHeaderFooterBgColor: m3.surfaceContainerLow,
+  lightText1Color: m3.onSurfaceVariant,
+  fileExplorerThinLineDividerColor: m3.outlineVariant,
+  fileDrop: alphaHex(m3.primary, m3State.hover),
+  disabledBgColor: alphaHex(m3.onSurface, 0.12),
+  nativeSystemColor: m3.surfaceContainer,
+  contrastPrimaryMainColor: m3.inverseSurface,
+  selectionBg: m3.secondaryContainer,
+  selectionHover: alphaHex(m3.onSurface, m3State.hover),
+  selectionBorder: m3.primary,
+  focusRing: m3.secondary,
+  checkboxEdge: m3.surface,
+  toolbarButtonHover: alphaHex(m3.onSurfaceVariant, m3State.hover),
+  toolbarButtonActive: alphaHex(m3.primary, m3State.pressed),
+  statusSurface: m3.surfaceContainer,
+  m3,
+});
 
-  const darkPrimaryColor = '#242424';
-  const darkSecondaryColor = '#007af5';
-
-  const snackbarError = `#f33950`;
+// M3 high contrast level when macOS "Increase contrast" is on
+export const getColorPalette = (highContrast = prefersHighContrast()) => {
+  const tokens = highContrast ? m3HighContrastColorTokens : m3ColorTokens;
 
   return {
     get light() {
-      return {
-        primary: {
-          main: lightPrimaryColor,
-          contrastText: '#000',
-        },
-        secondary: {
-          main: lightSecondaryColor,
-          contrastText: '#fff',
-        },
-        background: {
-          default: lightPrimaryColor,
-          paper: lightPrimaryColor,
-        },
-        text: {
-          primary: '#1d1d1f',
-          secondary: 'rgba(0, 0, 0, 0.60)',
-          disabled: 'rgba(0, 0, 0, 0.38)',
-        },
-        snackbar: {
-          error: snackbarError,
-        },
-        btnTextColor: '#fff',
-        fileColor: '#000',
-        tableHeaderFooterBgColor: `#fbfbfb`,
-        lightText1Color: `rgba(0, 0, 0, 0.50)`,
-        fileExplorerThinLineDividerColor: `rgba(0, 0, 0, 0.12)`,
-        fileDrop: `rgba(0, 122, 245, 0.08)`,
-        disabledBgColor: `#f3f3f3`,
-        nativeSystemColor: `#ececec`,
-        contrastPrimaryMainColor: darkPrimaryColor,
-        selectionBg: 'rgba(0, 106, 217, 0.12)',
-        selectionHover: 'rgba(0, 106, 217, 0.08)',
-        selectionBorder: '#006ad9',
-        focusRing: 'rgba(0, 106, 217, 0.42)',
-        checkboxEdge: 'rgba(255, 255, 255, 0.72)',
-        toolbarButtonHover: 'rgba(0, 0, 0, 0.07)',
-        toolbarButtonActive: 'rgba(0, 106, 217, 0.12)',
-        statusSurface: '#f5f6f8',
-        m3: m3ColorTokens.light,
-      };
+      return paletteFromM3(tokens.light);
     },
     get dark() {
-      return {
-        primary: {
-          main: darkPrimaryColor,
-          contrastText: '#fff',
-        },
-        secondary: {
-          main: darkSecondaryColor,
-          contrastText: '#fff',
-        },
-        background: {
-          default: darkPrimaryColor,
-          paper: darkPrimaryColor,
-        },
-        text: {
-          primary: '#fff',
-          secondary: 'rgba(255, 255, 255, 0.65)',
-          disabled: 'rgba(255, 255, 255, 0.4)',
-        },
-        snackbar: {
-          error: snackbarError,
-        },
-        action: {
-          active: 'rgba(255, 255, 255, 0.65)',
-          hover: 'rgba(255, 255, 255, 0.2)',
-          selected: 'rgba(255, 255, 255, 0.16)',
-          disabled: 'rgba(255, 255, 255, 0.3)',
-          disabledBackground: 'rgba(255, 255, 255, 0.12)',
-        },
-        divider: `rgba(255, 255, 255, 0.12)`,
-        btnTextColor: '#fff',
-        fileColor: '#d5d5d5',
-        tableHeaderFooterBgColor: `#313131`,
-        lightText1Color: `rgba(255, 255, 255, 0.50)`,
-        fileExplorerThinLineDividerColor: `rgba(255, 255, 255, .12)`,
-        fileDrop: `rgba(0, 122, 245, 0.08)`,
-        disabledBgColor: `rgba(255, 255, 255, 0.15)`,
-        nativeSystemColor: `#323232`,
-        contrastPrimaryMainColor: lightPrimaryColor,
-        selectionBg: 'rgba(82, 156, 255, 0.2)',
-        selectionHover: 'rgba(82, 156, 255, 0.14)',
-        selectionBorder: '#72adff',
-        focusRing: 'rgba(114, 173, 255, 0.52)',
-        checkboxEdge: 'rgba(0, 0, 0, 0.55)',
-        toolbarButtonHover: 'rgba(255, 255, 255, 0.1)',
-        toolbarButtonActive: 'rgba(82, 156, 255, 0.18)',
-        statusSurface: '#292a2d',
-        m3: m3ColorTokens.dark,
-      };
+      return paletteFromM3(tokens.dark);
     },
   };
 };

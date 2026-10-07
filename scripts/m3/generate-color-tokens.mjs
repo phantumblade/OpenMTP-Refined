@@ -24,7 +24,8 @@ const roles = Object.getOwnPropertyNames(MaterialDynamicColors)
   .filter((name) => !/PaletteKeyColor$/.test(name))
   .sort();
 
-const buildScheme = (isDark) => {
+// M3 contrast levels: 0 standard, 0.5 medium, 1 high
+const buildScheme = (isDark, contrastLevel = 0) => {
   const source = Hct.fromInt(argbFromHex(SEED));
   const tertiary = Hct.fromInt(argbFromHex(TERTIARY_SEED));
   const vibrant = new SchemeVibrant(source, isDark, 0);
@@ -33,7 +34,7 @@ const buildScheme = (isDark) => {
   const scheme = new DynamicScheme({
     sourceColorHct: source,
     variant: Variant.VIBRANT,
-    contrastLevel: 0,
+    contrastLevel,
     isDark,
     primaryPalette: vibrant.primaryPalette,
     secondaryPalette: vibrant.secondaryPalette,
@@ -54,6 +55,15 @@ const buildScheme = (isDark) => {
 };
 
 const tokens = { light: buildScheme(false), dark: buildScheme(true) };
+// used when macOS "Increase contrast" is on
+const highContrastTokens = {
+  light: buildScheme(false, 1),
+  dark: buildScheme(true, 1),
+};
+const format = (value) =>
+  JSON.stringify(value, null, 2)
+    .replace(/"([^"]+)":/g, '$1:')
+    .replace(/"/g, "'");
 
 writeFileSync(
   OUTPUT,
@@ -63,11 +73,14 @@ writeFileSync(
 
 export const M3_SEED_COLOR = '${SEED}';
 
-export const m3ColorTokens = ${JSON.stringify(tokens, null, 2)
-    .replace(/"([^"]+)":/g, '$1:')
-    .replace(/"/g, "'")};
+export const m3ColorTokens = ${format(tokens)};
+
+// High contrast level (7:1 for text), for macOS "Increase contrast".
+export const m3HighContrastColorTokens = ${format(highContrastTokens)};
 `
 );
 
 // eslint-disable-next-line no-console
-console.log(`Wrote ${roles.length} roles x 2 themes to ${OUTPUT.pathname}`);
+console.log(
+  `Wrote ${roles.length} roles x 2 themes x 2 contrasts to ${OUTPUT.pathname}`
+);

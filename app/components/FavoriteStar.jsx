@@ -1,8 +1,9 @@
 import React from 'react';
 import { StarRounded as StarRoundedIcon } from './m3/symbolIcons';
 
-// Yellow star shown next to folders pinned to the sidebar favourites.
-const FAVORITE_STAR_COLOR = '#F5B400';
+// Star shown next to folders pinned to the sidebar favourites, in the M3
+// tertiary role (the icon's orange) like the favourites in the sidebar.
+const FAVORITE_STAR_COLOR = 'var(--md-sys-color-tertiary)';
 
 export default function FavoriteStar({ size = 15, style = {} }) {
   return (

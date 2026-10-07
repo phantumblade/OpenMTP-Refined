@@ -328,7 +328,7 @@ export default class FileExplorerTableBodyListWrapperRender extends PureComponen
             style={{
               cursor: 'pointer',
               userSelect: 'none',
-              background: 'rgba(128,128,128,0.06)',
+              background: 'var(--md-sys-color-surface-container-low)',
             }}
             onClick={() => this.toggleSection(group.id)}
           >
@@ -338,7 +338,7 @@ export default class FileExplorerTableBodyListWrapperRender extends PureComponen
                 padding: '10px 12px',
                 fontWeight: 700,
                 fontSize: 12,
-                borderBottom: '1px solid rgba(128,128,128,0.12)',
+                borderBottom: '1px solid var(--md-sys-color-outline-variant)',
               }}
             >
               <span style={{ marginRight: 6, verticalAlign: 'middle' }}>
@@ -361,7 +361,8 @@ export default class FileExplorerTableBodyListWrapperRender extends PureComponen
                   fontWeight: 600,
                   padding: '2px 7px',
                   borderRadius: 10,
-                  background: 'rgba(128,128,128,0.15)',
+                  background: 'var(--md-sys-color-surface-container-highest)',
+                  color: 'var(--md-sys-color-on-surface-variant)',
                   verticalAlign: 'middle',
                 }}
               >

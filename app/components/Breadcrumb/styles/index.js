@@ -1,4 +1,5 @@
 import { mixins } from '../../../styles/js';
+import { alphaHex, m3State } from '../../../styles/m3/tokens';
 
 export const styles = (theme) => {
   return {
@@ -27,7 +28,7 @@ export const styles = (theme) => {
       },
       '&::-webkit-scrollbar-thumb': {
         borderRadius: 4,
-        backgroundColor: 'rgba(128, 128, 128, 0.3)',
+        backgroundColor: alphaHex(theme.palette.m3.onSurfaceVariant, 0.38),
       },
     },
 
@@ -50,15 +51,15 @@ export const styles = (theme) => {
       borderRadius: 6,
       transition: 'background-color 150ms ease, color 150ms ease',
       '&:hover': {
-        color: theme.palette.secondary.main,
-        backgroundColor: 'rgba(128, 128, 128, 0.08)',
+        color: theme.palette.m3.primary,
+        backgroundColor: alphaHex(theme.palette.m3.onSurface, m3State.hover),
       },
     },
 
     breadcrumbActiveA: {
       fontWeight: 700,
-      color: theme.palette.text.primary,
-      backgroundColor: 'rgba(128, 128, 128, 0.12)',
+      color: theme.palette.m3.onSecondaryContainer,
+      backgroundColor: theme.palette.m3.secondaryContainer,
       cursor: 'default',
     },
 
