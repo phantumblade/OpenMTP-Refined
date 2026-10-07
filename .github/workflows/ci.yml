@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - master
-      - main
-      - ux-redesign
   pull_request:
 
 permissions:
@@ -18,7 +16,8 @@ concurrency:
 jobs:
   javascript:
     name: JavaScript quality and build
-    runs-on: macos-13
+    # macos-13 (Intel) runners are retired: jobs waited in the queue forever
+    runs-on: macos-15
     timeout-minutes: 30
 
     steps:
@@ -28,7 +27,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 16.20.2
+          node-version: 20.x
           cache: yarn
 
       - name: Install Yarn
@@ -51,7 +50,7 @@ jobs:
 
   native:
     name: Native Go tests
-    runs-on: macos-13
+    runs-on: macos-15
     timeout-minutes: 20
 
     defaults:

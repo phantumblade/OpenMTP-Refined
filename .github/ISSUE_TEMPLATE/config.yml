@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Download the latest version / Scarica l'ultima versione
+    url: https://github.com/phantumblade/OpenMTP-Refined/releases/latest
+    about: Check that you are using the latest release first.
+  - name: Install and troubleshooting guide / Guida e problemi frequenti
+    url: https://github.com/phantumblade/OpenMTP-Refined#readme
+    about: Phone not detected, macOS permissions, Gatekeeper.
