@@ -243,3 +243,49 @@ export const quitBlockingProcess = async (owner) => {
 
   return !isAlive(owner.pid);
 };
+
+const KEEP_RELEASED_INTERVAL_MS = 80;
+
+// launchd restarts ptpcamerad within ~1s and it grabs the phone again, often
+// before the native layer has claimed the MTP interface (go-mtpfs ignores a
+// failed claim, so OpenSession then times out). While a connection attempt is
+// running, keep stopping it; returns the function that ends the guard.
+export const keepPhoneReleasedFromSystemDaemons = () => {
+  if (process.platform !== 'darwin') {
+    return () => {};
+  }
+
+  let stopped = false;
+  let timer = null;
+
+  const tick = async () => {
+    if (stopped) {
+      return;
+    }
+
+    const output = await run('pgrep', ['-x', ...RELEASABLE_OWNER_NAMES]);
+
+    String(output)
+      .split('\n')
+      .map((line) => parseInt(line, 10))
+      .filter((pid) => Number.isInteger(pid) && !selfPids().includes(pid))
+      .forEach((pid) => {
+        try {
+          process.kill(pid, 'SIGKILL');
+        } catch (e) {
+          // already gone
+        }
+      });
+
+    if (!stopped) {
+      timer = setTimeout(tick, KEEP_RELEASED_INTERVAL_MS);
+    }
+  };
+
+  tick();
+
+  return () => {
+    stopped = true;
+    clearTimeout(timer);
+  };
+};

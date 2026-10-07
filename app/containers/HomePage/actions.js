@@ -10,7 +10,10 @@ import { DEVICE_TYPE, MTP_MODE } from '../../enums';
 import { log } from '../../utils/log';
 import fileExplorerController from '../../data/file-explorer/controllers/FileExplorerController';
 import { checkIf } from '../../utils/checkIf';
-import { releasePhoneFromSystemDaemons } from '../../helpers/usbOwners';
+import {
+  keepPhoneReleasedFromSystemDaemons,
+  releasePhoneFromSystemDaemons,
+} from '../../helpers/usbOwners';
 import { MTP_ERROR } from '../../enums/mtpError';
 import { DEVICES_DEFAULT_PATH } from '../../constants';
 import { analyticsService } from '../../services/analytics';
@@ -444,11 +447,18 @@ function runKalamMtpInit(
         }
 
         const attemptStartedAt = Date.now();
+        // ptpcamerad comes back within ~1s: keep it away until the native
+        // layer has claimed the phone and opened the session
+        const stopKeepingReleased = keepPhoneReleasedFromSystemDaemons();
 
-        // eslint-disable-next-line no-await-in-loop
-        initResult = await fileExplorerController.initialize({
-          deviceType,
-        });
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          initResult = await fileExplorerController.initialize({
+            deviceType,
+          });
+        } finally {
+          stopKeepingReleased();
+        }
 
         // only quick failures are transient (e.g. the interface still being
         // released); a phone that doesn't answer times out after ~20s and

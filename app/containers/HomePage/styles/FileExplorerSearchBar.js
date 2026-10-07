@@ -26,6 +26,7 @@ export const styles = (theme) => {
     // here (desktop density) instead of 56dp.
     inputShell: {
       position: 'relative',
+      isolation: 'isolate',
       display: 'flex',
       alignItems: 'center',
       width: '100%',
@@ -34,12 +35,22 @@ export const styles = (theme) => {
       boxSizing: 'border-box',
       borderRadius: 24,
       backgroundColor: m3.surfaceContainerHigh,
-      transition: `border-radius ${m3Motion.fastSpatial}, box-shadow ${m3Motion.defaultEffects}`,
-      '&:hover:not($inputShellOpen)': {
-        boxShadow: `inset 0 0 0 100px ${alphaHex(m3.onSurface, m3State.hover)}`,
+      transition: 'border-radius 100ms linear',
+      // M3 state layer: an overlay whose opacity fades, so hovering never
+      // flashes
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        inset: 0,
+        zIndex: -1,
+        borderRadius: 'inherit',
+        backgroundColor: m3.onSurface,
+        opacity: 0,
+        pointerEvents: 'none',
+        transition: 'opacity 150ms linear',
       },
-      '&:focus-within': {
-        boxShadow: `inset 0 0 0 2px ${m3.secondary}`,
+      '&:hover:not($inputShellOpen)::before': {
+        opacity: m3State.hover,
       },
       '@media (prefers-reduced-motion: reduce)': {
         transition: 'none',
@@ -49,9 +60,6 @@ export const styles = (theme) => {
     inputShellOpen: {
       borderRadius: `${m3Shape.extraLarge}px ${m3Shape.extraLarge}px 0 0`,
       boxShadow: m3Elevation.level2,
-      '&:focus-within': {
-        boxShadow: m3Elevation.level2,
-      },
     },
     searchIcon: {
       flex: '0 0 auto',
@@ -316,6 +324,24 @@ export const styles = (theme) => {
       borderTop: `1px solid ${m3.outline}`,
       boxShadow: m3Elevation.level2,
       clipPath: 'inset(0 -20px -20px -20px)',
+      // Compose DockedSearchBar: fadeIn + expandVertically, 600ms
+      // (DurationLong4) after 100ms (DurationShort2), emphasized decelerate
+      animation:
+        '$searchViewEnter 600ms cubic-bezier(0.05, 0.7, 0.1, 1) 100ms both',
+      '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+    },
+    // fadeOut + shrinkVertically, 350ms (DurationMedium3) after 100ms
+    resultsPanelClosing: {
+      animation: '$searchViewExit 350ms cubic-bezier(0, 1, 0, 1) 100ms both',
+      pointerEvents: 'none',
+    },
+    '@keyframes searchViewEnter': {
+      from: { opacity: 0, clipPath: 'inset(0 -20px 100% -20px)' },
+      to: { opacity: 1, clipPath: 'inset(0 -20px -20px -20px)' },
+    },
+    '@keyframes searchViewExit': {
+      from: { opacity: 1, clipPath: 'inset(0 -20px -20px -20px)' },
+      to: { opacity: 0, clipPath: 'inset(0 -20px 100% -20px)' },
     },
     resultsMeta: {
       ...m3Type.bodySmall,

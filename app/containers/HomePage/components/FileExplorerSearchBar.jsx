@@ -25,6 +25,9 @@ import FileExplorerDateFilter from './FileExplorerDateFilter';
 import FileExplorerTypeFilter from './FileExplorerTypeFilter';
 import M3LoadingIndicator from '../../../components/m3/M3LoadingIndicator';
 
+// exit delay + duration of the docked search view (see styles)
+const PANEL_EXIT_MS = 450;
+
 class FileExplorerSearchBar extends PureComponent {
   constructor(props) {
     super(props);
@@ -39,16 +42,33 @@ class FileExplorerSearchBar extends PureComponent {
       truncated: false,
       directoriesScanned: 0,
       activeIndex: -1,
+      isPanelClosing: false,
     };
     this.searchTimer = null;
+    this.panelCloseTimer = null;
     this.searchVersion = 0;
     this.lastProgressUpdate = 0;
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     const { rootPath, deviceType, rootNodes, fileTransferProgress } =
       this.props;
-    const { query } = this.state;
+    const { query, isOpen } = this.state;
+
+    // keep the results mounted while their exit animation plays
+    if (prevState.isOpen && !isOpen) {
+      window.clearTimeout(this.panelCloseTimer);
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({ isPanelClosing: true });
+      this.panelCloseTimer = window.setTimeout(
+        () => this.setState({ isPanelClosing: false }),
+        PANEL_EXIT_MS
+      );
+    } else if (!prevState.isOpen && isOpen && prevState.isPanelClosing) {
+      window.clearTimeout(this.panelCloseTimer);
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({ isPanelClosing: false });
+    }
 
     if (
       prevProps.rootPath !== rootPath ||
@@ -79,6 +99,7 @@ class FileExplorerSearchBar extends PureComponent {
   }
 
   componentWillUnmount() {
+    window.clearTimeout(this.panelCloseTimer);
     window.clearTimeout(this.searchTimer);
     this.searchVersion += 1;
   }
@@ -327,7 +348,9 @@ class FileExplorerSearchBar extends PureComponent {
       truncated,
       directoriesScanned,
       activeIndex,
+      isPanelClosing,
     } = this.state;
+    const isPanelShown = isOpen || isPanelClosing;
     const t = (key, values) => translate(appLanguage, key, values);
     const isDisabled =
       deviceType === DEVICE_TYPE.mtp &&
@@ -345,7 +368,7 @@ class FileExplorerSearchBar extends PureComponent {
       <div className={styles.root}>
         <div
           className={
-            isOpen
+            isPanelShown
               ? `${styles.inputShell} ${styles.inputShellOpen}`
               : styles.inputShell
           }
@@ -412,12 +435,16 @@ class FileExplorerSearchBar extends PureComponent {
           </span>
         </div>
 
-        {isOpen && (
+        {isPanelShown && (
           <div
             id={`${deviceType}-file-search-results`}
             role="listbox"
             tabIndex={-1}
-            className={styles.resultsPanel}
+            className={
+              isOpen
+                ? styles.resultsPanel
+                : `${styles.resultsPanel} ${styles.resultsPanelClosing}`
+            }
             onMouseDown={(event) => event.preventDefault()}
           >
             <div className={styles.resultsMeta} aria-live="polite">

@@ -256,6 +256,7 @@ export default class ToolbarAreaPane extends PureComponent {
             deviceType={deviceType}
             currentBrowsePath={currentBrowsePath[deviceType]}
             appLanguage={appLanguage}
+            insetForWindowControls={showLocalPaneOnLeftSide}
             onOpenSettings={() => onToolbarAction('settings', false)}
             onRefresh={() => onToolbarAction('refresh', false)}
             onToggleDrawer={onToggleDrawer}

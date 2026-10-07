@@ -77,6 +77,14 @@ Silicon Macs.
 
 ### Fixed
 
+- Phone connection: macOS restarts ptpcamerad within a second and it took
+  the phone back before OpenMTP had claimed it (the native layer ignores a
+  failed claim, so the session then timed out). OpenMTP now keeps it away for
+  the whole connection attempt.
+- Side menu content no longer sits under the window buttons; its hover
+  highlight glides to the item under the pointer.
+- Search bar hover no longer flashes, and the results open and close with the
+  Material 3 docked search animation.
 - Opening ~/Pictures asked for Photos library access, which browsing the
   folder does not need; the request and its entitlement are gone.
 - Side menu actions for the phone (storage, MTP mode) that did nothing when

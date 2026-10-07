@@ -35,6 +35,43 @@ const LOCATION_ICONS = {
 // headlines and labelLarge labels. It belongs to the Mac pane, so it only
 // lists Mac locations and actions; phone actions live on the phone pane.
 class SidebarAreaPaneLists extends PureComponent {
+  hoverRef = React.createRef();
+
+  // One hover highlight for the whole menu that glides to the item under the
+  // pointer (M3 standard easing), instead of each item flashing on and off.
+  moveHover = (event) => {
+    const indicator = this.hoverRef.current;
+    const target = event.currentTarget;
+
+    if (!indicator || target.getAttribute('aria-disabled')) {
+      return;
+    }
+
+    const { offsetTop, offsetHeight } = target.closest('li') || target;
+    const wasHidden = indicator.style.opacity !== '1';
+
+    if (wasHidden) {
+      // appear in place, then glide from here on
+      indicator.style.transition = 'opacity 150ms linear';
+    }
+
+    indicator.style.transform = `translateY(${offsetTop}px)`;
+    indicator.style.height = `${offsetHeight}px`;
+    indicator.style.opacity = '1';
+
+    if (wasHidden) {
+      // eslint-disable-next-line no-unused-expressions
+      indicator.offsetHeight;
+      indicator.style.transition = '';
+    }
+  };
+
+  hideHover = () => {
+    if (this.hoverRef.current) {
+      this.hoverRef.current.style.opacity = '0';
+    }
+  };
+
   _handleListDirectory = ({ filePath, deviceType, isSidemenu }) => {
     const { onClickHandler, onToggleDrawer } = this.props;
 
@@ -87,6 +124,8 @@ class SidebarAreaPaneLists extends PureComponent {
           })}
           aria-current={active ? 'page' : undefined}
           aria-disabled={disabled || undefined}
+          onMouseEnter={this.moveHover}
+          onFocus={this.moveHover}
           onClick={disabled ? undefined : onClick}
         >
           <MaterialSymbol
@@ -290,6 +329,7 @@ class SidebarAreaPaneLists extends PureComponent {
       appLanguage,
       onOpenSettings,
       onRefresh,
+      insetForWindowControls,
     } = this.props;
 
     const { top: sidebarTop, bottom: sidebarBottom } = sidebarFavouriteList;
@@ -310,47 +350,57 @@ class SidebarAreaPaneLists extends PureComponent {
 
     return (
       <nav className={styles.listsWrapper}>
+        {insetForWindowControls && (
+          <div className={styles.windowControlsInset} />
+        )}
         {this.renderMacCard()}
 
         <div className={styles.contentScrollArea}>
-          {this.renderSection({
-            title: isItalian ? 'Posizioni rapide' : 'Quick access',
-            children: (
-              <ul className={styles.list}>
-                {sidebarTop && this.renderLocations(sidebarTop)}
-                {sidebarBottom && this.renderLocations(sidebarBottom)}
-              </ul>
-            ),
-          })}
+          <div className={styles.navContent} onMouseLeave={this.hideHover}>
+            <span
+              ref={this.hoverRef}
+              className={styles.hoverIndicator}
+              aria-hidden="true"
+            />
+            {this.renderSection({
+              title: isItalian ? 'Posizioni rapide' : 'Quick access',
+              children: (
+                <ul className={styles.list}>
+                  {sidebarTop && this.renderLocations(sidebarTop)}
+                  {sidebarBottom && this.renderLocations(sidebarBottom)}
+                </ul>
+              ),
+            })}
 
-          <hr className={styles.divider} />
+            <hr className={styles.divider} />
 
-          {this.renderSection({
-            title: translate(appLanguage, 'Favorites'),
-            badge:
-              favoriteFolders.length > 0
-                ? `${favoriteFolders.length}/${FAVORITE_FOLDERS_MAX}`
-                : null,
-            children: this.renderFavoriteFolders(),
-          })}
+            {this.renderSection({
+              title: translate(appLanguage, 'Favorites'),
+              badge:
+                favoriteFolders.length > 0
+                  ? `${favoriteFolders.length}/${FAVORITE_FOLDERS_MAX}`
+                  : null,
+              children: this.renderFavoriteFolders(),
+            })}
 
-          <hr className={styles.divider} />
+            <hr className={styles.divider} />
 
-          {this.renderSection({
-            title: isItalian ? 'Strumenti e azioni' : 'Tools and actions',
-            children: (
-              <ul className={styles.list}>
-                {tools.map((tool) =>
-                  this.renderItem({
-                    key: tool.icon,
-                    icon: tool.icon,
-                    label: tool.label,
-                    onClick: () => this._handleAction(tool.action),
-                  })
-                )}
-              </ul>
-            ),
-          })}
+            {this.renderSection({
+              title: isItalian ? 'Strumenti e azioni' : 'Tools and actions',
+              children: (
+                <ul className={styles.list}>
+                  {tools.map((tool) =>
+                    this.renderItem({
+                      key: tool.icon,
+                      icon: tool.icon,
+                      label: tool.label,
+                      onClick: () => this._handleAction(tool.action),
+                    })
+                  )}
+                </ul>
+              ),
+            })}
+          </div>
         </div>
 
         {/* Footer Block */}

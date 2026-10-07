@@ -25,7 +25,7 @@ export const styles = (theme) => {
     },
     // M3 filled card for "This Mac", matching the footer card
     macCard: {
-      margin: '12px 12px 4px',
+      margin: '8px 12px 4px',
       padding: '16px 16px 14px',
       borderRadius: m3Shape.large,
       backgroundColor: m3.surfaceContainerHighest,
@@ -88,6 +88,32 @@ export const styles = (theme) => {
       marginTop: 8,
       color: m3.onSurfaceVariant,
     },
+    // room for the macOS window buttons when the drawer covers them
+    windowControlsInset: {
+      flexShrink: 0,
+      height: 36,
+    },
+    navContent: {
+      position: 'relative',
+    },
+    hoverIndicator: {
+      position: 'absolute',
+      top: 0,
+      left: 12,
+      right: 12,
+      zIndex: 1,
+      height: 48,
+      borderRadius: m3Shape.full,
+      backgroundColor: alphaHex(m3.onSurface, m3State.hover),
+      opacity: 0,
+      pointerEvents: 'none',
+      willChange: 'transform',
+      transition:
+        'transform 220ms cubic-bezier(0.2, 0, 0, 1), height 220ms cubic-bezier(0.2, 0, 0, 1), opacity 150ms linear',
+      '@media (prefers-reduced-motion: reduce)': {
+        transition: 'opacity 150ms linear',
+      },
+    },
     contentScrollArea: {
       flex: 1,
       minHeight: 0,
@@ -140,7 +166,6 @@ export const styles = (theme) => {
       outline: 'none',
       transition: `background-color ${m3Motion.defaultEffects}, color ${m3Motion.defaultEffects}`,
       '&:hover': {
-        backgroundColor: alphaHex(m3.onSurface, m3State.hover),
         color: m3.onSurface,
       },
       '&:active': {
@@ -159,12 +184,7 @@ export const styles = (theme) => {
       backgroundColor: m3.secondaryContainer,
       color: m3.onSecondaryContainer,
       '&:hover': {
-        backgroundColor: m3.secondaryContainer,
         color: m3.onSecondaryContainer,
-        boxShadow: `inset 0 0 0 100px ${alphaHex(
-          m3.onSecondaryContainer,
-          m3State.hover
-        )}`,
       },
     },
     itemIcon: {
