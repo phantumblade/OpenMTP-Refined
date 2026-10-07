@@ -66,8 +66,10 @@ Silicon Macs.
 - Side menu rebuilt as a Material 3 navigation drawer (pill items, secondary
   container indicator, section headlines, MTP mode chip).
 - Selection, grid and list styling follow Material 3.
-- The DMG ships a cleanly signed app; on macOS 26 the app applies its tilted
-  icon as a Finder custom icon at first launch and shows it in the Dock.
+- The DMG opens in a Material 3 install window (background, bilingual hint,
+  wavy arrow) and the app inside already shows its tilted icon; Gatekeeper
+  still offers "Open Anyway" for it. The app also re-applies the icon at
+  first launch if it is missing.
 - Reorganized toolbar, footer, sidebar and connection guidance.
 - Improved device identity and disconnect-state handling.
 - Reworked transfer preparation, retry and recovery states.

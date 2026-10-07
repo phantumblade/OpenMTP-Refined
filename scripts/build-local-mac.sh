@@ -33,9 +33,8 @@ function run(argv) {
 JXA
 }
 
-# The DMG gets the cleanly signed bundle: Finder icon metadata would break the
-# signature for downloaded copies. The app attaches the icon to itself at first
-# launch (app/helpers/customAppIcon.js); the local install gets it right away.
+# The ZIP gets the bundle without Finder metadata; the app also attaches the
+# icon to itself at first launch (app/helpers/customAppIcon.js).
 npx electron-builder --config electron-builder-config.js build --mac zip \
   --prepackaged "$APP" --publish never
 
@@ -47,6 +46,12 @@ if [ ! -x "$DMGBUILD_VENV/bin/dmgbuild" ]; then
   python3 -m venv "$DMGBUILD_VENV"
   "$DMGBUILD_VENV/bin/pip" install --quiet 'dmgbuild==1.6.7'
 fi
+# The DMG carries the tilted icon as a Finder custom icon (it survives the
+# drag to /Applications). Strict codesign checks reject the Finder metadata,
+# but Gatekeeper on macOS 26 accepts it: a downloaded copy shows the usual
+# "can't be verified" prompt and opens with "Open Anyway" (tested 2026-10-07).
+set_custom_icon "$APP"
+
 VERSION=$(node -p "require('./package.json').version")
 DMG="dist/openmtp-${VERSION}-mac-$(uname -m | sed 's/x86_64/x64/').dmg"
 rm -f "$DMG"
