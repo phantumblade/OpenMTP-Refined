@@ -7,6 +7,14 @@ Version 4.0.0 is the first release of the fork with its own version number.
 
 ## Unreleased
 
+### Added
+
+- Colour style in Settings → General: "Classic" keeps the current calm
+  Material You colours, "Vibrant" uses the 2025 colour spec of Material 3
+  Expressive, with saturated containers and surfaces tinted by the brand
+  blue (deep navy in dark mode). Both follow light/dark mode and macOS
+  "Increase contrast", and switch instantly.
+
 ### Fixed
 
 - Small windows (down to the 880×640 minimum): the date filter no longer
