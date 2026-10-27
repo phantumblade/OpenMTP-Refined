@@ -434,6 +434,103 @@ const italian = {
     'Rilevato un potenziale conflitto USB: {apps}. Chiudi completamente le applicazioni indicate e riaggiorna la connessione.',
   'An error occurred while initializing the device. Unlock the phone and reconnect the USB cable.':
     'Si è verificato un errore durante l’inizializzazione del dispositivo. Sblocca lo smartphone e ricollega il cavo USB.',
+  // app menu and updates (main process, update windows)
+  'About {app}': 'Informazioni su {app}',
+  'Check For Updates': 'Controlla aggiornamenti',
+  'Install Update from File…': 'Installa aggiornamento da file…',
+  'Hide {app}': 'Nascondi {app}',
+  'Hide Others': 'Nascondi gli altri',
+  'Show All': 'Mostra tutti',
+  Quit: 'Esci',
+  Edit: 'Modifica',
+  Undo: 'Annulla',
+  Redo: 'Ripeti',
+  Cut: 'Taglia',
+  'Select All': 'Seleziona tutto',
+  View: 'Vista',
+  Reload: 'Ricarica',
+  'Toggle Full Screen': 'Attiva/disattiva schermo intero',
+  'Toggle Developer Tools': 'Strumenti per sviluppatori',
+  Window: 'Finestra',
+  Minimize: 'Contrai',
+  'Bring All To Front': 'Porta tutto in primo piano',
+  Help: 'Aiuto',
+  'Report Bugs': 'Segnala un problema',
+  'Keyboard Shortcuts': 'Scorciatoie da tastiera',
+  'New Features And Updates': 'Novità e aggiornamenti',
+  'Privacy Policy': 'Informativa sulla privacy',
+  'Buy Me A Coffee!': 'Offrimi un caffè!',
+  'Invite A Friend': 'Invita un amico',
+  'Find Us On GitHub': 'Seguici su GitHub',
+  'Progress…': 'Avanzamento…',
+  'Update Error': 'Errore di aggiornamento',
+  'A network error occurred. Try again!':
+    'Si è verificato un errore di rete. Riprova!',
+  'Something went wrong while updating the app. Try again!':
+    'Qualcosa è andato storto durante l’aggiornamento. Riprova!',
+  'No Updates Found': 'Nessun aggiornamento',
+  'You have the latest version installed.': 'Hai già l’ultima versione.',
+  'Update in progress': 'Aggiornamento in corso',
+  'Another update is in progress. Do you want to restart it?':
+    'È già in corso un aggiornamento. Vuoi ricominciarlo?',
+  Yes: 'Sì',
+  'Install Update': 'Installa aggiornamento',
+  'OpenMTP {version} is ready to install.':
+    'OpenMTP {version} è pronto per l’installazione.',
+  'OpenMTP will quit, replace itself with the new version and open again. If you choose Later, it is installed when you quit OpenMTP.':
+    'OpenMTP si chiuderà, si sostituirà con la nuova versione e si riaprirà. Se scegli Più tardi, verrà installata quando chiudi OpenMTP.',
+  'Install and Relaunch': 'Installa e riapri',
+  Later: 'Più tardi',
+  'Install OpenMTP from a File': 'Installa OpenMTP da un file',
+  Install: 'Installa',
+  'OpenMTP (DMG, ZIP or app)': 'OpenMTP (DMG, ZIP o app)',
+  'Install OpenMTP {version}?': 'Installare OpenMTP {version}?',
+  'The installed version is {installed}. OpenMTP will quit, replace itself and open again.':
+    'La versione installata è la {installed}. OpenMTP si chiuderà, si sostituirà e si riaprirà.',
+  'This file could not be installed: {reason}':
+    'Impossibile installare questo file: {reason}',
+  'Checking For Updates': 'Controllo aggiornamenti',
+  'Internet connection is unavailable.':
+    'La connessione a Internet non è disponibile.',
+  'Please wait…': 'Attendi…',
+  'Downloading Updates': 'Download dell’aggiornamento',
+  'The downloaded update is damaged (its checksum does not match). Try again later.':
+    'L’aggiornamento scaricato è danneggiato (l’impronta non corrisponde). Riprova più tardi.',
+  'Only an installed OpenMTP can update itself.':
+    'Solo un OpenMTP installato può aggiornarsi.',
+  'This is the copy of OpenMTP already installed.':
+    'Questa è la copia di OpenMTP già installata.',
+  'Choose a DMG, ZIP or app of OpenMTP.':
+    'Scegli un DMG, uno ZIP o un’app di OpenMTP.',
+  'This file does not contain OpenMTP Refined.':
+    'Questo file non contiene OpenMTP Refined.',
+  'The download contains version {version} instead of {expected}.':
+    'Il download contiene la versione {version} invece della {expected}.',
+  'No OpenMTP app was found in this file.':
+    'In questo file non c’è nessuna app OpenMTP.',
+  'This version of OpenMTP is not built for this Mac ({arch}).':
+    'Questa versione di OpenMTP non è fatta per questo Mac ({arch}).',
+  'OpenMTP is not running from an app bundle.':
+    'OpenMTP non è in esecuzione da un pacchetto app.',
+  "OpenMTP can't replace itself in {folder}: install the new version from the DMG instead.":
+    'OpenMTP non può sostituirsi in {folder}: installa la nuova versione dal DMG.',
+  'No update is ready to install.':
+    'Nessun aggiornamento è pronto per l’installazione.',
+  'The update server answered {status}. Try again later.':
+    'Il server degli aggiornamenti ha risposto {status}. Riprova più tardi.',
+  'The download stopped responding. Try again later.':
+    'Il download ha smesso di rispondere. Riprova più tardi.',
+  'The download was interrupted.': 'Il download si è interrotto.',
+  'Software Update': 'Aggiornamento software',
+  'Fetching update information…':
+    'Recupero delle informazioni sull’aggiornamento…',
+  'A new version of {app} is available!':
+    'È disponibile una nuova versione di {app}!',
+  '{release} is now available – you have {installed}. Would you like to download it now?':
+    'È disponibile {release}: tu hai la {installed}. Vuoi scaricarla adesso?',
+  'Release notes:': 'Note di rilascio:',
+  No: 'No',
+  'Select Storage': 'Scegli la memoria',
 };
 
 const dictionaries = {

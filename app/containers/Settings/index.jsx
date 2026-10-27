@@ -1,3 +1,4 @@
+import { ipcRenderer } from 'electron';
 import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
@@ -23,6 +24,7 @@ import {
 import SettingsDialog from './components/SettingsDialog';
 import { checkIf } from '../../utils/checkIf';
 import { FILE_TRANSFER_DIRECTION } from '../../enums';
+import { IpcEvents } from '../../services/ipc-events/IpcEventType';
 
 class Settings extends Component {
   _handleDialogBoxCloseBtnClick = ({ confirm = false }) => {
@@ -133,6 +135,7 @@ class Settings extends Component {
       {
         key: 'appLanguage',
         value,
+        onSuccess: () => ipcRenderer.send(IpcEvents.APP_LANGUAGE_CHANGED),
       },
       deviceType
     );
@@ -213,10 +216,10 @@ class Settings extends Component {
     actionCreateSelectMtpMode({ value }, deviceType);
   };
 
-  _handleSetCommonSettingsChange = ({ key, value }, deviceType) => {
+  _handleSetCommonSettingsChange = ({ key, value, onSuccess }, deviceType) => {
     const { actionSetCommonSettings } = this.props;
 
-    actionSetCommonSettings({ key, value }, deviceType);
+    actionSetCommonSettings({ key, value, onSuccess }, deviceType);
   };
 
   render() {
@@ -308,9 +311,11 @@ const mapDispatchToProps = (dispatch, _) =>
         },
 
       actionSetCommonSettings:
-        ({ key, value }, deviceType) =>
+        ({ key, value, onSuccess }, deviceType) =>
         (_, getState) => {
-          dispatch(setCommonSettings({ key, value }, deviceType, getState));
+          dispatch(
+            setCommonSettings({ key, value, onSuccess }, deviceType, getState)
+          );
         },
 
       actionCreateReloadDirList:

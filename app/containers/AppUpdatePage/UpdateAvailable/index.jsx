@@ -12,6 +12,7 @@ import { APP_NAME, APP_VERSION } from '../../../constants/meta';
 import { setStyle } from '../../../utils/styles';
 import { getAppThemeMode } from '../../../helpers/theme';
 import { getCurrentThemePalette } from '../../App/styles';
+import { translateWithSetting as t } from '../../../helpers/translateWithSetting';
 
 class AppUpdatePage extends Component {
   constructor(props) {
@@ -86,10 +87,10 @@ class AppUpdatePage extends Component {
       return (
         <div>
           <Helmet titleTemplate="%s">
-            <title>Software Update</title>
+            <title>{t('Software Update')}</title>
           </Helmet>
           <Typography variant="subtitle1" className={styles.loadingText}>
-            Fetching Update Information...
+            {t('Fetching update information…')}
           </Typography>
         </div>
       );
@@ -104,18 +105,20 @@ class AppUpdatePage extends Component {
     return (
       <div className={styles.root}>
         <Helmet titleTemplate="%s">
-          <title>Software Update</title>
+          <title>{t('Software Update')}</title>
         </Helmet>
         <Typography variant="subtitle1" className={styles.title}>
-          A new version of {APP_NAME} is available!
+          {t('A new version of {app} is available!', { app: APP_NAME })}
         </Typography>
         <Typography variant="caption">
-          {releaseName} is now available &ndash; you have {APP_VERSION}. Would
-          you like to download it now?
+          {t(
+            '{release} is now available – you have {installed}. Would you like to download it now?',
+            { release: releaseName, installed: APP_VERSION }
+          )}
         </Typography>
 
         <Typography variant="body2" className={styles.releaseNotes}>
-          Release Notes:
+          {t('Release notes:')}
         </Typography>
 
         <div className={styles.scrollContainer}>
@@ -135,14 +138,14 @@ class AppUpdatePage extends Component {
             color="secondary"
             className={styles.btnNegative}
           >
-            No
+            {t('No')}
           </Button>
           <Button
             onClick={() => this._handleBtnClick({ confirm: true })}
             color="primary"
             className={styles.btnPositive}
           >
-            Yes
+            {t('Yes')}
           </Button>
         </div>
       </div>

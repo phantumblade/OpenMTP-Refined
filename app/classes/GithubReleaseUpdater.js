@@ -15,6 +15,7 @@ import {
   pickUpdate,
 } from '../helpers/appUpdateRelease';
 import { log } from '../utils/log';
+import { translateWithSetting as tr } from '../helpers/translateWithSetting';
 
 const execFileAsync = promisify(execFile);
 
@@ -124,7 +125,9 @@ export default class GithubReleaseUpdater extends EventEmitter {
 
     if (sha256 !== update.asset.sha256) {
       throw new UpdateError(
-        'The downloaded update is damaged (its checksum does not match). Try again later.'
+        tr(
+          'The downloaded update is damaged (its checksum does not match). Try again later.'
+        )
       );
     }
 
@@ -155,7 +158,7 @@ export default class GithubReleaseUpdater extends EventEmitter {
       (await this.readBundleInfo(target)).CFBundleIdentifier !==
       UPDATE_BUNDLE_ID
     ) {
-      throw new UpdateError('Only an installed OpenMTP can update itself.');
+      throw new UpdateError(tr('Only an installed OpenMTP can update itself.'));
     }
 
     fs.mkdirSync(appDir, { recursive: true });
@@ -166,7 +169,9 @@ export default class GithubReleaseUpdater extends EventEmitter {
       await execFileAsync('ditto', ['-x', '-k', filePath, appDir]);
     } else if (/\.app\/?$/i.test(filePath)) {
       if (fs.realpathSync(filePath) === fs.realpathSync(target)) {
-        throw new UpdateError('This is the copy of OpenMTP already installed.');
+        throw new UpdateError(
+          tr('This is the copy of OpenMTP already installed.')
+        );
       }
 
       await execFileAsync('ditto', [
@@ -174,21 +179,24 @@ export default class GithubReleaseUpdater extends EventEmitter {
         path.join(appDir, path.basename(filePath)),
       ]);
     } else {
-      throw new UpdateError('Choose a DMG, ZIP or app of OpenMTP.');
+      throw new UpdateError(tr('Choose a DMG, ZIP or app of OpenMTP.'));
     }
 
     const bundle = this.findBundle(appDir);
     const info = await this.readBundleInfo(bundle);
 
     if (info.CFBundleIdentifier !== UPDATE_BUNDLE_ID) {
-      throw new UpdateError('This file does not contain OpenMTP Refined.');
+      throw new UpdateError(tr('This file does not contain OpenMTP Refined.'));
     }
 
     const version = info.CFBundleShortVersionString;
 
     if (expectedVersion && version !== expectedVersion) {
       throw new UpdateError(
-        `The download contains version ${version} instead of ${expectedVersion}.`
+        tr('The download contains version {version} instead of {expected}.', {
+          version,
+          expected: expectedVersion,
+        })
       );
     }
 
@@ -237,7 +245,7 @@ export default class GithubReleaseUpdater extends EventEmitter {
       );
 
     if (!name) {
-      throw new UpdateError('No OpenMTP app was found in this file.');
+      throw new UpdateError(tr('No OpenMTP app was found in this file.'));
     }
 
     return path.join(dir, name);
@@ -255,7 +263,7 @@ export default class GithubReleaseUpdater extends EventEmitter {
 
       return JSON.parse(stdout);
     } catch (e) {
-      throw new UpdateError('This file does not contain OpenMTP Refined.');
+      throw new UpdateError(tr('This file does not contain OpenMTP Refined.'));
     }
   }
 
@@ -273,7 +281,9 @@ export default class GithubReleaseUpdater extends EventEmitter {
 
     if (!description.includes(wanted)) {
       throw new UpdateError(
-        `This version of OpenMTP is not built for this Mac (${wanted}).`
+        tr('This version of OpenMTP is not built for this Mac ({arch}).', {
+          arch: wanted,
+        })
       );
     }
   }
@@ -282,7 +292,7 @@ export default class GithubReleaseUpdater extends EventEmitter {
     const target = bundlePathFromExecutable(app.getPath('exe'));
 
     if (!target) {
-      throw new UpdateError('OpenMTP is not running from an app bundle.');
+      throw new UpdateError(tr('OpenMTP is not running from an app bundle.'));
     }
 
     try {
@@ -290,9 +300,10 @@ export default class GithubReleaseUpdater extends EventEmitter {
       fs.accessSync(target, fs.constants.W_OK);
     } catch (e) {
       throw new UpdateError(
-        `OpenMTP can't replace itself in ${path.dirname(
-          target
-        )}: install the new version from the DMG instead.`
+        tr(
+          "OpenMTP can't replace itself in {folder}: install the new version from the DMG instead.",
+          { folder: path.dirname(target) }
+        )
       );
     }
 
@@ -322,7 +333,7 @@ export default class GithubReleaseUpdater extends EventEmitter {
     const { bundle, workDir, target } = this.preparedUpdate || {};
 
     if (!bundle) {
-      throw new UpdateError('No update is ready to install.');
+      throw new UpdateError(tr('No update is ready to install.'));
     }
 
     const script = path.join(workDir, 'install.sh');
@@ -384,7 +395,9 @@ export default class GithubReleaseUpdater extends EventEmitter {
       if (response.statusCode !== 200) {
         reject(
           new UpdateError(
-            `The update server answered ${response.statusCode}. Try again later.`
+            tr('The update server answered {status}. Try again later.', {
+              status: response.statusCode,
+            })
           )
         );
 
@@ -438,7 +451,7 @@ export default class GithubReleaseUpdater extends EventEmitter {
           () =>
             fail(
               new UpdateError(
-                'The download stopped responding. Try again later.'
+                tr('The download stopped responding. Try again later.')
               )
             ),
           DOWNLOAD_STALL_MS
@@ -481,7 +494,7 @@ export default class GithubReleaseUpdater extends EventEmitter {
           });
           response.on('error', fail);
           response.on('aborted', () =>
-            fail(new UpdateError('The download was interrupted.'))
+            fail(new UpdateError(tr('The download was interrupted.')))
           );
         },
         fail

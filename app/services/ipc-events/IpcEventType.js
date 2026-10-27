@@ -16,4 +16,8 @@ export class IpcEvents {
     'ipc.reportBugsDisposeMtpReply.fromMain';
 
   static USB_HOTPLUG = 'ipc.usbHotplug';
+
+  // sent once the new language is saved, so the main process can translate
+  // the app menu again
+  static APP_LANGUAGE_CHANGED = 'ipc.settings.appLanguageChanged';
 }

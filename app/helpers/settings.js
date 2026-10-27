@@ -17,6 +17,12 @@ export const getAppThemeModeSetting = () => {
   return getAppThemeMode(value);
 };
 
+export const getAppLanguageSetting = () => {
+  const setting = settingsStorage.getItems(['appLanguage']);
+
+  return setting?.appLanguage ?? initialState.appLanguage;
+};
+
 export const getAppColorStyleSetting = () => {
   const setting = settingsStorage.getItems(['appColorStyle']);
 

@@ -10,6 +10,7 @@ import { APP_NAME, APP_GITHUB_URL } from './constants/meta';
 import { openExternalUrl } from './utils/url';
 import { BUY_ME_A_COFFEE_URL } from './constants';
 import { inviteViaEmail } from './templates/menu';
+import { translateWithSetting } from './helpers/translateWithSetting';
 
 export default class MenuBuilder {
   constructor({ mainWindow, autoAppUpdate, appUpdaterEnable }) {
@@ -53,43 +54,45 @@ export default class MenuBuilder {
   }
 
   buildDarwinTemplate() {
+    // translated when built; main.dev rebuilds the menu when the language changes
+    const t = translateWithSetting;
     const subMenuAbout = {
       label: `${APP_NAME}`,
       submenu: [
         {
-          label: `About ${APP_NAME}`,
+          label: t('About {app}', { app: APP_NAME }),
           selector: 'orderFrontStandardAboutPanel:',
         },
         { type: 'separator' },
         {
           visible: this.appUpdaterEnable,
-          label: 'Check For Updates',
+          label: t('Check For Updates'),
           click: () => {
             this.autoAppUpdate.forceCheck();
           },
         },
         {
           visible: this.appUpdaterEnable,
-          label: 'Install Update from File…',
+          label: t('Install Update from File…'),
           click: () => {
             this.autoAppUpdate.installFromFile();
           },
         },
         { type: 'separator' },
         {
-          label: `Hide ${APP_NAME}`,
+          label: t('Hide {app}', { app: APP_NAME }),
           accelerator: 'Command+H',
           selector: 'hide:',
         },
         {
-          label: 'Hide Others',
+          label: t('Hide Others'),
           accelerator: 'Command+Shift+H',
           selector: 'hideOtherApplications:',
         },
-        { label: 'Show All', selector: 'unhideAllApplications:' },
+        { label: t('Show All'), selector: 'unhideAllApplications:' },
         { type: 'separator' },
         {
-          label: 'Quit',
+          label: t('Quit'),
           accelerator: 'Command+Q',
           click: () => {
             app.quit();
@@ -98,41 +101,41 @@ export default class MenuBuilder {
       ],
     };
     const subMenuEdit = {
-      label: 'Edit',
+      label: t('Edit'),
       submenu: [
         {
-          label: 'Undo',
+          label: t('Undo'),
           accelerator: 'Command+Z',
           selector: 'undo:',
           role: 'undo',
         },
         {
-          label: 'Redo',
+          label: t('Redo'),
           accelerator: 'Command+Y',
           selector: 'redo:',
           role: 'redo',
         },
         { type: 'separator' },
         {
-          label: 'Cut',
+          label: t('Cut'),
           accelerator: 'Command+X',
           selector: 'cut:',
           role: 'cut',
         },
         {
-          label: 'Copy',
+          label: t('Copy'),
           accelerator: 'Command+C',
           selector: 'copy:',
           role: 'copy',
         },
         {
-          label: 'Paste',
+          label: t('Paste'),
           accelerator: 'Command+V',
           selector: 'paste:',
           role: 'paste',
         },
         {
-          label: 'Select All',
+          label: t('Select All'),
           accelerator: 'Command+A',
           selector: 'selectAll:',
           role: 'selectAll',
@@ -140,24 +143,24 @@ export default class MenuBuilder {
       ],
     };
     const subMenuViewDev = {
-      label: 'View',
+      label: t('View'),
       submenu: [
         {
-          label: 'Reload',
+          label: t('Reload'),
           accelerator: 'Command+R',
           click: () => {
             this.mainWindow.webContents.reload();
           },
         },
         {
-          label: 'Toggle Full Screen',
+          label: t('Toggle Full Screen'),
           accelerator: 'Ctrl+Command+F',
           click: () => {
             this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
           },
         },
         {
-          label: 'Toggle Developer Tools',
+          label: t('Toggle Developer Tools'),
           accelerator: 'Alt+Command+I',
           click: () => {
             this.mainWindow.toggleDevTools();
@@ -166,10 +169,10 @@ export default class MenuBuilder {
       ],
     };
     const subMenuViewProd = {
-      label: 'View',
+      label: t('View'),
       submenu: [
         {
-          label: 'Toggle Full Screen',
+          label: t('Toggle Full Screen'),
           accelerator: 'Ctrl+Command+F',
           click: () => {
             this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
@@ -178,59 +181,63 @@ export default class MenuBuilder {
       ],
     };
     const subMenuWindow = {
-      label: 'Window',
+      label: t('Window'),
       submenu: [
         {
-          label: 'Minimize',
+          label: t('Minimize'),
           accelerator: 'Command+M',
           selector: 'performMiniaturize:',
         },
-        { label: 'Close', accelerator: 'Command+W', selector: 'performClose:' },
+        {
+          label: t('Close'),
+          accelerator: 'Command+W',
+          selector: 'performClose:',
+        },
         { type: 'separator' },
-        { label: 'Bring All To Front', selector: 'arrangeInFront:' },
+        { label: t('Bring All To Front'), selector: 'arrangeInFront:' },
       ],
     };
     const subMenuHelp = {
-      label: 'Help',
+      label: t('Help'),
       submenu: [
         {
-          label: 'Report Bugs',
+          label: t('Report Bugs'),
           click: () => {
             reportBugsWindow();
           },
         },
         {
-          label: 'Keyboard Shortcuts',
+          label: t('Keyboard Shortcuts'),
           click: () => {
             keyboardShortcutsWindow();
           },
         },
         {
-          label: 'New Features And Updates',
+          label: t('New Features And Updates'),
           click: () => {
             appFeaturesWindow();
           },
         },
         {
-          label: 'Privacy Policy',
+          label: t('Privacy Policy'),
           click: () => {
             privacyPolicyWindow();
           },
         },
         {
-          label: 'Buy Me A Coffee!',
+          label: t('Buy Me A Coffee!'),
           click: () => {
             openExternalUrl(BUY_ME_A_COFFEE_URL);
           },
         },
         {
-          label: `Invite A Friend`,
+          label: t('Invite A Friend'),
           click: () => {
             openExternalUrl(inviteViaEmail);
           },
         },
         {
-          label: 'Find Us On GitHub',
+          label: t('Find Us On GitHub'),
           click: () => {
             openExternalUrl(APP_GITHUB_URL);
           },

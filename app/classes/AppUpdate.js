@@ -5,6 +5,7 @@ import { PATHS } from '../constants/paths';
 import { APP_VERSION } from '../constants/meta';
 import GithubReleaseUpdater from './GithubReleaseUpdater';
 import { UpdateError } from '../helpers/appUpdateRelease';
+import { translateWithSetting as tr } from '../helpers/translateWithSetting';
 import { unixTimestampNow } from '../utils/date';
 import { undefinedOrNull } from '../utils/funcs';
 import {
@@ -31,7 +32,7 @@ const createChildWindow = () => {
       show: false,
       height: 150,
       width: 600,
-      title: 'Progress...',
+      title: tr('Progress…'),
       resizable: false,
       minimizable: false,
       maximizable: false,
@@ -141,7 +142,7 @@ export default class AppUpdate {
         }
 
         if (error instanceof UpdateError) {
-          this.spitMessageDialog('Update Error', error.message, 'error');
+          this.spitMessageDialog(tr('Update Error'), error.message, 'error');
           log.doLog(error, `AppUpdate -> onerror -> UpdateError`);
 
           return null;
@@ -149,8 +150,8 @@ export default class AppUpdate {
 
         if (this.isNetworkError(error)) {
           this.spitMessageDialog(
-            'Update Error',
-            'Oops.. A network error occured. Try again!',
+            tr('Update Error'),
+            tr('A network error occurred. Try again!'),
             'error'
           );
 
@@ -160,8 +161,8 @@ export default class AppUpdate {
         }
 
         this.spitMessageDialog(
-          'Update Error',
-          'Oops.. Some error occured while updating the app. Try again!',
+          tr('Update Error'),
+          tr('Something went wrong while updating the app. Try again!'),
           'error'
         );
 
@@ -316,9 +317,9 @@ export default class AppUpdate {
           }
 
           const { response: buttonIndex } = await dialog.showMessageBox({
-            title: 'No Updates Found',
-            message: 'You have the latest version installed.',
-            buttons: ['Close'],
+            title: tr('No Updates Found'),
+            message: tr('You have the latest version installed.'),
+            buttons: [tr('Close')],
           });
 
           switch (buttonIndex) {
@@ -335,10 +336,11 @@ export default class AppUpdate {
 
       if (this.updateStatus === UPDATER_STATUS.updateInProgress) {
         const { response: buttonIndex } = await dialog.showMessageBox({
-          title: 'Update in progress',
-          message:
-            'Another update is in progess. Are you sure want to restart the update?',
-          buttons: ['Cancel', 'Yes'],
+          title: tr('Update in progress'),
+          message: tr(
+            'Another update is in progress. Do you want to restart it?'
+          ),
+          buttons: [tr('Cancel'), tr('Yes')],
         });
 
         switch (buttonIndex) {
@@ -366,11 +368,12 @@ export default class AppUpdate {
   async askToInstall(version) {
     const { response } = await dialog.showMessageBox({
       type: 'info',
-      title: 'Install Update',
-      message: `OpenMTP ${version} is ready to install.`,
-      detail:
-        'OpenMTP will quit, replace itself with the new version and open again. If you choose Later, it is installed when you quit OpenMTP.',
-      buttons: ['Install and Relaunch', 'Later'],
+      title: tr('Install Update'),
+      message: tr('OpenMTP {version} is ready to install.', { version }),
+      detail: tr(
+        'OpenMTP will quit, replace itself with the new version and open again. If you choose Later, it is installed when you quit OpenMTP.'
+      ),
+      buttons: [tr('Install and Relaunch'), tr('Later')],
       defaultId: 0,
       cancelId: 1,
     });
@@ -384,7 +387,7 @@ export default class AppUpdate {
     } catch (e) {
       log.error(e, `AppUpdate -> askToInstall`);
       dialog.showErrorBox(
-        'Update Error',
+        tr('Update Error'),
         e instanceof UpdateError ? e.message : `${e?.message || e}`
       );
     }
@@ -395,12 +398,12 @@ export default class AppUpdate {
     this.setMainWindow();
 
     const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
-      title: 'Install OpenMTP from a File',
-      buttonLabel: 'Install',
+      title: tr('Install OpenMTP from a File'),
+      buttonLabel: tr('Install'),
       properties: ['openFile'],
       filters: [
         {
-          name: 'OpenMTP (DMG, ZIP or app)',
+          name: tr('OpenMTP (DMG, ZIP or app)'),
           extensions: ['dmg', 'zip', 'app'],
         },
       ],
@@ -421,10 +424,13 @@ export default class AppUpdate {
 
       const { response } = await dialog.showMessageBox(mainWindow, {
         type: 'question',
-        title: 'Install Update',
-        message: `Install OpenMTP ${version}?`,
-        detail: `The installed version is ${APP_VERSION}. OpenMTP will quit, replace itself and open again.`,
-        buttons: ['Install and Relaunch', 'Cancel'],
+        title: tr('Install Update'),
+        message: tr('Install OpenMTP {version}?', { version }),
+        detail: tr(
+          'The installed version is {installed}. OpenMTP will quit, replace itself and open again.',
+          { installed: APP_VERSION }
+        ),
+        buttons: [tr('Install and Relaunch'), tr('Cancel')],
         defaultId: 0,
         cancelId: 1,
       });
@@ -436,10 +442,12 @@ export default class AppUpdate {
       this.setTaskBarProgressBar(-1);
       log.error(e, `AppUpdate -> installFromFile`);
       dialog.showErrorBox(
-        'Install Update',
+        tr('Install Update'),
         e instanceof UpdateError
           ? e.message
-          : `This file could not be installed: ${e?.message || e}`
+          : tr('This file could not be installed: {reason}', {
+              reason: `${e?.message || e}`,
+            })
       );
     }
   }
@@ -450,8 +458,8 @@ export default class AppUpdate {
         .then((connected) => {
           if (!connected) {
             this.spitMessageDialog(
-              'Checking For Updates',
-              'Internet connection is unavailable.'
+              tr('Checking For Updates'),
+              tr('Internet connection is unavailable.')
             );
 
             return null;
@@ -464,8 +472,8 @@ export default class AppUpdate {
             progressbarWindow.webContents.send(
               'appUpdatesProgressBarCommunication',
               {
-                progressTitle: `Checking For Updates`,
-                progressBodyText: `Please wait...`,
+                progressTitle: tr('Checking For Updates'),
+                progressBodyText: tr('Please wait…'),
                 value: 0,
                 variant: `indeterminate`,
               }
@@ -486,8 +494,8 @@ export default class AppUpdate {
         .then((connected) => {
           if (!connected) {
             this.spitMessageDialog(
-              'Downloading Updates',
-              'Internet connection is unavailable.'
+              tr('Downloading Updates'),
+              tr('Internet connection is unavailable.')
             );
 
             return null;
@@ -508,8 +516,8 @@ export default class AppUpdate {
   setUpdateProgressWindow({ value = 0 }) {
     try {
       const data = {
-        progressTitle: `Downloading Updates`,
-        progressBodyText: `Please wait...`,
+        progressTitle: tr('Downloading Updates'),
+        progressBodyText: tr('Please wait…'),
         value,
         variant: `determinate`,
       };
@@ -601,7 +609,7 @@ export default class AppUpdate {
         const { response: buttonIndex } = await dialog.showMessageBox({
           title,
           message,
-          buttons: ['Close'],
+          buttons: [tr('Close')],
         });
 
         switch (buttonIndex) {
