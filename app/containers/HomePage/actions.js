@@ -1078,7 +1078,10 @@ export function reloadDirList(
   checkIf(ignoreHidden, 'boolean');
   checkIf(getState, 'function');
 
-  const { mtpMode, mtpDevice } = getState().Home;
+  // mtpMode lives in Settings: read from Home it was always undefined, so
+  // Legacy mode never refreshed its storages on reload
+  const { mtpDevice } = getState().Home;
+  const { mtpMode } = getState().Settings;
 
   checkIf(mtpDevice, 'object');
 

@@ -1,3 +1,5 @@
+import { alphaHex } from '../../../styles/m3/tokens';
+
 export const styles = (theme) => ({
   root: {
     display: 'grid',
@@ -103,7 +105,8 @@ export const styles = (theme) => ({
     marginLeft: 7,
     padding: '0 5px',
     borderRadius: 9,
-    background: 'rgba(255, 255, 255, 0.2)',
+    // tinted with the button's on-colour so it stays visible in dark mode
+    background: alphaHex(theme.palette.secondary.contrastText, 0.2),
     fontSize: 10,
   },
   '@media (max-width: 760px)': {
