@@ -477,9 +477,12 @@ export default class AppUpdate {
     const { timeGenerated: _timeGenerated } = this._errorDialog;
     const delayTime = 1000;
 
+    // only drops a dialog fired within [delayTime] of the previous one (the
+    // inverted difference used to be always negative, silencing every update
+    // dialog after the first one for the rest of the session)
     if (
       _timeGenerated !== 0 &&
-      _timeGenerated - unixTimestampNow() < delayTime
+      unixTimestampNow() - _timeGenerated < delayTime
     ) {
       return null;
     }

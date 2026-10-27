@@ -10,7 +10,7 @@ import { copySync } from 'fs-extra';
 import { PATHS } from '../constants/paths';
 import {
   fileExistsSync,
-  writeFileAsync,
+  writeFileSync,
   createDirSync,
   deleteFilesSync,
 } from '../helpers/fileOps';
@@ -35,11 +35,13 @@ export default class Boot {
     this.settingsFile = settingsFile;
   }
 
-  async init() {
+  // Synchronous on purpose: main.dev decides before the app is ready
+  // whether to boot or to show the "unable to load profile" window.
+  init() {
     try {
       if (
-        !(await this.verifyDir(profileDir)) &&
-        (await this.verifyDir(previousBundleProfileDir))
+        !this.verifyDir(profileDir) &&
+        this.verifyDir(previousBundleProfileDir)
       ) {
         copySync(previousBundleProfileDir, profileDir, {
           errorOnExist: false,
@@ -50,27 +52,27 @@ export default class Boot {
       for (let i = 0; i < this.verifyDirList.length; i += 1) {
         const item = this.verifyDirList[i];
 
-        if (!(await this.verifyDir(item))) {
-          await this.createDir(item);
+        if (!this.verifyDir(item)) {
+          this.createDir(item);
         }
       }
 
       if (!this.verifyFile(this.settingsFile)) {
-        await this.createFile(this.settingsFile);
+        this.createFile(this.settingsFile);
       }
 
       for (let i = 0; i < this.verifyFileList.length; i += 1) {
         const item = this.verifyFileList[i];
 
         if (!this.verifyFile(item)) {
-          await this.createFile(item);
+          this.createFile(item);
         }
       }
 
       // if the previous version of the profile directory exists then remove it
       // issue: https://github.com/ganeshrvel/openmtp/issues/143
-      if (await this.verifyDir(prevProfileDir)) {
-        await deleteFilesSync(prevProfileDir);
+      if (this.verifyDir(prevProfileDir)) {
+        deleteFilesSync(prevProfileDir);
       }
 
       return true;
@@ -79,12 +81,12 @@ export default class Boot {
     }
   }
 
-  async verify() {
+  verify() {
     try {
-      for (let i = 0; i < this.verifyFileList.length; i += 1) {
+      for (let i = 0; i < this.verifyDirList.length; i += 1) {
         const item = this.verifyDirList[i];
 
-        if (!(await this.verifyDir(item))) {
+        if (!this.verifyDir(item)) {
           return false;
         }
       }
@@ -112,12 +114,16 @@ export default class Boot {
           return false;
         }
       }
+
+      return true;
     } catch (e) {
       console.error(e);
+
+      return false;
     }
   }
 
-  async verifyDir(filePath) {
+  verifyDir(filePath) {
     try {
       return fileExistsSync(filePath);
     } catch (e) {
@@ -125,9 +131,9 @@ export default class Boot {
     }
   }
 
-  async createDir(newFolderPath) {
+  createDir(newFolderPath) {
     try {
-      await createDirSync(newFolderPath);
+      createDirSync(newFolderPath);
     } catch (e) {
       console.error(e);
     }
@@ -143,7 +149,8 @@ export default class Boot {
 
   createFile(filePath) {
     try {
-      writeFileAsync(filePath, ``);
+      // written synchronously so that verify() right after can see it
+      writeFileSync(filePath, ``);
     } catch (e) {
       console.error(e);
     }
