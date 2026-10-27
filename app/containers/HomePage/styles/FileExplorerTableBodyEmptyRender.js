@@ -1,6 +1,14 @@
 import { tableCellFileExplorerTableRowsRender } from './FileExplorerTableBodyListRender';
 import { m3Motion, m3Shape, m3Type } from '../../../styles/m3/tokens';
 
+// Windows too short for the full-size connection screen next to the status
+// FAB (e.g. a 13" MacBook): smaller hero and type so the actions stay visible.
+export const SHORT_WINDOW = '@media (max-height: 820px)';
+// at the minimum window height there is no room for the hero at all: the
+// headline and the toolbar's phone button still show the connection state
+const SHORTEST_WINDOW = '@media (max-height: 680px)';
+const HERO_COMPACT_SIZE = 72;
+
 // Phone connection screen, styled with Material 3 Expressive tokens.
 export const styles = (theme) => {
   const { m3 } = theme.palette;
@@ -33,6 +41,10 @@ export const styles = (theme) => {
       paddingBottom: 'calc(32px + var(--status-fab-space, 0px))',
       transition: 'padding-bottom 300ms cubic-bezier(0.2, 0, 0, 1)',
       color: m3.onSurface,
+      [SHORT_WINDOW]: {
+        paddingTop: 16,
+        paddingBottom: 'calc(16px + var(--status-fab-space, 0px))',
+      },
     },
     // Two columns when the pane is wide enough (status + steps side by side),
     // stacked otherwise, so everything fits without scrolling.
@@ -72,6 +84,15 @@ export const styles = (theme) => {
       height: 104,
       marginBottom: 20,
       color: m3.primaryContainer,
+      // the morphing shape is drawn for 104px: scale it as a whole so the
+      // animation stays identical, just smaller
+      [SHORT_WINDOW]: {
+        width: HERO_COMPACT_SIZE,
+        height: HERO_COMPACT_SIZE,
+        marginBottom: 12,
+        '& > *': { transform: `scale(${HERO_COMPACT_SIZE / 104})` },
+      },
+      [SHORTEST_WINDOW]: { display: 'none' },
     },
     srOnly: {
       position: 'absolute',
@@ -88,12 +109,14 @@ export const styles = (theme) => {
       ...m3Type.headlineMediumEmphasized,
       margin: 0,
       color: m3.onSurface,
+      [SHORT_WINDOW]: { fontSize: 24, lineHeight: '32px' },
     },
     supporting: {
       ...m3Type.bodyLarge,
       margin: '8px 0 0',
       maxWidth: 420,
       color: m3.onSurfaceVariant,
+      [SHORT_WINDOW]: { ...m3Type.bodyMedium, marginTop: 4 },
     },
     actions: {
       display: 'flex',
@@ -101,6 +124,7 @@ export const styles = (theme) => {
       justifyContent: 'center',
       gap: 12,
       marginTop: 24,
+      [SHORT_WINDOW]: { marginTop: 16 },
     },
     statusCard: {
       display: 'flex',

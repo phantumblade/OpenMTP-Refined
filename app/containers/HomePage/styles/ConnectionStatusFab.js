@@ -5,6 +5,7 @@ import {
   m3State,
   m3Type,
 } from '../../../styles/m3/tokens';
+import { SHORT_WINDOW } from './FileExplorerTableBodyEmptyRender';
 
 // Large extended FAB (Compose ExtendedFabLargeTokens): 28dp corners, 24dp
 // padding, level 3 elevation; error container colours since it reports a
@@ -45,6 +46,11 @@ export const styles = (theme) => {
     color: m3.onErrorContainer,
     boxShadow: m3Elevation.level3,
     transformOrigin: 'bottom center',
+    [SHORT_WINDOW]: {
+      gap: 12,
+      minHeight: 0,
+      padding: '12px 8px 12px 16px',
+    },
   };
 
   return {
@@ -83,6 +89,7 @@ export const styles = (theme) => {
     face: {
       flexShrink: 0,
       color: m3.error,
+      [SHORT_WINDOW]: { width: 32, height: 32 },
     },
     content: {
       flex: 1,
@@ -94,6 +101,7 @@ export const styles = (theme) => {
       margin: 0,
       fontSize: 17,
       fontWeight: 600,
+      [SHORT_WINDOW]: { fontSize: 15, lineHeight: '20px' },
     },
     body: {
       ...m3Type.bodyMedium,

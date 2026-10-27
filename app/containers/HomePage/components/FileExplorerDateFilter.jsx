@@ -152,86 +152,88 @@ class FileExplorerDateFilter extends PureComponent {
               </div>
             </div>
 
-            <span className={classes.sectionLabel}>{t('Date field')}</span>
-            <div className={classes.segmented} role="radiogroup">
-              {[
-                [
-                  FILE_DATE_FIELD.modified,
-                  'edit_calendar',
-                  'Modification date',
-                ],
-                [FILE_DATE_FIELD.created, 'calendar_add_on', 'Creation date'],
-              ].map(([field, icon, label]) => {
-                const selected = draft.field === field;
+            <div className={classes.dateFilterBody}>
+              <span className={classes.sectionLabel}>{t('Date field')}</span>
+              <div className={classes.segmented} role="radiogroup">
+                {[
+                  [
+                    FILE_DATE_FIELD.modified,
+                    'edit_calendar',
+                    'Modification date',
+                  ],
+                  [FILE_DATE_FIELD.created, 'calendar_add_on', 'Creation date'],
+                ].map(([field, icon, label]) => {
+                  const selected = draft.field === field;
 
-                return (
-                  <button
-                    key={field}
-                    type="button"
-                    role="radio"
-                    aria-checked={selected}
-                    disabled={
-                      field === FILE_DATE_FIELD.created &&
-                      !creationDateAvailable
-                    }
-                    className={classNames(classes.segment, {
-                      [classes.segmentSelected]: selected,
-                    })}
-                    onClick={() => this.setDraft({ field })}
-                  >
-                    <MaterialSymbol
-                      name={selected ? 'check' : icon}
-                      size={18}
-                    />
-                    {t(label)}
-                  </button>
-                );
-              })}
+                  return (
+                    <button
+                      key={field}
+                      type="button"
+                      role="radio"
+                      aria-checked={selected}
+                      disabled={
+                        field === FILE_DATE_FIELD.created &&
+                        !creationDateAvailable
+                      }
+                      className={classNames(classes.segment, {
+                        [classes.segmentSelected]: selected,
+                      })}
+                      onClick={() => this.setDraft({ field })}
+                    >
+                      <MaterialSymbol
+                        name={selected ? 'check' : icon}
+                        size={18}
+                      />
+                      {t(label)}
+                    </button>
+                  );
+                })}
+              </div>
+              {!creationDateAvailable && (
+                <p className={classes.dateFilterNotice}>
+                  {t('Creation date is unavailable over MTP')}
+                </p>
+              )}
+
+              <div className={classes.chips}>
+                {Object.keys(QUICK_RANGE_LABELS).map((key) => {
+                  const range = ranges[key];
+                  const selected =
+                    draft.from === range.from && draft.to === range.to;
+
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      className={classNames(classes.chip, {
+                        [classes.chipSelected]: selected,
+                      })}
+                      aria-pressed={selected}
+                      onClick={() => this.setDraft(range)}
+                    >
+                      {selected && <MaterialSymbol name="check" size={18} />}
+                      {t(QUICK_RANGE_LABELS[key])}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <M3DateRangePicker
+                from={draft.from}
+                to={draft.to}
+                language={appLanguage}
+                fromLabel={t('From date')}
+                toLabel={t('To date')}
+                error={!valid}
+                onChange={({ from, to }) => this.setDraft({ from, to })}
+              />
+
+              {!valid && (
+                <p className={classes.dateFilterError} role="alert">
+                  {t('Start date must be before end date')}
+                </p>
+              )}
             </div>
-            {!creationDateAvailable && (
-              <p className={classes.dateFilterNotice}>
-                {t('Creation date is unavailable over MTP')}
-              </p>
-            )}
-
-            <div className={classes.chips}>
-              {Object.keys(QUICK_RANGE_LABELS).map((key) => {
-                const range = ranges[key];
-                const selected =
-                  draft.from === range.from && draft.to === range.to;
-
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    className={classNames(classes.chip, {
-                      [classes.chipSelected]: selected,
-                    })}
-                    aria-pressed={selected}
-                    onClick={() => this.setDraft(range)}
-                  >
-                    {selected && <MaterialSymbol name="check" size={18} />}
-                    {t(QUICK_RANGE_LABELS[key])}
-                  </button>
-                );
-              })}
-            </div>
-
-            <M3DateRangePicker
-              from={draft.from}
-              to={draft.to}
-              language={appLanguage}
-              fromLabel={t('From date')}
-              toLabel={t('To date')}
-              error={!valid}
-              onChange={({ from, to }) => this.setDraft({ from, to })}
-            />
-
-            {!valid && (
-              <p className={classes.dateFilterError} role="alert">
-                {t('Start date must be before end date')}
-              </p>
-            )}
 
             <div className={classes.dateFilterActions}>
               <M3Button

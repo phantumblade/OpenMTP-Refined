@@ -162,6 +162,10 @@ export const styles = (theme) => {
       width: 380,
       marginTop: 8,
       overflow: 'hidden',
+      // Popover caps the paper at the window height: lay it out as a column
+      // so the middle scrolls and the actions stay reachable on short windows
+      display: 'flex',
+      flexDirection: 'column',
       borderRadius: m3Shape.extraLarge,
       color: m3.onSurface,
       backgroundColor: m3.surfaceContainerHigh,
@@ -171,15 +175,32 @@ export const styles = (theme) => {
       width: 360,
       marginTop: 8,
       overflow: 'hidden',
+      // Popover caps the paper at the window height: lay it out as a column
+      // so the middle scrolls and the actions stay reachable on short windows
+      display: 'flex',
+      flexDirection: 'column',
       borderRadius: m3Shape.extraLarge,
       color: m3.onSurface,
       backgroundColor: m3.surfaceContainerHigh,
       boxShadow: m3Elevation.level3,
     },
     dateFilterContent: {
+      display: 'flex',
+      flexDirection: 'column',
+      minHeight: 0,
       padding: '20px 20px 16px',
     },
+    dateFilterBody: {
+      flex: '0 1 auto',
+      minHeight: 0,
+      overflowY: 'auto',
+      overscrollBehavior: 'contain',
+      // keep focus rings and the scrollbar off the clipped edge
+      margin: '0 -20px',
+      padding: '0 20px 4px',
+    },
     dateFilterHeader: {
+      flexShrink: 0,
       display: 'flex',
       alignItems: 'center',
       gap: 14,
@@ -286,6 +307,7 @@ export const styles = (theme) => {
       fontVariantNumeric: 'tabular-nums',
     },
     typeFilterList: {
+      minHeight: 0,
       display: 'flex',
       flexWrap: 'wrap',
       gap: 8,
@@ -306,6 +328,7 @@ export const styles = (theme) => {
       color: m3.error,
     },
     dateFilterActions: {
+      flexShrink: 0,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',

@@ -25,13 +25,19 @@ export const styles = (theme) => {
       minHeight: 56,
       padding: '0 16px',
     },
+    // the caption gives way first when the pane is narrow (e.g. Italian at
+    // the minimum window width), so the sort buttons are never cut off
     caption: {
       ...m3Type.labelLarge,
+      minWidth: 0,
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
       color: m3.onSurfaceVariant,
       whiteSpace: 'nowrap',
     },
     group: {
       display: 'flex',
+      flexShrink: 0,
       gap: 2,
     },
     button: {
@@ -49,6 +55,8 @@ export const styles = (theme) => {
       cursor: 'pointer',
       outline: 'none',
       transition: `border-radius 300ms ${SPRING}, background-color 200ms linear, color 200ms linear, box-shadow 150ms linear`,
+      // two panes side by side in a small window: tighter buttons
+      '@media (max-width: 1000px)': { padding: '0 12px' },
       '&:first-child': {
         borderTopLeftRadius: 20,
         borderBottomLeftRadius: 20,
