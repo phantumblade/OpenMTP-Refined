@@ -1,5 +1,4 @@
 import path from 'path';
-import { promisify } from 'node:util';
 import { exec, spawn } from 'child_process';
 import { log } from '../../../utils/log';
 import {
@@ -15,46 +14,25 @@ import { baseName, getExtension } from '../../../utils/files';
 import { mtpCliPath } from '../../../helpers/binaries';
 import { msToTime, unixTimestampNow } from '../../../utils/date';
 import { checkIf } from '../../../utils/checkIf';
+import { escapeShellMtp } from '../../../helpers/mtpCliShell';
+
+// `lsext` prints one line per file: Node's default 1 MB limit is reached by
+// a folder with ~12k photos and the listing then fails.
+const MTP_CLI_MAX_BUFFER = 256 * 1024 * 1024;
 
 export class FileExplorerLegacyDataSource {
   constructor() {
     this.mtpCli = `"${this._escapeShellMtp(mtpCliPath)}"`;
-    this.execPromise = promisify(exec);
+  }
+
+  // the callback API directly: the promisified `exec` used before left one
+  // never-settling promise behind per command and had the 1 MB output limit
+  _execCallback(command, callback) {
+    exec(command, { maxBuffer: MTP_CLI_MAX_BUFFER }, callback);
   }
 
   _escapeShellMtp(cmd) {
-    if (cmd.indexOf(`\\"`) !== -1 && cmd.indexOf(`"\\`) !== -1) {
-      return cmd
-        .replace(/`/g, '\\`')
-        .replace(/\\/g, `\\\\\\\\`)
-        .replace(/"/g, `\\\\\\"`);
-    }
-
-    if (cmd.indexOf(`"\\"`) !== -1) {
-      return cmd
-        .replace(/`/g, '\\`')
-        .replace(/\\/g, `\\\\\\\\`)
-        .replace(/"/g, `\\\\\\"`);
-    }
-
-    if (cmd.indexOf(`\\"`) !== -1) {
-      return cmd
-        .replace(/`/g, '\\`')
-        .replace(/\\/g, `\\\\\\`)
-        .replace(/"/g, `\\\\\\\\"`);
-    }
-
-    if (cmd.indexOf(`"\\`) !== -1) {
-      return cmd
-        .replace(/`/g, '\\`')
-        .replace(/\\/g, `\\\\\\\\`)
-        .replace(/"/g, `\\\\\\"`);
-    }
-
-    return cmd
-      .replace(/`/g, '\\`')
-      .replace(/\\/g, `\\\\\\`)
-      .replace(/"/g, `\\\\\\"`);
+    return escapeShellMtp(cmd);
   }
 
   _filterOutMtpLines(string, index) {
@@ -97,7 +75,7 @@ export class FileExplorerLegacyDataSource {
   async _exec(command) {
     try {
       return new Promise((resolve) => {
-        this.execPromise(command, (error, stdout, stderr) => {
+        this._execCallback(command, (error, stdout, stderr) => {
           const { filteredStderr, filteredError, filteredStdout } =
             this._cleanJunkMtpError({ error, stdout, stderr });
 
@@ -126,7 +104,7 @@ export class FileExplorerLegacyDataSource {
 
   async _execNoCatch(command) {
     return new Promise((resolve) => {
-      this.execPromise(command, (error, stdout, stderr) => {
+      this._execCallback(command, (error, stdout, stderr) => {
         const { filteredStderr, filteredError, filteredStdout } =
           this._cleanJunkMtpError({ error, stdout, stderr });
 
@@ -185,7 +163,8 @@ export class FileExplorerLegacyDataSource {
       let startTime = 0;
       let prevCopiedTime = 0;
       let currentCopiedTime = 0;
-      let bufferedOutput = null;
+      let pendingOutput = '';
+      let outputLineIndex = 0;
       let settled = false;
 
       const stopProgress = () => {
@@ -263,35 +242,28 @@ export class FileExplorerLegacyDataSource {
       });
 
       cmd.stdout.on('data', (data) => {
-        bufferedOutput = data.toString();
-
         if (startTime === 0) {
           startTime = unixTimestampNow();
         }
 
-        if (
-          typeof bufferedOutput === 'undefined' ||
-          bufferedOutput === null ||
-          bufferedOutput.length < 1
-        ) {
-          return null;
-        }
+        // a chunk may end in the middle of a line: keep the partial line
+        // for the next chunk instead of parsing half a progress event
+        const lines = `${pendingOutput}${data.toString()}`.split(/\r?\n/);
 
-        const _bufferedOutput = splitIntoLines(bufferedOutput).filter(
-          (a, index) => !this._filterOutMtpLines(a, index)
-        );
+        pendingOutput = lines.pop();
 
-        if (_bufferedOutput.length < 1) {
-          return null;
-        }
+        const _bufferedOutput = lines.filter((a) => {
+          const index = outputLineIndex;
 
+          outputLineIndex += 1;
+
+          return !this._filterOutMtpLines(a, index);
+        });
+
+        // one unparsable line must not drop the rest of the chunk
         for (let i = 0; i < _bufferedOutput.length; i += 1) {
           const item = _bufferedOutput[i];
           const bufferedOutputSplit = item.split(' ');
-
-          if (bufferedOutputSplit.length < 1) {
-            return null;
-          }
 
           const totalLength = bufferedOutputSplit.length;
           const eventIndex = 0;
@@ -304,7 +276,7 @@ export class FileExplorerLegacyDataSource {
           const matchedItem = item.match(/(\d+?\d*)\s(\d+?\d*)$/);
 
           if (matchedItem === null) {
-            return null;
+            continue; // eslint-disable-line no-continue
           }
 
           const matchedItemSplit = matchedItem[0].split(' ');
@@ -317,7 +289,7 @@ export class FileExplorerLegacyDataSource {
             prevCopiedTime = 0;
             currentCopiedTime = 0;
 
-            return null;
+            continue; // eslint-disable-line no-continue
           }
 
           if (
@@ -326,7 +298,7 @@ export class FileExplorerLegacyDataSource {
             currentProgressSizeIndex < 2 ||
             totalFileSizeIndex < 3
           ) {
-            return null;
+            continue; // eslint-disable-line no-continue
           }
 
           const filePath = bufferedOutputSplit
@@ -440,7 +412,7 @@ export class FileExplorerLegacyDataSource {
           };
         });
 
-      if (undefinedOrNull(storageList) || storageList.length < 1) {
+      if (Object.keys(storageList).length < 1) {
         return {
           error: `${DEVICES_LABEL[DEVICE_TYPE.mtp]} storage not accessible`,
           stderr: null,

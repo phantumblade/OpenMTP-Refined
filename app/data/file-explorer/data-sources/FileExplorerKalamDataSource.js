@@ -1,5 +1,4 @@
 import { exec } from 'child_process';
-import { promisify } from 'node:util';
 import { log } from '../../../utils/log';
 import { Kalam } from '../../../../ffi/kalam/src/Kalam';
 import { checkIf } from '../../../utils/checkIf';
@@ -11,7 +10,6 @@ import { kalamDebugReportCli } from '../../../helpers/binaries';
 export class FileExplorerKalamDataSource {
   constructor() {
     this.kalamFfi = new Kalam();
-    this.execPromise = promisify(exec);
   }
 
   /**
@@ -23,13 +21,18 @@ export class FileExplorerKalamDataSource {
   async _exec(command) {
     try {
       return new Promise((resolve) => {
-        this.execPromise(command, (error, stdout, stderr) => {
-          return resolve({
-            data: stdout,
-            stderr,
-            error,
-          });
-        });
+        // a verbose debug report can exceed Node's default 1 MB limit
+        exec(
+          command,
+          { maxBuffer: 64 * 1024 * 1024 },
+          (error, stdout, stderr) => {
+            return resolve({
+              data: stdout,
+              stderr,
+              error,
+            });
+          }
+        );
       });
     } catch (e) {
       log.error(e);
