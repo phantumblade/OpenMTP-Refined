@@ -20,9 +20,21 @@ import (
 	"github.com/ganeshrvel/go-mtpx"
 	"os"
 	"time"
+	"unsafe"
 )
 
 type SendCbResult C.on_cb_result_t
+
+// send hands the JSON to the JS callback and frees the C copy afterwards:
+// koffi runs the callback synchronously (a call from another thread blocks
+// until JS has copied the string), so nothing reads it once this returns.
+// Without the free every result, progress tick and directory listing leaked.
+func send(onDonePtr *SendCbResult, json string) {
+	cJson := C.CString(json)
+	defer C.free(unsafe.Pointer(cJson))
+
+	C.send_cb_result((*C.on_cb_result_t)(onDonePtr), cJson)
+}
 
 func SendError(onDonePtr *SendCbResult, err error) {
 	errorType, errorMsg := processError(err)
@@ -35,8 +47,7 @@ func SendError(onDonePtr *SendCbResult, err error) {
 
 	json := toJson(o)
 
-	convertedDoneCbPtr := (*C.on_cb_result_t)(onDonePtr)
-	C.send_cb_result(convertedDoneCbPtr, C.CString(json))
+	send(onDonePtr, json)
 }
 
 func SendInitialize(onDonePtr *SendCbResult, deviceInfo *mtp.DeviceInfo, usbDesc *mtp.UsbDeviceInfo) {
@@ -49,8 +60,7 @@ func SendInitialize(onDonePtr *SendCbResult, deviceInfo *mtp.DeviceInfo, usbDesc
 
 	json := toJson(o)
 
-	convertedDoneCbPtr := (*C.on_cb_result_t)(onDonePtr)
-	C.send_cb_result(convertedDoneCbPtr, C.CString(json))
+	send(onDonePtr, json)
 }
 
 func SendDeviceInfo(onDonePtr *SendCbResult, deviceInfo *mtp.DeviceInfo, usbDesc *mtp.UsbDeviceInfo) {
@@ -63,8 +73,7 @@ func SendDeviceInfo(onDonePtr *SendCbResult, deviceInfo *mtp.DeviceInfo, usbDesc
 
 	json := toJson(o)
 
-	convertedDoneCbPtr := (*C.on_cb_result_t)(onDonePtr)
-	C.send_cb_result(convertedDoneCbPtr, C.CString(json))
+	send(onDonePtr, json)
 }
 
 func SendStorages(onDonePtr *SendCbResult, storages []mtpx.StorageData) {
@@ -74,8 +83,7 @@ func SendStorages(onDonePtr *SendCbResult, storages []mtpx.StorageData) {
 
 	json := toJson(o)
 
-	convertedDoneCbPtr := (*C.on_cb_result_t)(onDonePtr)
-	C.send_cb_result(convertedDoneCbPtr, C.CString(json))
+	send(onDonePtr, json)
 }
 
 func SendMakeDirectory(onDonePtr *SendCbResult) {
@@ -85,8 +93,7 @@ func SendMakeDirectory(onDonePtr *SendCbResult) {
 
 	json := toJson(o)
 
-	convertedDoneCbPtr := (*C.on_cb_result_t)(onDonePtr)
-	C.send_cb_result(convertedDoneCbPtr, C.CString(json))
+	send(onDonePtr, json)
 }
 
 func SendFileExists(onDonePtr *SendCbResult, fc []mtpx.FileExistsContainer, inputFiles []string) {
@@ -106,8 +113,7 @@ func SendFileExists(onDonePtr *SendCbResult, fc []mtpx.FileExistsContainer, inpu
 
 	json := toJson(o)
 
-	convertedDoneCbPtr := (*C.on_cb_result_t)(onDonePtr)
-	C.send_cb_result(convertedDoneCbPtr, C.CString(json))
+	send(onDonePtr, json)
 }
 
 func SendDeleteFile(onDonePtr *SendCbResult) {
@@ -117,8 +123,7 @@ func SendDeleteFile(onDonePtr *SendCbResult) {
 
 	json := toJson(o)
 
-	convertedDoneCbPtr := (*C.on_cb_result_t)(onDonePtr)
-	C.send_cb_result(convertedDoneCbPtr, C.CString(json))
+	send(onDonePtr, json)
 }
 
 func SendRenameFile(onDonePtr *SendCbResult) {
@@ -128,8 +133,7 @@ func SendRenameFile(onDonePtr *SendCbResult) {
 
 	json := toJson(o)
 
-	convertedDoneCbPtr := (*C.on_cb_result_t)(onDonePtr)
-	C.send_cb_result(convertedDoneCbPtr, C.CString(json))
+	send(onDonePtr, json)
 }
 
 func SendWalk(onDonePtr *SendCbResult, files []*mtpx.FileInfo) {
@@ -157,8 +161,7 @@ func SendWalk(onDonePtr *SendCbResult, files []*mtpx.FileInfo) {
 
 	json := toJson(o)
 
-	convertedDoneCbPtr := (*C.on_cb_result_t)(onDonePtr)
-	C.send_cb_result(convertedDoneCbPtr, C.CString(json))
+	send(onDonePtr, json)
 }
 
 func SendUploadFilesPreprocess(onDonePtr *SendCbResult, fi *os.FileInfo, fullPath string) {
@@ -172,8 +175,7 @@ func SendUploadFilesPreprocess(onDonePtr *SendCbResult, fi *os.FileInfo, fullPat
 
 	json := toJson(o)
 
-	convertedDoneCbPtr := (*C.on_cb_result_t)(onDonePtr)
-	C.send_cb_result(convertedDoneCbPtr, C.CString(json))
+	send(onDonePtr, json)
 }
 
 func SendDownloadFilesPreprocess(onDonePtr *SendCbResult, fi *mtpx.FileInfo) {
@@ -187,8 +189,7 @@ func SendDownloadFilesPreprocess(onDonePtr *SendCbResult, fi *mtpx.FileInfo) {
 
 	json := toJson(o)
 
-	convertedDoneCbPtr := (*C.on_cb_result_t)(onDonePtr)
-	C.send_cb_result(convertedDoneCbPtr, C.CString(json))
+	send(onDonePtr, json)
 }
 
 func SendTransferFilesProgress(onDonePtr *SendCbResult, p *mtpx.ProgressInfo) {
@@ -218,8 +219,7 @@ func SendTransferFilesProgress(onDonePtr *SendCbResult, p *mtpx.ProgressInfo) {
 
 	json := toJson(o)
 
-	convertedDoneCbPtr := (*C.on_cb_result_t)(onDonePtr)
-	C.send_cb_result(convertedDoneCbPtr, C.CString(json))
+	send(onDonePtr, json)
 }
 
 func SendTransferFilesDone(onDonePtr *SendCbResult) {
@@ -229,8 +229,7 @@ func SendTransferFilesDone(onDonePtr *SendCbResult) {
 
 	json := toJson(o)
 
-	convertedDoneCbPtr := (*C.on_cb_result_t)(onDonePtr)
-	C.send_cb_result(convertedDoneCbPtr, C.CString(json))
+	send(onDonePtr, json)
 }
 
 func SendDispose(onDonePtr *SendCbResult) {
@@ -240,6 +239,5 @@ func SendDispose(onDonePtr *SendCbResult) {
 
 	json := toJson(o)
 
-	convertedDoneCbPtr := (*C.on_cb_result_t)(onDonePtr)
-	C.send_cb_result(convertedDoneCbPtr, C.CString(json))
+	send(onDonePtr, json)
 }

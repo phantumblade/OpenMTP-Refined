@@ -5,6 +5,8 @@ import { undefinedOrNull } from '../../../app/utils/funcs';
 import { checkIf } from '../../../app/utils/checkIf';
 import { FILE_TRANSFER_DIRECTION } from '../../../app/enums';
 
+const INITIALIZE_SLOW_ATTEMPT_MS = 4000;
+
 export class Kalam {
   constructor() {
     this.libPath = kalamLibPath;
@@ -33,6 +35,17 @@ export class Kalam {
         'void UploadFiles(char* uploadFilesInputJson, on_cb_result_t* onPreprocessPtr, on_cb_result_t* onProgressPtr, on_cb_result_t* onDonePtr)',
       Dispose: 'void Dispose(on_cb_result_t* onDonePtr)',
     });
+
+    this.fnCache = {};
+  }
+
+  // parsing a koffi prototype is not free: declare each function once
+  _fn(name) {
+    if (!this.fnCache[name]) {
+      this.fnCache[name] = this.lib.func(this.fnDictionary[name]);
+    }
+
+    return this.fnCache[name];
   }
 
   _getNapiError(error) {
@@ -67,7 +80,7 @@ export class Kalam {
           return resolve(this._getData(json));
         }, koffi.pointer(onDonePtr));
 
-        const Initialize = this.lib.func(this.fnDictionary.Initialize);
+        const Initialize = this._fn('Initialize');
 
         Initialize.async(rawOnDonePtr, (err, _) => {
           koffi.unregister(rawOnDonePtr);
@@ -99,6 +112,8 @@ export class Kalam {
 
     while (attempt < maxAttempts) {
       attempt += 1;
+      const attemptStartedAt = Date.now();
+
       // eslint-disable-next-line no-await-in-loop
       res = await this._singleInitialize();
 
@@ -120,8 +135,17 @@ export class Kalam {
       // the native layer already waited up to two minutes for the phone and
       // then reset it once: retrying would only repeat that wait
       const nativeGaveUp = errString.includes('after reset');
+      // only quick failures are transient: a phone that didn't answer for
+      // seconds won't answer a retry either, and the caller retries as well
+      const attemptWasSlow =
+        Date.now() - attemptStartedAt > INITIALIZE_SLOW_ATTEMPT_MS;
 
-      if (isTransientUsbError && !nativeGaveUp && attempt < maxAttempts) {
+      if (
+        isTransientUsbError &&
+        !nativeGaveUp &&
+        !attemptWasSlow &&
+        attempt < maxAttempts
+      ) {
         log.info(
           `Kalam initialize transient USB error (attempt ${attempt}/${maxAttempts}): ${errString}. Retrying in ${
             attempt * 400
@@ -155,9 +179,7 @@ export class Kalam {
           return resolve(this._getData(json));
         }, koffi.pointer(onDonePtr));
 
-        const FetchDeviceInfo = this.lib.func(
-          this.fnDictionary.FetchDeviceInfo
-        );
+        const FetchDeviceInfo = this._fn('FetchDeviceInfo');
 
         FetchDeviceInfo.async(rawOnDonePtr, (err, _) => {
           koffi.unregister(rawOnDonePtr);
@@ -192,7 +214,7 @@ export class Kalam {
           return resolve(this._getData(json));
         }, koffi.pointer(onDonePtr));
 
-        const FetchStorages = this.lib.func(this.fnDictionary.FetchStorages);
+        const FetchStorages = this._fn('FetchStorages');
 
         FetchStorages.async(rawOnDonePtr, (err, _) => {
           koffi.unregister(rawOnDonePtr);
@@ -224,7 +246,7 @@ export class Kalam {
           return resolve(this._getData(json));
         }, koffi.pointer(onDonePtr));
 
-        const MakeDirectory = this.lib.func(this.fnDictionary.MakeDirectory);
+        const MakeDirectory = this._fn('MakeDirectory');
 
         const _storageId = parseInt(storageId, 10);
         const args = { storageId: _storageId, fullPath };
@@ -260,7 +282,7 @@ export class Kalam {
           return resolve(this._getData(json));
         }, koffi.pointer(onDonePtr));
 
-        const FileExists = this.lib.func(this.fnDictionary.FileExists);
+        const FileExists = this._fn('FileExists');
 
         const _storageId = parseInt(storageId, 10);
 
@@ -297,7 +319,7 @@ export class Kalam {
           return resolve(this._getData(json));
         }, koffi.pointer(onDonePtr));
 
-        const DeleteFile = this.lib.func(this.fnDictionary.DeleteFile);
+        const DeleteFile = this._fn('DeleteFile');
 
         const _storageId = parseInt(storageId, 10);
 
@@ -335,7 +357,7 @@ export class Kalam {
           return resolve(this._getData(json));
         }, koffi.pointer(onDonePtr));
 
-        const RenameFile = this.lib.func(this.fnDictionary.RenameFile);
+        const RenameFile = this._fn('RenameFile');
 
         const _storageId = parseInt(storageId, 10);
 
@@ -383,7 +405,7 @@ export class Kalam {
           return resolve(this._getData(json));
         }, koffi.pointer(onDonePtr));
 
-        const Walk = this.lib.func(this.fnDictionary.Walk);
+        const Walk = this._fn('Walk');
 
         const _storageId = parseInt(storageId, 10);
 
@@ -507,11 +529,11 @@ export class Kalam {
 
         switch (direction) {
           case FILE_TRANSFER_DIRECTION.download:
-            TransferFiles = this.lib.func(this.fnDictionary.DownloadFiles);
+            TransferFiles = this._fn('DownloadFiles');
 
             break;
           case FILE_TRANSFER_DIRECTION.upload:
-            TransferFiles = this.lib.func(this.fnDictionary.UploadFiles);
+            TransferFiles = this._fn('UploadFiles');
 
             break;
 
@@ -574,7 +596,7 @@ export class Kalam {
           return resolve(this._getData(json));
         }, koffi.pointer(onDonePtr));
 
-        const Dispose = this.lib.func(this.fnDictionary.Dispose);
+        const Dispose = this._fn('Dispose');
 
         Dispose.async(rawOnDonePtr, (err, _) => {
           koffi.unregister(rawOnDonePtr);
