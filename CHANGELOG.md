@@ -9,6 +9,16 @@ Version 4.0.0 is the first release of the fork with its own version number.
 
 ### Fixed
 
+- Small windows (down to the 880×640 minimum): the date filter no longer
+  runs off the bottom of the window, so its calendar and the Apply button
+  stay reachable (the middle of the panel scrolls instead).
+- The phone connection screen gets a compact layout in windows up to 820
+  pixels high (e.g. a 13" MacBook), so "Try connection again" is no longer
+  hidden under the error card.
+- The "Sort by" bar no longer gets cut off in Italian when both panes share a
+  small window.
+- The connection screen animations stop drawing while they are at rest: on
+  the idle "no phone" screen the app now uses about a third of the CPU it did.
 - Legacy MTP mode: folders with more than about 12,000 files failed to open
   (the listing outgrew a 1 MB output limit), and transfer progress could
   skip updates when a line arrived split in two.
