@@ -23,6 +23,7 @@ const (
 	robustTotal          = 120 * time.Second
 	robustSessionTimeout = 2000 // ms, per OpenSession attempt
 	robustDrainQuiet     = 400 * time.Millisecond
+	robustDrainMax       = 30 * time.Second
 	robustDrainPoll      = 150 // ms, per bulk-in read while draining
 	robustStorageWait    = 5 * time.Second
 )
@@ -31,13 +32,16 @@ const (
 // usually the reply to a request of a host that vanished (for example
 // macOS ptpcamerad killed mid-transaction). Android's MTP server blocks
 // while that reply is pending and cannot read our next request, so it has
-// to be consumed first. It stops after the pipe has been quiet for `quiet`.
+// to be consumed first. It stops after the pipe has been quiet for `quiet`,
+// or after robustDrainMax in any case: a device that never stops sending
+// must not hang the connection attempt.
 func (d *Device) drainIn(quiet time.Duration) (int, error) {
 	buf := make([]byte, 16*1024)
 	total := 0
-	lastData := time.Now()
+	start := time.Now()
+	lastData := start
 
-	for time.Since(lastData) < quiet {
+	for time.Since(lastData) < quiet && time.Since(start) < robustDrainMax {
 		n, err := d.h.BulkTransfer(d.fetchEP, buf, robustDrainPoll)
 		if n > 0 {
 			total += n
