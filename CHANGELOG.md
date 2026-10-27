@@ -5,6 +5,43 @@ All notable changes to this fork will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Version 4.0.0 is the first release of the fork with its own version number.
 
+## Unreleased
+
+### Fixed
+
+- Legacy MTP mode: folders with more than about 12,000 files failed to open
+  (the listing outgrew a 1 MB output limit), and transfer progress could
+  skip updates when a line arrived split in two.
+- Legacy MTP mode now refreshes the phone's storages when reloading, as it
+  was meant to.
+- The mouse back/forward buttons sometimes sent the focussed pane to its
+  parent folder instead of the previous one, because the other pane handled
+  the click as well.
+- Grid thumbnails of RAW photos and videos: two files with the same name in
+  different folders showed the same picture, and an edited file kept its old
+  thumbnail. A stuck QuickLook process is now stopped after six seconds.
+- Dark mode: the check mark of selected items in selection dialogs and the
+  item count on the "Transfer here" button were almost invisible, and the
+  release notes box had a black border.
+- Update dialogs ("network error", "no internet connection") were shown only
+  once per session; later ones were silently dropped.
+- The "unable to load profile" window never appeared when OpenMTP could not
+  create its settings and log files.
+- The phone library's results, progress updates and folder listings were
+  never freed, so memory use kept growing during long sessions.
+- A phone that doesn't answer is no longer retried several times by two
+  layers at once, which could make the connection screen wait minutes for
+  the same error.
+
+### Security
+
+- Legacy MTP mode: a file or folder on the phone named like
+  `$(command)` ran that command on the Mac when opened or copied. File names
+  are now passed to the shell literally.
+- Windows can no longer leave the app page: dropping a file outside the drop
+  zone used to open it as a page with full access to the Mac. Web and mail
+  links open in the browser and the mail app.
+
 ## 4.0.0 — 2026-10-06
 
 First public release of OpenMTP Refined, with a downloadable DMG for Apple
