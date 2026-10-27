@@ -23,6 +23,7 @@ import {
   APP_THEME_MODE_TYPE,
   APP_LANGUAGE_TYPE,
   APP_FONT_FAMILY_TYPE,
+  APP_COLOR_STYLE_TYPE,
   MTP_MODE,
   FILE_TRANSFER_DIRECTION,
 } from '../../../enums';
@@ -174,6 +175,7 @@ export default class SettingsDialog extends PureComponent {
       appThemeMode,
       appLanguage,
       appFontFamily,
+      appColorStyle,
       styles,
       enableAutoUpdateCheck,
       enableBackgroundAutoUpdate,
@@ -196,6 +198,7 @@ export default class SettingsDialog extends PureComponent {
       onAppThemeModeChange,
       onAppLanguageChange,
       onAppFontFamilyChange,
+      onAppColorStyleChange,
       onShowLocalPaneChange,
       onShowLocalPaneOnLeftSideChange,
       onShowDirectoriesFirstChange,
@@ -377,6 +380,35 @@ export default class SettingsDialog extends PureComponent {
                         value: APP_THEME_MODE_TYPE.auto,
                         title: t('Auto'),
                         description: t('Follows the macOS appearance.'),
+                      })}
+                    </RadioGroup>
+                  ),
+                  grouped: false,
+                })}
+
+                {this.renderSection({
+                  icon: 'format_paint',
+                  title: t('Colour style'),
+                  description: t('How bold the Material 3 colours are.'),
+                  children: (
+                    <RadioGroup
+                      className={styles.group}
+                      value={appColorStyle}
+                      onChange={onAppColorStyleChange}
+                    >
+                      {this.renderRadioRow({
+                        icon: 'tonality',
+                        value: APP_COLOR_STYLE_TYPE.classic,
+                        title: t('Classic'),
+                        description: t('Calm tonal colours (Material You).'),
+                      })}
+                      {this.renderRadioRow({
+                        icon: 'colors',
+                        value: APP_COLOR_STYLE_TYPE.vibrant,
+                        title: t('Vibrant'),
+                        description: t(
+                          'Saturated colours and tinted surfaces (Material 3 Expressive).'
+                        ),
                       })}
                     </RadioGroup>
                   ),

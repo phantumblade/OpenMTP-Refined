@@ -240,6 +240,15 @@ const italian = {
   'How the app talks to you and looks.': 'Come l’app ti parla e come appare.',
   'Light, dark or following macOS.': 'Chiaro, scuro o come macOS.',
   'Follows the macOS appearance.': 'Segue l’aspetto di macOS.',
+  'Colour style': 'Stile dei colori',
+  'How bold the Material 3 colours are.':
+    'Quanto sono accesi i colori Material 3.',
+  Classic: 'Classico',
+  'Calm tonal colours (Material You).':
+    'Colori tonali e pacati (Material You).',
+  Vibrant: 'Vivace',
+  'Saturated colours and tinted surfaces (Material 3 Expressive).':
+    'Colori saturi e superfici tinte (Material 3 Expressive).',
   'Phone connection': 'Connessione al telefono',
   'How OpenMTP talks to Android phones over USB.':
     'Come OpenMTP comunica con i telefoni Android via USB.',

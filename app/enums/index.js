@@ -34,6 +34,13 @@ export const APP_FONT_FAMILY_TYPE = {
   facultyGlyphic: 'facultyGlyphic',
 };
 
+// Material 3 colour spec the palette is generated with (see
+// scripts/m3/generate-color-tokens.mjs)
+export const APP_COLOR_STYLE_TYPE = {
+  classic: 'classic',
+  vibrant: 'vibrant',
+};
+
 export const FILE_TRANSFER_DIRECTION = {
   upload: 'upload',
   download: 'download',

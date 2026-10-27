@@ -17,6 +17,12 @@ export const getAppThemeModeSetting = () => {
   return getAppThemeMode(value);
 };
 
+export const getAppColorStyleSetting = () => {
+  const setting = settingsStorage.getItems(['appColorStyle']);
+
+  return setting?.appColorStyle ?? initialState.appColorStyle;
+};
+
 export const getMtpModeSetting = () => {
   const setting = settingsStorage.getItems(['mtpMode']);
 

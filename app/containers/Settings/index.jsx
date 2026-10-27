@@ -148,6 +148,16 @@ class Settings extends Component {
     );
   };
 
+  _handleAppColorStyleChange = (event, value, deviceType) => {
+    this._handleSetCommonSettingsChange(
+      {
+        key: 'appColorStyle',
+        value,
+      },
+      deviceType
+    );
+  };
+
   _handleShowLocalPaneChange = (event, value, deviceType) => {
     this._handleSetCommonSettingsChange(
       {
@@ -240,6 +250,7 @@ class Settings extends Component {
         onAppThemeModeChange={this._handleSetAppThemeModeChange}
         onAppLanguageChange={this._handleAppLanguageChange}
         onAppFontFamilyChange={this._handleAppFontFamilyChange}
+        onAppColorStyleChange={this._handleAppColorStyleChange}
         onShowLocalPaneChange={this._handleShowLocalPaneChange}
         onShowLocalPaneOnLeftSideChange={
           this._handleShowLocalPaneOnLeftSideChange

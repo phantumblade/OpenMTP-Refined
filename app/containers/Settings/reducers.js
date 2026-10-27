@@ -4,6 +4,7 @@ import {
   FILE_EXPLORER_VIEW_TYPE,
   APP_THEME_MODE_TYPE,
   APP_FONT_FAMILY_TYPE,
+  APP_COLOR_STYLE_TYPE,
   MTP_MODE,
   FILE_TRANSFER_DIRECTION,
 } from '../../enums';
@@ -36,6 +37,7 @@ export const initialState = {
   // first launch follows the Mac's language; later the saved choice wins
   appLanguage: detectSystemLanguage(),
   appFontFamily: APP_FONT_FAMILY_TYPE.system,
+  appColorStyle: APP_COLOR_STYLE_TYPE.classic,
   showLocalPane: true,
   showLocalPaneOnLeftSide: true,
   showDirectoriesFirst: true,

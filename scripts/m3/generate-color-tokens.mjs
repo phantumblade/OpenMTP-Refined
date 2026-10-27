@@ -24,11 +24,18 @@ const roles = Object.getOwnPropertyNames(MaterialDynamicColors)
   .filter((name) => !/PaletteKeyColor$/.test(name))
   .sort();
 
+// The two colour styles the user can pick in Settings, both from the
+// "Vibrant" scheme variant:
+// - classic: the 2021 colour spec (Material You), calm tonal containers
+// - vibrant: the 2025 spec of Material 3 Expressive, with saturated
+//   containers and surfaces tinted by the brand colour
+const SPEC_VERSIONS = { classic: '2021', vibrant: '2025' };
+
 // M3 contrast levels: 0 standard, 0.5 medium, 1 high
-const buildScheme = (isDark, contrastLevel = 0) => {
+const buildScheme = (isDark, contrastLevel = 0, specVersion = '2021') => {
   const source = Hct.fromInt(argbFromHex(SEED));
   const tertiary = Hct.fromInt(argbFromHex(TERTIARY_SEED));
-  const vibrant = new SchemeVibrant(source, isDark, 0);
+  const vibrant = new SchemeVibrant(source, isDark, 0, specVersion);
   // Vibrant primary and neutrals, custom tertiary (M3 allows a custom
   // key colour per role)
   const scheme = new DynamicScheme({
@@ -36,6 +43,7 @@ const buildScheme = (isDark, contrastLevel = 0) => {
     variant: Variant.VIBRANT,
     contrastLevel,
     isDark,
+    specVersion,
     primaryPalette: vibrant.primaryPalette,
     secondaryPalette: vibrant.secondaryPalette,
     tertiaryPalette: TonalPalette.fromHueAndChroma(
@@ -54,12 +62,23 @@ const buildScheme = (isDark, contrastLevel = 0) => {
   );
 };
 
-const tokens = { light: buildScheme(false), dark: buildScheme(true) };
-// used when macOS "Increase contrast" is on
-const highContrastTokens = {
-  light: buildScheme(false, 1),
-  dark: buildScheme(true, 1),
-};
+const buildStyle = (specVersion) => ({
+  standard: {
+    light: buildScheme(false, 0, specVersion),
+    dark: buildScheme(true, 0, specVersion),
+  },
+  // used when macOS "Increase contrast" is on
+  highContrast: {
+    light: buildScheme(false, 1, specVersion),
+    dark: buildScheme(true, 1, specVersion),
+  },
+});
+const styles = Object.fromEntries(
+  Object.entries(SPEC_VERSIONS).map(([style, spec]) => [
+    style,
+    buildStyle(spec),
+  ])
+);
 const format = (value) =>
   JSON.stringify(value, null, 2)
     .replace(/"([^"]+)":/g, '$1:')
@@ -73,14 +92,22 @@ writeFileSync(
 
 export const M3_SEED_COLOR = '${SEED}';
 
-export const m3ColorTokens = ${format(tokens)};
+// Classic style: the 2021 colour spec.
+export const m3ColorTokens = ${format(styles.classic.standard)};
 
 // High contrast level (7:1 for text), for macOS "Increase contrast".
-export const m3HighContrastColorTokens = ${format(highContrastTokens)};
+export const m3HighContrastColorTokens = ${format(styles.classic.highContrast)};
+
+// Vibrant style: the 2025 colour spec of Material 3 Expressive.
+export const m3VibrantColorTokens = ${format(styles.vibrant.standard)};
+
+export const m3VibrantHighContrastColorTokens = ${format(
+    styles.vibrant.highContrast
+  )};
 `
 );
 
 // eslint-disable-next-line no-console
 console.log(
-  `Wrote ${roles.length} roles x 2 themes x 2 contrasts to ${OUTPUT.pathname}`
+  `Wrote ${roles.length} roles x 2 styles x 2 themes x 2 contrasts to ${OUTPUT.pathname}`
 );

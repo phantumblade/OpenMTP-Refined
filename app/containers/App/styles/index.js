@@ -4,8 +4,12 @@ import { getAppFontFamily } from '../../../helpers/fonts';
 import {
   m3ColorTokens,
   m3HighContrastColorTokens,
+  m3VibrantColorTokens,
+  m3VibrantHighContrastColorTokens,
 } from '../../../styles/m3/colorTokens';
 import { prefersHighContrast } from '../../../helpers/theme';
+import { getAppColorStyleSetting } from '../../../helpers/settings';
+import { APP_COLOR_STYLE_TYPE } from '../../../enums';
 import {
   alphaHex,
   m3Elevation,
@@ -81,9 +85,31 @@ const paletteFromM3 = (m3) => ({
   m3,
 });
 
-// M3 high contrast level when macOS "Increase contrast" is on
-export const getColorPalette = (highContrast = prefersHighContrast()) => {
-  const tokens = highContrast ? m3HighContrastColorTokens : m3ColorTokens;
+const COLOR_TOKENS = {
+  [APP_COLOR_STYLE_TYPE.classic]: {
+    standard: m3ColorTokens,
+    highContrast: m3HighContrastColorTokens,
+  },
+  [APP_COLOR_STYLE_TYPE.vibrant]: {
+    standard: m3VibrantColorTokens,
+    highContrast: m3VibrantHighContrastColorTokens,
+  },
+};
+
+export const getColorTokens = (colorStyle, highContrast) => {
+  const style =
+    COLOR_TOKENS[colorStyle] ?? COLOR_TOKENS[APP_COLOR_STYLE_TYPE.classic];
+
+  return highContrast ? style.highContrast : style.standard;
+};
+
+// The colour style chosen in Settings; M3 high contrast level when macOS
+// "Increase contrast" is on
+export const getColorPalette = (
+  highContrast = prefersHighContrast(),
+  colorStyle = getAppColorStyleSetting()
+) => {
+  const tokens = getColorTokens(colorStyle, highContrast);
 
   return {
     get light() {
@@ -95,8 +121,8 @@ export const getColorPalette = (highContrast = prefersHighContrast()) => {
   };
 };
 
-export const getCurrentThemePalette = (appThemeMode) => {
-  return getColorPalette()[appThemeMode];
+export const getCurrentThemePalette = (appThemeMode, colorStyle) => {
+  return getColorPalette(undefined, colorStyle)[appThemeMode];
 };
 
 // Material 3 (Expressive) styling for the MUI v4 components used across the
@@ -363,9 +389,9 @@ const m3ComponentOverrides = (m3) => ({
 });
 
 export const materialUiTheme = ({ ...args }) => {
-  const { appThemeMode, appFontFamily } = args;
+  const { appThemeMode, appFontFamily, appColorStyle } = args;
 
-  const palette = getCurrentThemePalette(appThemeMode);
+  const palette = getCurrentThemePalette(appThemeMode, appColorStyle);
   const fontFamily = getAppFontFamily(appFontFamily);
 
   return {
