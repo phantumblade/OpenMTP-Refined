@@ -1,5 +1,5 @@
 import path from 'path';
-import { exec, spawn } from 'child_process';
+import { execFile, spawn } from 'child_process';
 import { log } from '../../../utils/log';
 import {
   isArray,
@@ -14,25 +14,17 @@ import { baseName, getExtension } from '../../../utils/files';
 import { mtpCliPath } from '../../../helpers/binaries';
 import { msToTime, unixTimestampNow } from '../../../utils/date';
 import { checkIf } from '../../../utils/checkIf';
-import { escapeShellMtp } from '../../../helpers/mtpCliShell';
+import { MTP_CLI_ARGS } from '../../../helpers/mtpCliArgs';
 
 // `lsext` prints one line per file: Node's default 1 MB limit is reached by
 // a folder with ~12k photos and the listing then fails.
 const MTP_CLI_MAX_BUFFER = 256 * 1024 * 1024;
 
 export class FileExplorerLegacyDataSource {
-  constructor() {
-    this.mtpCli = `"${this._escapeShellMtp(mtpCliPath)}"`;
-  }
-
-  // the callback API directly: the promisified `exec` used before left one
-  // never-settling promise behind per command and had the 1 MB output limit
-  _execCallback(command, callback) {
-    exec(command, { maxBuffer: MTP_CLI_MAX_BUFFER }, callback);
-  }
-
-  _escapeShellMtp(cmd) {
-    return escapeShellMtp(cmd);
+  // mtp-cli runs without a shell: phone file names reach it as plain
+  // arguments (helpers/mtpCliArgs) and can never be run as commands
+  _execCallback(args, callback) {
+    execFile(mtpCliPath, args, { maxBuffer: MTP_CLI_MAX_BUFFER }, callback);
   }
 
   _filterOutMtpLines(string, index) {
@@ -72,10 +64,10 @@ export class FileExplorerLegacyDataSource {
     };
   }
 
-  async _exec(command) {
+  async _exec(args) {
     try {
       return new Promise((resolve) => {
-        this._execCallback(command, (error, stdout, stderr) => {
+        this._execCallback(args, (error, stdout, stderr) => {
           const { filteredStderr, filteredError, filteredStdout } =
             this._cleanJunkMtpError({ error, stdout, stderr });
 
@@ -102,9 +94,9 @@ export class FileExplorerLegacyDataSource {
     }
   }
 
-  async _execNoCatch(command) {
+  async _execNoCatch(args) {
     return new Promise((resolve) => {
-      this._execCallback(command, (error, stdout, stderr) => {
+      this._execCallback(args, (error, stdout, stderr) => {
         const { filteredStderr, filteredError, filteredStdout } =
           this._cleanJunkMtpError({ error, stdout, stderr });
 
@@ -129,11 +121,8 @@ export class FileExplorerLegacyDataSource {
   }
 
   async _checkMtpFileExists(filePath, storageId) {
-    const storageSelectCmd = `"storage ${storageId}"`;
-    const escapedFilePath = `${this._escapeShellMtp(filePath)}`;
-
     const { stderr } = await this._execNoCatch(
-      `${this.mtpCli} ${storageSelectCmd} "properties \\"${escapedFilePath}\\""`
+      MTP_CLI_ARGS.properties(storageId, filePath)
     );
 
     return !stderr;
@@ -237,9 +226,7 @@ export class FileExplorerLegacyDataSource {
         });
       }, handletransferListTimeInterval);
 
-      const cmd = spawn(this.mtpCli, [...cmdArgs], {
-        shell: true,
-      });
+      const cmd = spawn(mtpCliPath, cmdArgs);
 
       cmd.stdout.on('data', (data) => {
         if (startTime === 0) {
@@ -364,7 +351,7 @@ export class FileExplorerLegacyDataSource {
   async listStorages() {
     try {
       const { data, error, stderr } = await this._exec(
-        `${this.mtpCli} "storage-list"`
+        MTP_CLI_ARGS.storageList()
       );
 
       if (error || stderr) {
@@ -448,17 +435,11 @@ export class FileExplorerLegacyDataSource {
         timeAdded: 5,
       };
       const response = [];
-      const storageSelectCmd = `"storage ${storageId}"`;
-
       const {
         data: filePropsData,
         error: filePropsError,
         stderr: filePropsStderr,
-      } = await this._exec(
-        `${this.mtpCli} ${storageSelectCmd} "lsext \\"${this._escapeShellMtp(
-          filePath
-        )}\\""`
-      );
+      } = await this._exec(MTP_CLI_ARGS.listFiles(storageId, filePath));
 
       if (filePropsError || filePropsStderr) {
         log.error(
@@ -548,12 +529,8 @@ export class FileExplorerLegacyDataSource {
         return { error: `No files selected.`, stderr: null, data: null };
       }
 
-      const storageSelectCmd = `"storage ${storageId}"`;
-      const escapedFilePath = `${this._escapeShellMtp(filePath)}`;
-      const escapedNewFilename = `${this._escapeShellMtp(newFilename)}`;
-
       const { error, stderr } = await this._exec(
-        `${this.mtpCli} ${storageSelectCmd} "rename \\"${escapedFilePath}\\" \\"${escapedNewFilename}\\""`
+        MTP_CLI_ARGS.rename(storageId, filePath, newFilename)
       );
 
       if (error || stderr) {
@@ -586,14 +563,10 @@ export class FileExplorerLegacyDataSource {
         return { error: `No files selected.`, stderr: null, data: null };
       }
 
-      const storageSelectCmd = `"storage ${storageId}"`;
-
       for (let i = 0; i < fileList.length; i += 1) {
         // eslint-disable-next-line no-await-in-loop
         const { error, stderr } = await this._exec(
-          `${this.mtpCli} ${storageSelectCmd} "rm \\"${this._escapeShellMtp(
-            fileList[i]
-          )}\\""`
+          MTP_CLI_ARGS.remove(storageId, fileList[i])
         );
 
         if (error || stderr) {
@@ -627,10 +600,8 @@ export class FileExplorerLegacyDataSource {
         return { error: `Invalid path.`, stderr: null, data: null };
       }
 
-      const storageSelectCmd = `"storage ${storageId}"`;
-      const escapedFilePath = `${this._escapeShellMtp(filePath)}`;
       const { error, stderr } = await this._exec(
-        `${this.mtpCli} ${storageSelectCmd} "mkpath \\"${escapedFilePath}\\""`
+        MTP_CLI_ARGS.makeDirectory(storageId, filePath)
       );
 
       if (error || stderr) {
@@ -756,8 +727,6 @@ export class FileExplorerLegacyDataSource {
         return;
       }
 
-      const storageSelectCmd = `"storage ${storageId}"`;
-
       if (isEmpty(fileList) || !isArray(fileList)) {
         onError({
           error: `No files selected`,
@@ -772,15 +741,13 @@ export class FileExplorerLegacyDataSource {
 
       switch (direction) {
         case FILE_TRANSFER_DIRECTION.download:
-          cmdArgs = (fileList ?? []).map((sourcePath) => {
-            const destinationPath = path.resolve(destination);
-            const escapedDestinationPath = this._escapeShellMtp(
-              `${destinationPath}/${baseName(sourcePath)}`
-            );
-            const escapedSourcePath = `${this._escapeShellMtp(sourcePath)}`;
-
-            return `-e ${storageSelectCmd} "get \\"${escapedSourcePath}\\" \\"${escapedDestinationPath}\\""`;
-          });
+          cmdArgs = (fileList ?? []).flatMap((sourcePath) =>
+            MTP_CLI_ARGS.download(
+              storageId,
+              sourcePath,
+              `${path.resolve(destination)}/${baseName(sourcePath)}`
+            )
+          );
 
           return this._transferFiles({
             cmdArgs,
@@ -790,15 +757,13 @@ export class FileExplorerLegacyDataSource {
           });
 
         case FILE_TRANSFER_DIRECTION.upload:
-          cmdArgs = (fileList ?? []).map((sourcePath) => {
-            const destinationPath = path.resolve(destination);
-            const escapedDestinationPath = `${this._escapeShellMtp(
-              destinationPath
-            )}`;
-            const escapedSourcePath = `${this._escapeShellMtp(sourcePath)}`;
-
-            return `-e ${storageSelectCmd} "put \\"${escapedSourcePath}\\" \\"${escapedDestinationPath}\\""`;
-          });
+          cmdArgs = (fileList ?? []).flatMap((sourcePath) =>
+            MTP_CLI_ARGS.upload(
+              storageId,
+              sourcePath,
+              path.resolve(destination)
+            )
+          );
 
           return this._transferFiles({
             cmdArgs,
@@ -823,7 +788,7 @@ export class FileExplorerLegacyDataSource {
   async fetchDebugReport() {
     try {
       const { data, error, stderr } = await this._exec(
-        `${this.mtpCli} "pwd" -v`
+        MTP_CLI_ARGS.debugReport()
       );
 
       if (error) {
