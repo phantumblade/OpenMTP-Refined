@@ -83,6 +83,15 @@ this in Terminal and open it again:
 xattr -dr com.apple.quarantine /Applications/OpenMTP.app
 ```
 
+### Updates
+
+When it opens, OpenMTP checks this repository's releases for a newer version,
+downloads it, verifies its SHA-256 checksum and asks to **Install and
+Relaunch** (or installs it when you quit). **OpenMTP → Check For Updates**
+checks right away, and **OpenMTP → Install Update from File…** installs a DMG,
+ZIP or app you already have, such as a build made on your Mac. Automatic
+checks and downloads can be turned off in **Settings → Updates**.
+
 ## Privacy and folder access
 
 OpenMTP does not ask for any permission when it starts. macOS protects a few
@@ -138,6 +147,12 @@ yarn dev
 `yarn test` runs the JavaScript lint, the performance and behaviour checks and
 the Go tests. `yarn package-mac-local` builds an ad-hoc signed app, installs it
 in `/Applications` and writes the DMG to `dist/`.
+
+To publish an update, raise `version` in `package.json`, build the DMG and
+attach it to a GitHub release tagged `vX.Y.Z` (mark betas as pre-releases).
+The file name must contain the architecture, e.g. `-arm64.dmg` or `-x64.zip`:
+the app installs only the build for its own Mac, and only if its checksum
+matches the one GitHub shows for the file.
 
 ```text
 app/components/m3/         Material 3 Expressive components
@@ -201,6 +216,16 @@ Terminale il comando qui sotto e riaprila:
 ```bash
 xattr -dr com.apple.quarantine /Applications/OpenMTP.app
 ```
+
+#### Aggiornamenti
+
+All'apertura OpenMTP controlla se nelle release di questo repository c'è una
+versione più nuova, la scarica, ne verifica l'impronta SHA-256 e propone
+**Install and Relaunch** (oppure la installa quando chiudi l'app).
+**OpenMTP → Check For Updates** controlla subito, e **OpenMTP → Install Update
+from File…** installa un DMG, uno ZIP o un'app che hai già, per esempio una
+build fatta sul tuo Mac. Controllo e download automatici si possono disattivare
+in **Impostazioni → Aggiornamenti**.
 
 ### Privacy e accesso alle cartelle
 

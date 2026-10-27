@@ -9,6 +9,15 @@ Version 4.0.0 is the first release of the fork with its own version number.
 
 ### Added
 
+- Updates from this fork's GitHub releases. When it opens, OpenMTP looks for
+  a newer version, downloads it in the background, checks its SHA-256 against
+  the one GitHub publishes and asks to install and relaunch, or installs it
+  when you quit. "Check For Updates" checks right away and shows what's new
+  first; "Install Update from File…" installs a DMG, ZIP or app you already
+  have (e.g. a local build). Ad-hoc signed builds can't use Electron's own
+  updater, so OpenMTP replaces its app bundle itself after quitting, keeping
+  the previous version if anything goes wrong.
+
 - Colour style in Settings → General: "Classic" keeps the current calm
   Material You colours, "Vibrant" uses the 2025 colour spec of Material 3
   Expressive, with saturated containers and surfaces tinted by the brand
