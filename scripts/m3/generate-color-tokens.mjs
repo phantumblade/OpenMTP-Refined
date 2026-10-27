@@ -54,12 +54,21 @@ const buildScheme = (isDark, contrastLevel = 0, specVersion = '2021') => {
     neutralVariantPalette: vibrant.neutralVariantPalette,
   });
 
-  return Object.fromEntries(
+  const tokens = Object.fromEntries(
     roles.map((name) => [
       name,
       hexFromArgb(MaterialDynamicColors[name].getArgb(scheme)),
     ])
   );
+
+  // The 2025 spec makes the lowest dark container pure black, meant for
+  // OLED phones; on a Mac the settings rows then look like holes in the
+  // navy dialog. Use neutral tone 4, the 2021 spec's value, instead.
+  if (specVersion === '2025' && isDark) {
+    tokens.surfaceContainerLowest = hexFromArgb(scheme.neutralPalette.tone(4));
+  }
+
+  return tokens;
 };
 
 const buildStyle = (specVersion) => ({
