@@ -24,6 +24,13 @@ Version 4.0.0 is the first release of the fork with its own version number.
   blue (deep navy in dark mode). Both follow light/dark mode and macOS
   "Increase contrast", and switch instantly.
 
+### Removed
+
+- The unused telemetry and update libraries inherited from upstream
+  (Sentry, Mixpanel, electron-ga, electron-updater) and their Sentry build
+  tooling: the fork never sent data, and the app now ships 35 fewer packages
+  and 15 fewer known dependency advisories.
+
 ### Fixed
 
 - Small windows (down to the 880×640 minimum): the date filter no longer
