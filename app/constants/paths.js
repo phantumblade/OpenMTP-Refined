@@ -35,7 +35,6 @@ const logDir = join(profileDir, `./logs`);
 const logFile = join(logDir, `./${APP_NAME}-${logFileName}`);
 const settingsFile = join(profileDir, `./settings.json`);
 const identifierFile = join(profileDir, `./identifier.json`);
-const devAppUpdateFile = join(configDir, `./dev-app-update.yml`);
 
 export const PATHS = {
   root: resolve(root),
@@ -50,7 +49,6 @@ export const PATHS = {
   logFile: resolve(logFile),
   settingsFile: resolve(settingsFile),
   identifierFile: resolve(identifierFile),
-  devAppUpdateFile: resolve(devAppUpdateFile),
   prevProfileDir: resolve(prevProfileDir),
   desktopDir: join(homeDir, `/Desktop`),
   documentsDir: join(homeDir, `/Documents`),

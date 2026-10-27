@@ -68,6 +68,13 @@ export default class MenuBuilder {
             this.autoAppUpdate.forceCheck();
           },
         },
+        {
+          visible: this.appUpdaterEnable,
+          label: 'Install Update from File…',
+          click: () => {
+            this.autoAppUpdate.installFromFile();
+          },
+        },
         { type: 'separator' },
         {
           label: `Hide ${APP_NAME}`,

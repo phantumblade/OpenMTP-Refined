@@ -320,11 +320,15 @@ if (!isDeviceBootable) {
           applyCustomAppIcon();
         }
 
-        let appUpdaterEnable = ENV_FLAVOR.enableAppUpdates;
-
-        if (appUpdaterEnable && isPackaged && process.platform === 'darwin') {
-          appUpdaterEnable = !isMas && app.isInApplicationsFolder();
-        }
+        // the updater replaces the running .app bundle, so only a packaged
+        // macOS build in Applications may update itself (never Electron.app
+        // while developing)
+        const appUpdaterEnable =
+          ENV_FLAVOR.enableAppUpdates &&
+          isPackaged &&
+          process.platform === 'darwin' &&
+          !isMas &&
+          app.isInApplicationsFolder();
 
         const autoUpdateCheckSettings = settingsStorage.getItems([
           'enableBackgroundAutoUpdate',

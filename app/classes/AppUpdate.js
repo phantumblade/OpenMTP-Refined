@@ -1,9 +1,10 @@
 import { BrowserWindow, dialog, ipcMain } from 'electron';
-import { autoUpdater } from 'electron-updater';
 import { isConnected } from '../utils/isOnline';
 import { log } from '../utils/log';
-import { isPackaged } from '../utils/isPackaged';
 import { PATHS } from '../constants/paths';
+import { APP_VERSION } from '../constants/meta';
+import GithubReleaseUpdater from './GithubReleaseUpdater';
+import { UpdateError } from '../helpers/appUpdateRelease';
 import { unixTimestampNow } from '../utils/date';
 import { undefinedOrNull } from '../utils/funcs';
 import {
@@ -93,14 +94,17 @@ const fireProgressbar = () => {
 
 export default class AppUpdate {
   constructor({ autoUpdateCheck, autoDownload, allowPrerelease }) {
-    this.autoUpdater = autoUpdater;
-    if (!isPackaged) {
-      this.autoUpdater.updateConfigPath = PATHS.devAppUpdateFile;
-    }
+    this.autoUpdater = new GithubReleaseUpdater({
+      currentVersion: APP_VERSION,
+      allowPrerelease,
+    });
 
-    this.autoUpdater.autoDownload = autoUpdateCheck && autoDownload;
-    this.autoUpdater.allowPrerelease = allowPrerelease;
+    // after the automatic check at launch, download without asking first
+    this.backgroundDownload = autoUpdateCheck && autoDownload;
     this.autoUpdateCheck = autoUpdateCheck;
+    // whether the user is waiting for this check or download: only then do
+    // errors deserve a dialog
+    this.interactive = false;
 
     this.progressbarWindowDomReadyFlag = null;
     this.updateInitFlag = false;
@@ -127,6 +131,21 @@ export default class AppUpdate {
         }
 
         this.closeActiveUpdates();
+
+        // a failed check at launch (offline, GitHub busy...) is retried next
+        // time; it must not interrupt the user with a dialog
+        if (!this.interactive) {
+          log.doLog(error, `AppUpdate -> onerror -> background`);
+
+          return null;
+        }
+
+        if (error instanceof UpdateError) {
+          this.spitMessageDialog('Update Error', error.message, 'error');
+          log.doLog(error, `AppUpdate -> onerror -> UpdateError`);
+
+          return null;
+        }
 
         if (this.isNetworkError(error)) {
           this.spitMessageDialog(
@@ -157,9 +176,11 @@ export default class AppUpdate {
           progressbarWindow.close();
         }
 
-        // When auto background update download and auto update check are active prevent other ways (manual) of download handling.
-        if (this.autoUpdater.autoDownload && this.autoUpdateCheck) {
+        // the automatic check at launch downloads in the background and asks
+        // only once the update is ready; a manual check shows what's new first
+        if (this.backgroundDownload && !this.interactive) {
           this.closeActiveUpdates(-1);
+          this.autoUpdater.downloadUpdate();
 
           return;
         }
@@ -194,13 +215,10 @@ export default class AppUpdate {
             progressbarWindow.close();
           }
 
+          this.interactive = true;
           this.closeActiveUpdates(-1);
           this.initDownloadUpdatesProgress();
-
-          // this is to prevent race condition
-          if (!this.autoUpdater.autoDownload) {
-            this.autoUpdater.downloadUpdate();
-          }
+          this.autoUpdater.downloadUpdate();
         });
       });
 
@@ -212,24 +230,13 @@ export default class AppUpdate {
         this.setUpdateProgressWindow({ value: progress.percent || 0 });
       });
 
-      this.autoUpdater.on('update-downloaded', async () => {
+      this.autoUpdater.on('update-downloaded', ({ version }) => {
         this.closeActiveUpdates();
         if (progressbarWindow !== null) {
           progressbarWindow.close();
         }
 
-        const { response: buttonIndex } = await dialog.showMessageBox({
-          title: 'Install Updates',
-          message: 'Updates downloaded. Application will quit now...',
-          buttons: ['Install and Relaunch'],
-        });
-
-        switch (buttonIndex) {
-          case 0:
-          default:
-            this.autoUpdater.quitAndInstall();
-            break;
-        }
+        this.askToInstall(version);
       });
 
       this.updateInitFlag = true;
@@ -280,6 +287,15 @@ export default class AppUpdate {
       this.setMainWindow();
 
       if (!mainWindow) {
+        return;
+      }
+
+      this.interactive = true;
+
+      // already downloaded (e.g. "Later" was chosen): offer it again
+      if (this.autoUpdater.preparedUpdate) {
+        this.askToInstall(this.autoUpdater.preparedUpdate.version);
+
         return;
       }
 
@@ -344,6 +360,87 @@ export default class AppUpdate {
       this.updateStatus = UPDATER_STATUS.checkInProgress;
     } catch (e) {
       log.error(e, `AppUpdate -> forceCheck`);
+    }
+  }
+
+  async askToInstall(version) {
+    const { response } = await dialog.showMessageBox({
+      type: 'info',
+      title: 'Install Update',
+      message: `OpenMTP ${version} is ready to install.`,
+      detail:
+        'OpenMTP will quit, replace itself with the new version and open again. If you choose Later, it is installed when you quit OpenMTP.',
+      buttons: ['Install and Relaunch', 'Later'],
+      defaultId: 0,
+      cancelId: 1,
+    });
+
+    try {
+      if (response === 0) {
+        this.autoUpdater.quitAndInstall();
+      } else {
+        this.autoUpdater.installOnQuit();
+      }
+    } catch (e) {
+      log.error(e, `AppUpdate -> askToInstall`);
+      dialog.showErrorBox(
+        'Update Error',
+        e instanceof UpdateError ? e.message : `${e?.message || e}`
+      );
+    }
+  }
+
+  // A DMG, ZIP or app picked by the user, e.g. a build made on this Mac.
+  async installFromFile() {
+    this.setMainWindow();
+
+    const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
+      title: 'Install OpenMTP from a File',
+      buttonLabel: 'Install',
+      properties: ['openFile'],
+      filters: [
+        {
+          name: 'OpenMTP (DMG, ZIP or app)',
+          extensions: ['dmg', 'zip', 'app'],
+        },
+      ],
+    });
+
+    if (canceled || !filePaths || filePaths.length < 1) {
+      return;
+    }
+
+    this.setTaskBarProgressBar(2);
+
+    try {
+      const { version } = await this.autoUpdater.prepareLocalUpdate(
+        filePaths[0]
+      );
+
+      this.setTaskBarProgressBar(-1);
+
+      const { response } = await dialog.showMessageBox(mainWindow, {
+        type: 'question',
+        title: 'Install Update',
+        message: `Install OpenMTP ${version}?`,
+        detail: `The installed version is ${APP_VERSION}. OpenMTP will quit, replace itself and open again.`,
+        buttons: ['Install and Relaunch', 'Cancel'],
+        defaultId: 0,
+        cancelId: 1,
+      });
+
+      if (response === 0) {
+        this.autoUpdater.quitAndInstall();
+      }
+    } catch (e) {
+      this.setTaskBarProgressBar(-1);
+      log.error(e, `AppUpdate -> installFromFile`);
+      dialog.showErrorBox(
+        'Install Update',
+        e instanceof UpdateError
+          ? e.message
+          : `This file could not be installed: ${e?.message || e}`
+      );
     }
   }
 

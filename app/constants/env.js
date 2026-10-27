@@ -23,7 +23,9 @@ const config = {
     reportToSenty: false,
     enableGoogleAnalytics: false,
     enableMixpanelAnalytics: false,
-    enableAppUpdates: false,
+    // reads the fork's own GitHub releases (classes/GithubReleaseUpdater);
+    // the privacy policy covers these checks and Settings can turn them off
+    enableAppUpdates: true,
     disableReactWarnings: false,
     allowDevelopmentEnvironment: false,
   },
