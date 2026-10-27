@@ -3,18 +3,14 @@
  */
 
 import path from 'path';
-import { existsSync } from 'fs';
 import webpack from 'webpack';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import SentryWebpackPlugin from '@sentry/webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import merge from 'webpack-merge';
 import TerserPlugin from 'terser-webpack-plugin';
 import baseConfig from './config.base';
 import { PATHS } from '../app/constants/paths';
 import { pkginfo } from '../app/utils/pkginfo';
-
-const sentryConfigFile = path.join(PATHS.root, 'sentry.properties');
 
 export default merge(baseConfig, {
   devtool: 'source-map',
@@ -243,19 +239,6 @@ export default merge(baseConfig, {
     //     process.env.OPEN_ANALYZER === 'true' ? 'server' : 'disabled',
     //   openAnalyzer: process.env.OPEN_ANALYZER === 'true',
     // }),
-
-    ...(existsSync(sentryConfigFile)
-      ? [
-          new SentryWebpackPlugin({
-            include: 'app/dist',
-            ignore: ['node_modules', 'webpack'],
-            urlPrefix: '~/app/dist',
-            configFile: sentryConfigFile,
-            rewrite: false,
-            release: pkginfo.version,
-          }),
-        ]
-      : []),
   ],
 
   /**

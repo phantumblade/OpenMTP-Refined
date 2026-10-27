@@ -1,7 +1,5 @@
 /* eslint global-require: off */
 
-import './services/sentry/index';
-
 import {
   app,
   BrowserWindow,

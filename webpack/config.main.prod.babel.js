@@ -3,17 +3,13 @@
  */
 
 import path from 'path';
-import { existsSync } from 'fs';
 import webpack from 'webpack';
 import merge from 'webpack-merge';
-import SentryWebpackPlugin from '@sentry/webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import baseConfig from './config.base';
 import { PATHS } from '../app/constants/paths';
 import { pkginfo } from '../app/utils/pkginfo';
-
-const sentryConfigFile = path.join(PATHS.root, 'sentry.properties');
 
 export default merge(baseConfig, {
   devtool: 'source-map',
@@ -64,19 +60,6 @@ export default merge(baseConfig, {
       DEBUG_PROD: false,
       START_MINIMIZED: false,
     }),
-
-    ...(existsSync(sentryConfigFile)
-      ? [
-          new SentryWebpackPlugin({
-            include: 'app/main.prod.js.map',
-            ignore: ['node_modules', 'webpack'],
-            urlPrefix: '~/app',
-            configFile: sentryConfigFile,
-            rewrite: false,
-            release: pkginfo.version,
-          }),
-        ]
-      : []),
   ],
 
   /**
