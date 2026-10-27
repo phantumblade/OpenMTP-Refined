@@ -19,7 +19,7 @@ export const styles = (theme) => ({
   scrollContainer: {
     ...mixins({ theme }).center,
     marginTop: 5,
-    border: `1px solid #000`,
+    border: `1px solid ${theme.palette.divider}`,
     background: theme.palette.background.paper,
     height: 350,
     width: '100%',

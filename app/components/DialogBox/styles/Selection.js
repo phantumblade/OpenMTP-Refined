@@ -3,7 +3,9 @@ export const styles = (theme) => ({
   selectedAvatar: {
     background: theme.palette.secondary.main,
   },
+  // on-colour of the avatar: white was nearly invisible on the light
+  // primary of the dark scheme
   selectedIcon: {
-    color: '#fff',
+    color: theme.palette.secondary.contrastText,
   },
 });

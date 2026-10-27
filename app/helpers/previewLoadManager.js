@@ -1,4 +1,5 @@
 import { execFile } from 'child_process';
+import { createHash } from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -38,22 +39,58 @@ export function isRawImageFormat(filePath) {
   );
 }
 
+// qlmanage always names its output `<file name>.png`, so every file gets its
+// own folder keyed by path, size and modification time: two `IMG_0001.DNG`
+// in different folders, or a file edited since, never share a thumbnail.
+export function quickLookOutputDir(filePath) {
+  let version = '';
+
+  try {
+    const { mtimeMs, size } = fs.statSync(filePath);
+
+    version = `${mtimeMs}:${size}`;
+  } catch (_) {
+    // unreadable file: qlmanage will fail and nothing gets cached
+  }
+
+  const key = createHash('sha1')
+    .update(`${filePath}\0${version}`)
+    .digest('hex');
+
+  return path.join(THUMB_CACHE_DIR, key);
+}
+
+const pendingQuickLookThumbnails = new Map();
+
 export function requestNativeQuickLookThumbnail(filePath) {
-  return new Promise((resolve) => {
-    if (!filePath) {
+  if (!filePath) {
+    return Promise.resolve(null);
+  }
+
+  const outputDir = quickLookOutputDir(filePath);
+  const thumbPath = path.join(outputDir, `${path.basename(filePath)}.png`);
+
+  if (fs.existsSync(thumbPath)) {
+    return Promise.resolve(pathToFileURL(thumbPath).toString());
+  }
+
+  // a failed <img> retries through QuickLook: share the running request
+  if (pendingQuickLookThumbnails.has(thumbPath)) {
+    return pendingQuickLookThumbnails.get(thumbPath);
+  }
+
+  const request = new Promise((resolve) => {
+    try {
+      fs.mkdirSync(outputDir, { recursive: true });
+    } catch (_) {
       return resolve(null);
-    }
-
-    const filename = path.basename(filePath);
-    const thumbPath = path.join(THUMB_CACHE_DIR, `${filename}.png`);
-
-    if (fs.existsSync(thumbPath)) {
-      return resolve(pathToFileURL(thumbPath).toString());
     }
 
     execFile(
       'qlmanage',
-      ['-t', '-s', '256', '-o', THUMB_CACHE_DIR, filePath],
+      ['-t', '-s', '256', '-o', outputDir, filePath],
+      // a hung qlmanage must not outlive the preview slot it was given
+      { timeout: PREVIEW_TIMEOUT_MS },
       (err) => {
         if (!err && fs.existsSync(thumbPath)) {
           resolve(pathToFileURL(thumbPath).toString());
@@ -62,7 +99,13 @@ export function requestNativeQuickLookThumbnail(filePath) {
         }
       }
     );
+  }).finally(() => {
+    pendingQuickLookThumbnails.delete(thumbPath);
   });
+
+  pendingQuickLookThumbnails.set(thumbPath, request);
+
+  return request;
 }
 
 /**

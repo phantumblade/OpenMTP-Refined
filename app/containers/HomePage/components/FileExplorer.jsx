@@ -287,6 +287,13 @@ class FileExplorer extends Component {
       event.preventDefault();
       event.stopPropagation();
 
+      // both panes listen on the window: only the focussed one navigates,
+      // otherwise the other pane (with no history of its own) also sent the
+      // focussed pane to its parent folder
+      if (activeDeviceType !== deviceType) {
+        return;
+      }
+
       if (!this.navigationHistory) {
         this.navigationHistory = {
           [DEVICE_TYPE.local]: { back: [], forward: [] },
