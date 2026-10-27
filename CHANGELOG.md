@@ -17,7 +17,6 @@ Version 4.0.0 is the first release of the fork with its own version number.
   have (e.g. a local build). Ad-hoc signed builds can't use Electron's own
   updater, so OpenMTP replaces its app bundle itself after quitting, keeping
   the previous version if anything goes wrong.
-
 - Colour style in Settings → General: "Classic" keeps the current calm
   Material You colours, "Vibrant" uses the 2025 colour spec of Material 3
   Expressive, with saturated containers and surfaces tinted by the brand
@@ -33,6 +32,12 @@ Version 4.0.0 is the first release of the fork with its own version number.
 
 ### Fixed
 
+- The app menu, the update windows and every update message are now in
+  Italian when the app is, and the menu switches language right away.
+- Vibrant colour style, dark mode: the settings and welcome lists no longer
+  show pure black rows (meant for phone OLED screens) in the navy dialog.
+- Connecting a phone can no longer hang if the phone never stops sending the
+  reply another app asked for: OpenMTP stops waiting for it after 30 seconds.
 - Small windows (down to the 880×640 minimum): the date filter no longer
   runs off the bottom of the window, so its calendar and the Apply button
   stay reachable (the middle of the panel scrolls instead).
@@ -69,6 +74,11 @@ Version 4.0.0 is the first release of the fork with its own version number.
 
 ### Security
 
+- Legacy MTP mode now runs mtp-cli without a shell. The escaping added
+  earlier still let a name with a backslash before `$(` (e.g.
+  `a\$(command)`) run a command on the Mac; file names are now passed as
+  plain arguments, so no name can be run, while mtp-cli receives exactly the
+  same text as before for every ordinary name.
 - Legacy MTP mode: a file or folder on the phone named like
   `$(command)` ran that command on the Mac when opened or copied. File names
   are now passed to the shell literally.
