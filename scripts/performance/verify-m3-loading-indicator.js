@@ -5,6 +5,13 @@ const {
   getMorphSequence,
   springValue,
 } = require('../../app/components/m3/M3LoadingIndicator');
+const {
+  restRemainingMs,
+} = require('../../app/components/m3/AngryFaceAnimation');
+const {
+  ANGRY_FACE_FPS,
+  ANGRY_FACE_FRAMES,
+} = require('../../app/components/m3/angryFaceFrames');
 
 function main() {
   // Compose: spring(dampingRatio = 0.6, stiffness = 200, visibilityThreshold = 0.1)
@@ -55,6 +62,16 @@ function main() {
 
   assert.strictEqual(lastIndex, 0);
   assert.ok(Math.abs(lastProgress - 1) < 0.01, `hand-over ${lastProgress}`);
+
+  // the angry face animates, then sleeps (no frames) until the next outburst
+  const outburstMs = (ANGRY_FACE_FRAMES.length / ANGRY_FACE_FPS) * 1000;
+  const cycleMs = outburstMs + 5000;
+
+  assert.strictEqual(restRemainingMs(0), 0);
+  assert.strictEqual(restRemainingMs(outburstMs - 1), 0);
+  assert.strictEqual(restRemainingMs(outburstMs), 5000);
+  assert.strictEqual(restRemainingMs(cycleMs - 100), 100);
+  assert.strictEqual(restRemainingMs(cycleMs + 10), 0);
 
   // eslint-disable-next-line no-console
   console.log('M3 loading indicator invariants: ok');

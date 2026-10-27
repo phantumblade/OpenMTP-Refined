@@ -64,9 +64,17 @@ const mouthPath = (cx, top, bottom, width, frown) => {
 const ANIMATION_MS = (ANGRY_FACE_FRAMES.length / ANGRY_FACE_FPS) * 1000;
 // the face rests between two outbursts instead of looping back-to-back
 const REST_BETWEEN_LOOPS_MS = 5000;
+const CYCLE_MS = ANIMATION_MS + REST_BETWEEN_LOOPS_MS;
+
+// Time until the next outburst while the face is resting, otherwise 0.
+export const restRemainingMs = (elapsedMs) => {
+  const inCycle = elapsedMs % CYCLE_MS;
+
+  return inCycle >= ANIMATION_MS ? CYCLE_MS - inCycle : 0;
+};
 
 const frameAt = (elapsedMs) => {
-  const inCycle = elapsedMs % (ANIMATION_MS + REST_BETWEEN_LOOPS_MS);
+  const inCycle = elapsedMs % CYCLE_MS;
 
   if (inCycle >= ANIMATION_MS) {
     return ANGRY_FACE_FRAMES[0];
@@ -102,6 +110,7 @@ export default function AngryFaceAnimation({
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const start = performance.now();
     let frameId = null;
+    let restTimer = null;
 
     const draw = (now) => {
       const [
@@ -174,14 +183,29 @@ export default function AngryFaceAnimation({
         )
       );
 
-      if (!reduceMotion) {
+      if (reduceMotion) {
+        return;
+      }
+
+      // the resting face is drawn once; sleep until the next outburst
+      // instead of redrawing the same frame for five seconds
+      const rest = restRemainingMs(Math.max(0, now - start));
+
+      if (rest > 0) {
+        restTimer = window.setTimeout(() => {
+          frameId = window.requestAnimationFrame(draw);
+        }, rest);
+      } else {
         frameId = window.requestAnimationFrame(draw);
       }
     };
 
     frameId = window.requestAnimationFrame(draw);
 
-    return () => window.cancelAnimationFrame(frameId);
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.clearTimeout(restTimer);
+    };
   }, []);
 
   return (

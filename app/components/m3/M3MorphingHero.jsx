@@ -35,6 +35,7 @@ export default function M3MorphingHero({
   const pathRef = useRef(null);
   const iconRef = useRef(null);
   const loadingRef = useRef(loading);
+  const wakeRef = useRef(null);
 
   loadingRef.current = loading;
 
@@ -108,6 +109,8 @@ export default function M3MorphingHero({
     };
 
     const tick = (now) => {
+      frameId = null;
+
       if (mode === 'idle' && loadingRef.current) {
         startLoading(now);
       }
@@ -169,16 +172,35 @@ export default function M3MorphingHero({
         }
       }
 
-      frameId = window.requestAnimationFrame(tick);
+      // the resting shape doesn't move: stop drawing until loading starts
+      // instead of waking the CPU 60 times a second for nothing
+      if (mode !== 'idle' || loadingRef.current) {
+        frameId = window.requestAnimationFrame(tick);
+      }
+    };
+
+    wakeRef.current = () => {
+      if (frameId === null) {
+        frameId = window.requestAnimationFrame(tick);
+      }
     };
 
     drawIdle();
     setFill(false);
     setIcon(true);
-    frameId = window.requestAnimationFrame(tick);
+    wakeRef.current();
 
-    return () => window.cancelAnimationFrame(frameId);
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      wakeRef.current = null;
+    };
   }, [size, shape, symmetryDegrees, color, loadingColor]);
+
+  useEffect(() => {
+    if (loading) {
+      wakeRef.current?.();
+    }
+  }, [loading]);
 
   return (
     <span
