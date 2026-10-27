@@ -8,6 +8,7 @@ import {
   ipcMain,
   nativeTheme,
   nativeImage,
+  shell,
 } from 'electron';
 import electronIs from 'electron-is';
 import usbDetect from 'usb-detection';
@@ -39,6 +40,7 @@ import IpcEventService from './services/ipc-events/IpcEventHandler';
 import { isKalamModeSupported } from './helpers/binaries';
 import { fileExistsSync } from './helpers/fileOps';
 import { applyCustomAppIcon } from './helpers/customAppIcon';
+import { isExternalUrl, navigationDecision } from './helpers/navigationPolicy';
 
 const remote = getRemoteWindow();
 
@@ -57,7 +59,9 @@ if (IS_DEV || DEBUG_PROD) {
   require('electron-debug')();
 }
 
-async function bootTheDevice() {
+// Synchronous: an async check returned a Promise, which is always truthy,
+// so the "unable to load profile" window could never appear.
+function bootTheDevice() {
   try {
     // For an existing installation
     if (bootLoader.quickVerify()) {
@@ -65,11 +69,13 @@ async function bootTheDevice() {
     }
 
     // For a fresh installation
-    await bootLoader.init();
+    bootLoader.init();
 
-    return await bootLoader.verify();
+    return bootLoader.verify();
   } catch (e) {
-    throw new Error(e);
+    console.error(e);
+
+    return false;
   }
 }
 
@@ -180,6 +186,32 @@ async function createWindow() {
   }
 }
 
+// Windows run with Node integration: keep every one of them on the app page
+// (see helpers/navigationPolicy) and send web links to the browser.
+app.on('web-contents-created', (_, contents) => {
+  contents.on('will-navigate', (event, targetUrl) => {
+    const decision = navigationDecision(targetUrl, PATHS.loadUrlPath);
+
+    if (decision === 'allow') {
+      return;
+    }
+
+    event.preventDefault();
+
+    if (decision === 'external') {
+      shell.openExternal(targetUrl);
+    }
+  });
+
+  contents.setWindowOpenHandler(({ url: targetUrl }) => {
+    if (isExternalUrl(targetUrl)) {
+      shell.openExternal(targetUrl);
+    }
+
+    return { action: 'deny' };
+  });
+});
+
 /**
  * Checks whether device is ready to boot or not.
  * Here profile files are created if not found.
@@ -214,7 +246,7 @@ if (!isDeviceBootable) {
 
     ipcMain.removeAllListeners('ELECTRON_BROWSER_WINDOW_ALERT');
     ipcMain.on('ELECTRON_BROWSER_WINDOW_ALERT', (event, message, title) => {
-      ipcMain.error(
+      log.error(
         message,
         `main.dev -> ipcMain -> on ELECTRON_BROWSER_WINDOW_ALERT -> ${title}`
       );
