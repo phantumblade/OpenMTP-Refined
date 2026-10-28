@@ -1,9 +1,10 @@
-import { spawn } from 'child_process';
+import { execFile, spawn } from 'child_process';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { app, nativeImage } from 'electron';
 import { log } from '../utils/log';
+import { finderInfoHasCustomIcon } from './finderInfo';
 
 // macOS 26 draws bundle icons that don't fill the standard squircle (like our
 // tilted one) inside a grey container, but leaves Finder custom icons alone.
@@ -30,12 +31,29 @@ const LSREGISTER =
 const appBundlePath = () =>
   path.resolve(path.dirname(app.getPath('exe')), '..', '..');
 
+// Icon\r alone isn't proof: a copied bundle keeps that file but can lose the
+// FinderInfo flag that makes Finder use it (see helpers/finderInfo).
+const hasCustomIcon = (bundle) =>
+  new Promise((resolve) => {
+    if (!fs.existsSync(path.join(bundle, 'Icon\r'))) {
+      resolve(false);
+
+      return;
+    }
+
+    execFile(
+      'xattr',
+      ['-px', 'com.apple.FinderInfo', bundle],
+      (error, stdout) => resolve(!error && finderInfoHasCustomIcon(stdout))
+    );
+  });
+
 export const shouldApplyCustomAppIcon = ({ platform, darwinMajor, bundle }) =>
   platform === 'darwin' &&
   darwinMajor >= FIRST_AFFECTED_DARWIN_MAJOR &&
   bundle.endsWith('.app');
 
-export function applyCustomAppIcon() {
+export async function applyCustomAppIcon() {
   try {
     const bundle = appBundlePath();
     const darwinMajor = Number(os.release().split('.')[0]);
@@ -64,8 +82,7 @@ export function applyCustomAppIcon() {
       app.dock.setIcon(dockImage);
     }
 
-    // Finder stores a custom icon in this file inside the bundle
-    if (fs.existsSync(path.join(bundle, 'Icon\r'))) {
+    if (await hasCustomIcon(bundle)) {
       return;
     }
 

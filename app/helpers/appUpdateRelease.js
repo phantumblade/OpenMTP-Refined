@@ -189,6 +189,20 @@ rm -rf "$backup"
 if command -v xattr >/dev/null 2>&1; then
   xattr -dr com.apple.quarantine "$target" 2>/dev/null
 fi
+
+# the copy drops the Finder custom icon of the bundle: put the tilted icon
+# back, as scripts/build-local-mac.sh does (macOS 26 boxes the bundle icon)
+icon="$target/Contents/Resources/icon.icns"
+darwin=$(uname -r | cut -d. -f1)
+if [ -f "$icon" ] && [ "$darwin" -ge 25 ] 2>/dev/null && command -v osascript >/dev/null 2>&1; then
+  osascript -l JavaScript - "$icon" "$target" >/dev/null 2>&1 <<'JXA'
+ObjC.import('AppKit');
+function run(argv) {
+  const image = $.NSImage.alloc.initWithContentsOfFile(argv[0]);
+  $.NSWorkspace.sharedWorkspace.setIconForFileOptions(image, argv[1], 0);
+}
+JXA
+fi
 lsregister=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
 if [ -x "$lsregister" ]; then
   "$lsregister" -f "$target" >/dev/null 2>&1

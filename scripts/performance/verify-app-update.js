@@ -11,6 +11,7 @@ const {
   pickUpdate,
   versionFromTag,
 } = require('../../app/helpers/appUpdateRelease');
+const { finderInfoHasCustomIcon } = require('../../app/helpers/finderInfo');
 
 const SHA = 'd8f9d4c5f4ea5dbdaa621894c53c36546e12a491970014ca148e3cc90c9240b1';
 const asset = (name, digest = `sha256:${SHA}`) => ({
@@ -202,7 +203,23 @@ function verifyInstallWaitsForQuit() {
   });
 }
 
+// the Finder flag that makes the tilted icon show, as `xattr -px` prints it
+function verifyCustomIconFlag() {
+  const finderInfo = (byte8) =>
+    `00 00 00 00 00 00 00 00 ${byte8} 00 00 00 00 00 00 00\n${'00 '.repeat(
+      16
+    )}`;
+
+  assert.strictEqual(finderInfoHasCustomIcon(finderInfo('04')), true);
+  assert.strictEqual(finderInfoHasCustomIcon(finderInfo('44')), true);
+  // copied bundle: other flags kept, custom icon flag gone
+  assert.strictEqual(finderInfoHasCustomIcon(finderInfo('40')), false);
+  assert.strictEqual(finderInfoHasCustomIcon(''), false);
+  assert.strictEqual(finderInfoHasCustomIcon(undefined), false);
+}
+
 async function main() {
+  verifyCustomIconFlag();
   verifyReleasePicking();
   verifyInstallScript();
   await verifyInstallWaitsForQuit();
