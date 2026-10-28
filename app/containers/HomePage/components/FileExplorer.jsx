@@ -56,6 +56,7 @@ import {
   makeMtpMode,
   makeShowDirectoriesFirst,
   makeAppLanguage,
+  makeAppMenuStyle,
   makeFavoriteFolders,
 } from '../../Settings/selectors';
 import { setFavoriteFolder } from '../../Settings/actions';
@@ -2486,6 +2487,7 @@ class FileExplorer extends Component {
       hideHiddenFiles,
       storageId,
       appThemeMode,
+      appMenuStyle,
       folderAccess,
     } = this.props;
     const {
@@ -2572,6 +2574,7 @@ class FileExplorer extends Component {
           anchorPosition={contextMenu?.anchorPosition}
           groups={contextMenu?.groups}
           ariaLabel={t('Actions')}
+          colorStyle={appMenuStyle}
           onClose={this.closeContextMenu}
         />
         <FileExplorerBodyRender
@@ -3416,6 +3419,7 @@ const mapStateToProps = (state, _) => {
     showDirectoriesFirst: makeShowDirectoriesFirst(state),
     multiSelectMode: makeMultiSelectMode(state),
     appLanguage: makeAppLanguage(state),
+    appMenuStyle: makeAppMenuStyle(state),
     favoriteFolders: makeFavoriteFolders(state),
   };
 };

@@ -24,6 +24,7 @@ import {
   APP_LANGUAGE_TYPE,
   APP_FONT_FAMILY_TYPE,
   APP_COLOR_STYLE_TYPE,
+  APP_MENU_STYLE_TYPE,
   MTP_MODE,
   FILE_TRANSFER_DIRECTION,
 } from '../../../enums';
@@ -176,6 +177,7 @@ export default class SettingsDialog extends PureComponent {
       appLanguage,
       appFontFamily,
       appColorStyle,
+      appMenuStyle,
       styles,
       enableAutoUpdateCheck,
       enableBackgroundAutoUpdate,
@@ -199,6 +201,7 @@ export default class SettingsDialog extends PureComponent {
       onAppLanguageChange,
       onAppFontFamilyChange,
       onAppColorStyleChange,
+      onAppMenuStyleChange,
       onShowLocalPaneChange,
       onShowLocalPaneOnLeftSideChange,
       onShowDirectoriesFirstChange,
@@ -407,6 +410,37 @@ export default class SettingsDialog extends PureComponent {
                         value: APP_COLOR_STYLE_TYPE.vibrant,
                         title: t('Vibrant'),
                         description: t('Saturated colors and tinted surfaces.'),
+                      })}
+                    </RadioGroup>
+                  ),
+                  grouped: false,
+                })}
+
+                {this.renderSection({
+                  icon: 'menu_open',
+                  title: t('Menu style'),
+                  description: t(
+                    'The colors of the menu that opens with a right click.'
+                  ),
+                  children: (
+                    <RadioGroup
+                      className={styles.group}
+                      value={appMenuStyle}
+                      onChange={onAppMenuStyleChange}
+                    >
+                      {this.renderRadioRow({
+                        icon: 'list',
+                        value: APP_MENU_STYLE_TYPE.standard,
+                        title: t('Standard'),
+                        description: t('Neutral, like the rest of the window.'),
+                      })}
+                      {this.renderRadioRow({
+                        icon: 'auto_awesome',
+                        value: APP_MENU_STYLE_TYPE.vibrant,
+                        title: t('Vibrant'),
+                        description: t(
+                          'In the orange of the app icon, so it stands out.'
+                        ),
                       })}
                     </RadioGroup>
                   ),

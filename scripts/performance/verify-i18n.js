@@ -6,7 +6,13 @@ const { translate } = require('../../app/i18n');
 const APP_DIR = path.join(__dirname, '../../app');
 
 // written the same in Italian
-const SAME_IN_ITALIAN = new Set(['Menu', 'No', 'Privacy', 'Repository']);
+const SAME_IN_ITALIAN = new Set([
+  'Menu',
+  'No',
+  'Privacy',
+  'Repository',
+  'Standard',
+]);
 
 const sourceFiles = (dir) =>
   fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {

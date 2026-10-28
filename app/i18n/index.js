@@ -248,6 +248,13 @@ const italian = {
     'Colori tonali pacati e superfici sobrie.',
   Vibrant: 'Vivace',
   'Saturated colors and tinted surfaces.': 'Colori saturi e superfici tinte.',
+  'Menu style': 'Stile dei menu',
+  'The colors of the menu that opens with a right click.':
+    'I colori del menu che si apre con il clic destro.',
+  'Neutral, like the rest of the window.':
+    'Neutro, come il resto della finestra.',
+  'In the orange of the app icon, so it stands out.':
+    'Nell’arancione dell’icona dell’app, per farlo risaltare.',
   'Phone connection': 'Connessione al telefono',
   'How OpenMTP talks to Android phones over USB.':
     'Come OpenMTP comunica con i telefoni Android via USB.',

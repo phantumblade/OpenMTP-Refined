@@ -41,6 +41,13 @@ export const APP_COLOR_STYLE_TYPE = {
   vibrant: 'vibrant',
 };
 
+// Material 3 Expressive menu color styles (Compose MenuDefaults): standard
+// sits on surfaceContainerLow, vibrant on tertiaryContainer
+export const APP_MENU_STYLE_TYPE = {
+  standard: 'standard',
+  vibrant: 'vibrant',
+};
+
 export const FILE_TRANSFER_DIRECTION = {
   upload: 'upload',
   download: 'download',

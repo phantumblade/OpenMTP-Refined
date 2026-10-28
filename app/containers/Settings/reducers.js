@@ -5,6 +5,7 @@ import {
   APP_THEME_MODE_TYPE,
   APP_FONT_FAMILY_TYPE,
   APP_COLOR_STYLE_TYPE,
+  APP_MENU_STYLE_TYPE,
   MTP_MODE,
   FILE_TRANSFER_DIRECTION,
 } from '../../enums';
@@ -38,6 +39,7 @@ export const initialState = {
   appLanguage: detectSystemLanguage(),
   appFontFamily: APP_FONT_FAMILY_TYPE.system,
   appColorStyle: APP_COLOR_STYLE_TYPE.classic,
+  appMenuStyle: APP_MENU_STYLE_TYPE.standard,
   showLocalPane: true,
   showLocalPaneOnLeftSide: true,
   showDirectoriesFirst: true,

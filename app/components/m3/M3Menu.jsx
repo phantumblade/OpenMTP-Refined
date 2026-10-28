@@ -11,6 +11,8 @@ import { alphaHex, m3Shape, m3State, m3Type } from '../../styles/m3/tokens';
 // label and the keyboard shortcut as trailing text; the selected item uses
 // the tertiary container. One drop shadow follows the outline of all the
 // groups, so the gaps read as cuts in a single menu rather than as boxes.
+// colorStyle picks the MenuDefaults colors: 'standard' (surface container
+// low) or 'vibrant' (tertiary container, selected item in tertiary).
 
 const EMPHASIZED_DECELERATE = 'cubic-bezier(0.05, 0.7, 0.1, 1)';
 
@@ -123,6 +125,29 @@ const styles = (theme) => {
       color: m3.onSurfaceVariant,
       letterSpacing: '0.04em',
     },
+    vibrant: {
+      '& $group': { backgroundColor: m3.tertiaryContainer },
+      '& $item': {
+        color: m3.onTertiaryContainer,
+        '&:hover, &:focus-visible': {
+          backgroundColor: alphaHex(m3.onTertiaryContainer, m3State.hover),
+        },
+        '&:active': {
+          backgroundColor: alphaHex(m3.onTertiaryContainer, m3State.pressed),
+        },
+        '&:focus-visible': {
+          boxShadow: `inset 0 0 0 2px ${m3.onTertiaryContainer}`,
+        },
+        '&:disabled': { backgroundColor: 'transparent' },
+      },
+      '& $icon, & $shortcut': { color: m3.onTertiaryContainer },
+      '& $itemSelected': {
+        backgroundColor: m3.tertiary,
+        color: m3.onTertiary,
+        '& $icon, & $shortcut': { color: m3.onTertiary },
+        '&:hover, &:focus-visible': { backgroundColor: m3.tertiary },
+      },
+    },
   };
 };
 
@@ -156,8 +181,15 @@ class M3Menu extends PureComponent {
   };
 
   render() {
-    const { classes, open, anchorPosition, groups, onClose, ariaLabel } =
-      this.props;
+    const {
+      classes,
+      open,
+      anchorPosition,
+      groups,
+      onClose,
+      ariaLabel,
+      colorStyle = 'standard',
+    } = this.props;
     const visibleGroups = (groups || []).filter((group) => group.length > 0);
 
     return (
@@ -178,7 +210,9 @@ class M3Menu extends PureComponent {
           role="menu"
           aria-label={ariaLabel}
           tabIndex={-1}
-          className={classes.menu}
+          className={classNames(classes.menu, {
+            [classes.vibrant]: colorStyle === 'vibrant',
+          })}
           onKeyDown={this.handleKeyDown}
         >
           {visibleGroups.map((group) => (

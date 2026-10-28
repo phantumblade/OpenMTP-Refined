@@ -77,6 +77,10 @@ export const makeAppColorStyle = createSelector(make, (state) =>
   state ? state.appColorStyle : initialState.appColorStyle
 );
 
+export const makeAppMenuStyle = createSelector(make, (state) =>
+  state ? state.appMenuStyle : initialState.appMenuStyle
+);
+
 // returns the app theme mode (light, dark)
 export const makeAppThemeMode = createSelector(make, (state) => {
   const theme = state ? state.appThemeMode : initialState.appThemeMode;

@@ -161,6 +161,16 @@ class Settings extends Component {
     );
   };
 
+  _handleAppMenuStyleChange = (event, value, deviceType) => {
+    this._handleSetCommonSettingsChange(
+      {
+        key: 'appMenuStyle',
+        value,
+      },
+      deviceType
+    );
+  };
+
   _handleShowLocalPaneChange = (event, value, deviceType) => {
     this._handleSetCommonSettingsChange(
       {
@@ -254,6 +264,7 @@ class Settings extends Component {
         onAppLanguageChange={this._handleAppLanguageChange}
         onAppFontFamilyChange={this._handleAppFontFamilyChange}
         onAppColorStyleChange={this._handleAppColorStyleChange}
+        onAppMenuStyleChange={this._handleAppMenuStyleChange}
         onShowLocalPaneChange={this._handleShowLocalPaneChange}
         onShowLocalPaneOnLeftSideChange={
           this._handleShowLocalPaneOnLeftSideChange

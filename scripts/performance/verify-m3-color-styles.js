@@ -31,6 +31,9 @@ const TEXT_PAIRS = [
   ['onPrimaryContainer', 'primaryContainer'],
   ['onSecondaryContainer', 'secondaryContainer'],
   ['onTertiaryContainer', 'tertiaryContainer'],
+  // menus: standard items, vibrant selected item
+  ['onSurfaceVariant', 'surfaceContainerLow'],
+  ['onTertiary', 'tertiary'],
   ['onErrorContainer', 'errorContainer'],
   ['primary', 'surface'],
 ];
