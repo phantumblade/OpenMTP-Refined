@@ -17,11 +17,15 @@ Version 4.0.0 is the first release of the fork with its own version number.
   have (e.g. a local build). Ad-hoc signed builds can't use Electron's own
   updater, so OpenMTP replaces its app bundle itself after quitting, keeping
   the previous version if anything goes wrong.
-- Colour style in Settings → General: "Classic" keeps the current calm
-  Material You colours, "Vibrant" uses the 2025 colour spec of Material 3
+- Color style in Settings → General: "Classic" keeps the current calm
+  tonal colours, "Vibrant" uses the 2025 colour spec of Material 3
   Expressive, with saturated containers and surfaces tinted by the brand
   blue (deep navy in dark mode). Both follow light/dark mode and macOS
   "Increase contrast", and switch instantly.
+- Menu style in Settings → General, the two colour styles of Material 3
+  Expressive menus: "Standard" keeps the right-click menu on the window's
+  surface colour, "Vibrant" fills it with the orange of the app icon
+  (tertiary container) and marks the selected item in a deeper orange.
 
 ### Removed
 
@@ -32,6 +36,16 @@ Version 4.0.0 is the first release of the fork with its own version number.
 
 ### Fixed
 
+- The rename, new folder, replace and delete dialogs, the storage and MTP
+  mode pickers, the window title ("Kalam Mode") and the "Root" folder of the
+  path bar were still in English with the app in Italian. The dialogs now
+  name their action ("Delete permanently?" with Delete and Cancel instead of
+  Yes and No), the MTP mode picker describes the modes as Settings does, and
+  a name error lists the characters that aren't allowed.
+- Consistent Italian texts: "telefono" everywhere instead of a mix with
+  "smartphone", sentence case instead of English-style capitals ("Cavo USB
+  per i dati"), the same quotation marks around every button and option
+  name, and Acquisizione Immagine called by its macOS name.
 - The app menu, the update windows and every update message are now in
   Italian when the app is, and the menu switches language right away.
 - Vibrant colour style, dark mode: the settings and welcome lists no longer
