@@ -123,6 +123,8 @@ const activeTransferSessions = new Set();
 // a real cable re-plug keeps the device away at least this long
 const USB_REPLUG_MIN_GAP_MS = 2000;
 const EMPTY_FAVORITE_PATHS = new Set();
+// what the rename and new folder checks reject, as shown to the user
+const ILLEGAL_NAME_CHARACTERS = '/ \\ ? % * : | " < >';
 
 class FileExplorer extends Component {
   constructor(props) {
@@ -1400,6 +1402,7 @@ class FileExplorer extends Component {
   _handleRenameEditDialog = async ({ ...args }) => {
     const {
       deviceType,
+      appLanguage,
       actionCreateRenameFile,
       hideHiddenFiles,
       currentBrowsePath,
@@ -1411,6 +1414,7 @@ class FileExplorer extends Component {
     const { data } = this.state.toggleDialog.rename;
     const { confirm, textFieldValue: newFilename } = args;
     const targetAction = 'rename';
+    const t = (key, values) => translate(appLanguage, key, values);
     const deviceTypeUpperCase = deviceType.toUpperCase();
 
     if (
@@ -1442,7 +1446,12 @@ class FileExplorer extends Component {
       this._handleErrorsEditDialog(
         {
           toggle: true,
-          message: `Error: Illegal characters.`,
+          message:
+            newFilename.trim() === ''
+              ? t('Enter a name')
+              : t('A name can’t contain {characters}', {
+                  characters: ILLEGAL_NAME_CHARACTERS,
+                }),
         },
         targetAction
       );
@@ -1488,7 +1497,9 @@ class FileExplorer extends Component {
         this._handleErrorsEditDialog(
           {
             toggle: true,
-            message: `Error: The name "${sanitizedNewFilename}" is already taken.`,
+            message: t('“{name}” already exists here', {
+              name: sanitizedNewFilename,
+            }),
           },
           targetAction
         );
@@ -1742,6 +1753,7 @@ class FileExplorer extends Component {
   _handleNewFolderEditDialog = async ({ ...args }) => {
     const {
       deviceType,
+      appLanguage,
       actionCreateNewFolder,
       hideHiddenFiles,
       currentBrowsePath,
@@ -1753,6 +1765,7 @@ class FileExplorer extends Component {
     const { data } = this.state.toggleDialog.newFolder;
     const { confirm, textFieldValue: newFolderName } = args;
     const targetAction = 'newFolder';
+    const t = (key, values) => translate(appLanguage, key, values);
     const deviceTypeUpperCase = deviceType.toUpperCase();
 
     if (
@@ -1784,7 +1797,7 @@ class FileExplorer extends Component {
       this._handleErrorsEditDialog(
         {
           toggle: true,
-          message: `Error: Folder name cannot be empty.`,
+          message: t('Enter a folder name'),
         },
         targetAction
       );
@@ -1803,7 +1816,9 @@ class FileExplorer extends Component {
       this._handleErrorsEditDialog(
         {
           toggle: true,
-          message: `Error: Illegal characters.`,
+          message: t('A name can’t contain {characters}', {
+            characters: ILLEGAL_NAME_CHARACTERS,
+          }),
         },
         targetAction
       );
@@ -1830,7 +1845,9 @@ class FileExplorer extends Component {
       this._handleErrorsEditDialog(
         {
           toggle: true,
-          message: `Error: The name "${newFolderName}" is already taken.`,
+          message: t('“{name}” already exists here', {
+            name: newFolderName,
+          }),
         },
         targetAction
       );
@@ -2480,24 +2497,23 @@ class FileExplorer extends Component {
     const { rename, newFolder } = toggleDialog;
     const togglePasteDialog =
       deviceType === DEVICE_TYPE.mtp && fileTransferProgess.toggle;
-    const renameSecondaryText =
-      deviceType === DEVICE_TYPE.mtp
-        ? `Not all ${DEVICES_LABEL[
-            DEVICE_TYPE.mtp
-          ].toLowerCase()}s will support the rename feature.`
-        : ``;
+    const t = (key, values) => translate(appLanguage, key, values);
 
     return (
       <Fragment>
         <TextFieldEditDialog
-          titleText={`Rename a ${
-            rename.data.isFolder ? `folder` : `file`
-          } on your ${DEVICES_LABEL[deviceType]}?`}
-          bodyText={`Path: ${rename.data.path || ''}`}
-          secondaryText={`${renameSecondaryText}`}
+          titleText={
+            rename.data.isFolder ? t('Rename folder') : t('Rename file')
+          }
+          bodyText={rename.data.path || ''}
+          secondaryText={
+            deviceType === DEVICE_TYPE.mtp
+              ? t('Some phones don’t allow renaming.')
+              : null
+          }
           trigger={rename.toggle}
           defaultValue={rename.data.name || ''}
-          label={rename.data.isFolder ? `New folder name` : `New file name`}
+          label={rename.data.isFolder ? t('Folder name') : t('File name')}
           id="renameDialog"
           required
           multiline={false}
@@ -2506,16 +2522,20 @@ class FileExplorer extends Component {
           fullWidthTextField
           autoFocus
           onClickHandler={this._handleRenameEditDialog}
-          btnPositiveText="Rename"
-          btnNegativeText="Cancel"
+          btnPositiveText={t('Rename')}
+          btnNegativeText={t('Cancel')}
           errors={rename.errors}
         />
         <TextFieldEditDialog
-          titleText={`Create a new folder on your ${DEVICES_LABEL[deviceType]}`}
-          bodyText={`Path: ${newFolder.data.path || ''}`}
+          titleText={
+            deviceType === DEVICE_TYPE.mtp
+              ? t('New folder on the phone')
+              : t('New folder on this Mac')
+          }
+          bodyText={newFolder.data.path || ''}
           trigger={newFolder.toggle}
           defaultValue=""
-          label="New folder name"
+          label={t('Folder name')}
           id="newFolderDialog"
           required
           multiline={false}
@@ -2524,8 +2544,8 @@ class FileExplorer extends Component {
           fullWidthTextField
           autoFocus
           onClickHandler={this._handleNewFolderEditDialog}
-          btnPositiveText="Create"
-          btnNegativeText="Cancel"
+          btnPositiveText={t('Create')}
+          btnNegativeText={t('Cancel')}
           errors={newFolder.errors}
         />
         <FileTransferDialog
@@ -2538,7 +2558,12 @@ class FileExplorer extends Component {
         <ConfirmDialog
           fullWidthDialog
           maxWidthDialog="xs"
-          bodyText="Replace and merge the existing items?"
+          titleText={t('Replace existing items?')}
+          bodyText={t(
+            'Items with the same name are already here: files will be replaced and folders merged.'
+          )}
+          btnPositiveText={t('Replace')}
+          btnNegativeText={t('Cancel')}
           trigger={togglePasteConfirmDialog}
           onClickHandler={this._handlePasteConfirm}
         />
@@ -2546,7 +2571,7 @@ class FileExplorer extends Component {
           open={Boolean(contextMenu)}
           anchorPosition={contextMenu?.anchorPosition}
           groups={contextMenu?.groups}
-          ariaLabel={translate(appLanguage, 'Actions')}
+          ariaLabel={t('Actions')}
           onClose={this.closeContextMenu}
         />
         <FileExplorerBodyRender

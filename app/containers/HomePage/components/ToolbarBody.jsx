@@ -11,7 +11,6 @@ import {
   faTerminal,
 } from '@fortawesome/free-solid-svg-icons';
 import SidebarAreaPaneLists from './SidebarAreaPaneLists';
-import { DEVICES_LABEL } from '../../../constants';
 import {
   Confirm as ConfirmDialog,
   Selection as SelectionDialog,
@@ -170,20 +169,21 @@ export default class ToolbarAreaPane extends PureComponent {
       });
     }
 
+    const t = (key, values) => translate(appLanguage, key, values);
     const mtpModeList = [
       {
         value: MTP_MODE.kalam,
-        name: `${capitalize(MTP_MODE.kalam)} Mode`,
+        name: t('{mode} mode', { mode: capitalize(MTP_MODE.kalam) }),
         icon: faBolt,
         selected: mtpMode === MTP_MODE.kalam,
-        hint: 'The all new and powerful MTP kernel — named after Dr. A. P. J. Abdul Kalam - Statesman, Scientist and Poet',
+        hint: t('Recommended: faster and more reliable.'),
       },
       {
         value: MTP_MODE.legacy,
-        name: `${capitalize(MTP_MODE.legacy)} Mode`,
+        name: t('{mode} mode', { mode: capitalize(MTP_MODE.legacy) }),
         icon: faTerminal,
         selected: mtpMode === MTP_MODE.legacy,
-        hint: `Previous generation MTP Kernel. Use this if Kalam mode doesn't detect your phone`,
+        hint: t('Older engine, for compatibility.'),
       },
     ];
 
@@ -193,19 +193,29 @@ export default class ToolbarAreaPane extends PureComponent {
     const deviceInfo = mtpDevice?.info?.mtpDeviceInfo;
     const deviceBrand = getDeviceBrand(deviceInfo?.Manufacturer);
     const deviceModel = deviceInfo?.Model;
-    const t = (key, values) => translate(appLanguage, key, values);
 
     return (
       <div className={styles.root}>
         <ConfirmDialog
           fullWidthDialog
           maxWidthDialog="xs"
-          bodyText={`Are you sure you want to permanently delete the items from your ${DEVICES_LABEL[deviceType]}?`}
+          titleText={t('Delete permanently?')}
+          bodyText={
+            deviceType === DEVICE_TYPE.mtp
+              ? t(
+                  'The selected items will be deleted from the phone. You can’t undo this.'
+                )
+              : t(
+                  'The selected items will be deleted from this Mac without going to the Trash. You can’t undo this.'
+                )
+          }
+          btnPositiveText={t('Delete')}
+          btnNegativeText={t('Cancel')}
           trigger={toggleDeleteConfirmDialog}
           onClickHandler={onDeleteConfirmDialog}
         />
         <SelectionDialog
-          titleText="Select Storage Option"
+          titleText={t('Select Storage')}
           list={_mtpStoragesList}
           id="selectionDialog"
           showAvatar
@@ -217,7 +227,7 @@ export default class ToolbarAreaPane extends PureComponent {
 
         {showMtpModeSelection && (
           <SelectionDialog
-            titleText="Select MTP Mode"
+            titleText={t('MTP Mode')}
             list={mtpModeList}
             id="selectionDialog"
             showAvatar

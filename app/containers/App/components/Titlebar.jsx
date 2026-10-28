@@ -23,6 +23,9 @@ class Titlebar extends PureComponent {
     const mtpDeviceInfo = mtpDevice?.info?.mtpDeviceInfo;
     const brand = getDeviceBrand(mtpDeviceInfo?.Manufacturer);
     const model = mtpDeviceInfo?.Model;
+    const modeLabel = translate(appLanguage, '{mode} mode', {
+      mode: capitalize(mtpMode),
+    });
 
     return (
       <div
@@ -46,12 +49,10 @@ class Titlebar extends PureComponent {
               parseInt(selectedStorage?.data.info?.FreeSpaceInBytes ?? 0, 10)
             )} ${translate(appLanguage, 'Free of')} ${niceBytes(
               parseInt(selectedStorage?.data.info?.MaxCapability ?? 0, 10)
-            )}, ${capitalize(mtpMode)} Mode`}
+            )}, ${modeLabel}`}
           </span>
         ) : (
-          <span className={styles.deviceInfo}>
-            {`${capitalize(mtpMode)} Mode`}
-          </span>
+          <span className={styles.deviceInfo}>{modeLabel}</span>
         )}
       </div>
     );

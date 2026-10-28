@@ -388,8 +388,8 @@ export default class SettingsDialog extends PureComponent {
 
                 {this.renderSection({
                   icon: 'format_paint',
-                  title: t('Colour style'),
-                  description: t('How bold the Material 3 colours are.'),
+                  title: t('Color style'),
+                  description: t('How bold the Material 3 colors are.'),
                   children: (
                     <RadioGroup
                       className={styles.group}
@@ -400,15 +400,13 @@ export default class SettingsDialog extends PureComponent {
                         icon: 'tonality',
                         value: APP_COLOR_STYLE_TYPE.classic,
                         title: t('Classic'),
-                        description: t('Calm tonal colours (Material You).'),
+                        description: t('Calm tonal colors and quiet surfaces.'),
                       })}
                       {this.renderRadioRow({
                         icon: 'colors',
                         value: APP_COLOR_STYLE_TYPE.vibrant,
                         title: t('Vibrant'),
-                        description: t(
-                          'Saturated colours and tinted surfaces (Material 3 Expressive).'
-                        ),
+                        description: t('Saturated colors and tinted surfaces.'),
                       })}
                     </RadioGroup>
                   ),

@@ -9,6 +9,7 @@ import { styles } from './styles';
 import { sanitizePath } from '../../utils/files';
 import { analyticsService } from '../../services/analytics';
 import { EVENT_TYPE } from '../../enums/events';
+import { translate } from '../../i18n';
 
 class Breadcrumb extends PureComponent {
   constructor(props) {
@@ -55,7 +56,7 @@ class Breadcrumb extends PureComponent {
     );
   };
 
-  tokenizeCurrentBrowsePath(currentBrowsePath) {
+  tokenizeCurrentBrowsePath(currentBrowsePath, appLanguage) {
     const sanitizedCurrentBrowsePath = sanitizePath(currentBrowsePath);
     const _currentBrowsePath = [];
     const currentBrowsePathBroken =
@@ -69,7 +70,7 @@ class Breadcrumb extends PureComponent {
 
       if (a === '' && index === 0) {
         _currentBrowsePath.push({
-          label: 'Root',
+          label: translate(appLanguage, 'Root'),
           path: '/',
           enabled: !isLast,
           bold: isLast,
@@ -120,7 +121,7 @@ class Breadcrumb extends PureComponent {
   }
 
   render() {
-    const { classes: styles, currentBrowsePath } = this.props;
+    const { classes: styles, currentBrowsePath, appLanguage } = this.props;
 
     return (
       <div className={styles.root}>
@@ -128,7 +129,7 @@ class Breadcrumb extends PureComponent {
           <Paper elevation={0}>
             <ul ref={this.breadcrumbRef} className={styles.breadcrumb}>
               {this.BreadcrumbCellRender(
-                this.tokenizeCurrentBrowsePath(currentBrowsePath)
+                this.tokenizeCurrentBrowsePath(currentBrowsePath, appLanguage)
               )}
             </ul>
           </Paper>

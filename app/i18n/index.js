@@ -8,12 +8,12 @@ const italian = {
   descending: 'decrescente',
   Actions: 'Azioni',
   'No favorites yet': 'Ancora nessun preferito',
-  'Fewer connection hiccups': 'Meno intoppi nel collegamento',
+  'Fewer connection hiccups': 'Meno intoppi nella connessione',
   'When the macOS Photos service holds on to your phone, OpenMTP releases it for you.':
     'Se il servizio Foto di macOS tiene occupato il telefono, OpenMTP lo libera al posto tuo.',
   'Clear help when something goes wrong': 'Aiuto chiaro quando qualcosa non va',
   'If the connection fails, OpenMTP tells you why and what to do next.':
-    'Se il collegamento non riesce, OpenMTP ti dice perché e cosa fare.',
+    'Se la connessione non riesce, OpenMTP ti dice perché e cosa fare.',
   'Keep up to 5 folders one click away in the side menu.':
     'Tieni fino a 5 cartelle a portata di clic nel menu laterale.',
   'Filters by date and type': 'Filtri per data e tipo',
@@ -77,7 +77,7 @@ const italian = {
   'Get started': 'Inizia',
   'Files and transfers': 'File e trasferimenti',
   'Look and feel': 'Aspetto',
-  'Welcome to OpenMTP Refined': 'Benvenuto in OpenMTP Refined',
+  'Welcome to OpenMTP Refined': 'Ti diamo il benvenuto in OpenMTP Refined',
   'Favorite folders': 'Cartelle preferite',
   Settings: 'Impostazioni',
   General: 'Generali',
@@ -158,7 +158,7 @@ const italian = {
   'Remove from Favorites': 'Rimuovi dai preferiti',
   'Favorites are full (max {max})': 'Preferiti pieni (massimo {max})',
   'Right-click a folder and choose Add to Favorites.':
-    'Fai clic destro su una cartella e scegli Aggiungi ai preferiti.',
+    'Fai clic destro su una cartella e scegli “Aggiungi ai preferiti”.',
   'Folder not found': 'Cartella non trovata',
   Name: 'Nome',
   Size: 'Dimensione',
@@ -176,29 +176,29 @@ const italian = {
     'Tieni il telefono sbloccato: può richiedere qualche secondo.',
   'Loading…': 'Caricamento…',
   'Connect your phone via USB and select File Transfer (MTP) mode.':
-    'Collega il tuo smartphone tramite cavo USB e seleziona la modalità Trasferimento File (MTP).',
-  'Data-capable USB Cable': 'Cavo USB per Dati',
+    'Collega il telefono con un cavo USB e scegli la modalità Trasferimento file (MTP).',
+  'Data-capable USB Cable': 'Cavo USB per i dati',
   'Avoid charge-only USB cables.':
     'Usa un cavo USB che supporti i dati, non un cavo di sola ricarica.',
-  'Unlock Screen & Keep Active': 'Sblocca Schermo',
+  'Unlock Screen & Keep Active': 'Schermo sbloccato e acceso',
   'Keep the phone screen unlocked.':
-    'Sblocca lo smartphone e mantieni lo schermo attivo.',
-  'Select File Transfer (MTP)': 'Modalità Trasferimento File (MTP)',
+    'Sblocca il telefono e mantieni lo schermo acceso.',
+  'Select File Transfer (MTP)': 'Modalità Trasferimento file (MTP)',
   'Open USB notification on Android.':
-    'Dalla notifica USB su Android, seleziona "Trasferimento File".',
-  'Allow Access & Try Again': 'Consenti Accesso e Riprova',
+    'Nella notifica USB di Android scegli “Trasferimento file”.',
+  'Allow Access & Try Again': 'Consenti l’accesso e riprova',
   'Accept data permission on Android and retry.':
-    'Accetta l’autorizzazione dati sul telefono e premi "Riprova la connessione".',
+    'Consenti l’accesso ai dati sul telefono e premi “Riprova la connessione”.',
   'Use a data-capable USB cable, not a charge-only cable.':
     'Usa un cavo USB che supporti i dati, non un cavo di sola ricarica.',
   'Unlock the phone and keep its screen on.':
     'Sblocca il telefono e mantieni lo schermo acceso.',
   'Open the USB notification and choose File transfer / Android Auto.':
-    'Apri la notifica USB e scegli Trasferimento file / Android Auto.',
+    'Apri la notifica USB e scegli “Trasferimento file / Android Auto”.',
   'Accept Allow access to phone data when Android asks.':
     'Quando Android lo chiede, consenti l’accesso ai dati del telefono.',
   'Then press Try connection again above.':
-    'Infine premi Riprova la connessione qui sopra.',
+    'Infine premi “Riprova la connessione” qui sopra.',
   'If it still fails, disconnect the cable, wait a moment, reconnect it and repeat the steps.':
     'Se ancora non funziona, scollega il cavo, attendi un momento, ricollegalo e ripeti i passaggi.',
   'Connection detail': 'Dettaglio connessione',
@@ -217,7 +217,7 @@ const italian = {
   'Close {app} and try again': 'Chiudi {app} e riprova',
   'Free the phone and try again': 'Libera il telefono e riprova',
   '{app} did not quit. Close it manually, then try again.':
-    '{app} non si è chiuso. Chiudilo tu e poi riprova.',
+    '{app} non si è chiusa. Chiudila tu, poi riprova.',
   'No other app is using the phone': 'Nessun’altra app sta usando il telefono',
   'How to connect': 'Come collegarlo',
   Guide: 'Guida',
@@ -240,15 +240,14 @@ const italian = {
   'How the app talks to you and looks.': 'Come l’app ti parla e come appare.',
   'Light, dark or following macOS.': 'Chiaro, scuro o come macOS.',
   'Follows the macOS appearance.': 'Segue l’aspetto di macOS.',
-  'Colour style': 'Stile dei colori',
-  'How bold the Material 3 colours are.':
+  'Color style': 'Stile dei colori',
+  'How bold the Material 3 colors are.':
     'Quanto sono accesi i colori Material 3.',
   Classic: 'Classico',
-  'Calm tonal colours (Material You).':
-    'Colori tonali e pacati (Material You).',
+  'Calm tonal colors and quiet surfaces.':
+    'Colori tonali pacati e superfici sobrie.',
   Vibrant: 'Vivace',
-  'Saturated colours and tinted surfaces (Material 3 Expressive).':
-    'Colori saturi e superfici tinte (Material 3 Expressive).',
+  'Saturated colors and tinted surfaces.': 'Colori saturi e superfici tinte.',
   'Phone connection': 'Connessione al telefono',
   'How OpenMTP talks to Android phones over USB.':
     'Come OpenMTP comunica con i telefoni Android via USB.',
@@ -268,24 +267,24 @@ const italian = {
   'Keep OpenMTP up to date automatically.':
     'Mantieni OpenMTP aggiornato automaticamente.',
   'The phone is still getting ready. With many files this can take a minute or more: keep it unlocked, and tap Allow if it asks for access.':
-    'Il telefono si sta ancora preparando. Con molti file può volerci anche più di un minuto: tienilo sbloccato e tocca «Consenti» se chiede l’accesso.',
+    'Il telefono si sta ancora preparando. Con molti file può volerci anche più di un minuto: tienilo sbloccato e tocca “Consenti” se chiede l’accesso.',
   'Android shows its files only while the phone is unlocked and you have allowed access.':
     'Android mostra i file solo quando il telefono è sbloccato e hai dato il permesso di accesso.',
   'Unlock the phone screen.': 'Sblocca lo schermo del telefono.',
   'If the phone asks “Allow access to phone data?”, tap Allow.':
-    'Se il telefono chiede «Consentire l’accesso ai dati del telefono?», tocca Consenti.',
-  'Press Try connection again.': 'Premi Riprova la connessione.',
+    'Se il telefono chiede “Consentire l’accesso ai dati del telefono?”, tocca “Consenti”.',
+  'Press Try connection again.': 'Premi “Riprova la connessione”.',
   'The Mac sees the phone, but the phone did not accept the connection. This usually happens when its screen is locked or an access request is waiting on the phone.':
     'Il Mac vede il telefono, ma il telefono non ha accettato la connessione. Di solito succede quando lo schermo è bloccato o c’è una richiesta di accesso in attesa sul telefono.',
   'Unlock the phone and look for an access request: tap Allow.':
-    'Sblocca il telefono e cerca la richiesta di accesso: tocca Consenti.',
+    'Sblocca il telefono e cerca la richiesta di accesso: tocca “Consenti”.',
   'In the USB notification, choose File Transfer.':
-    'Nella notifica USB scegli «Trasferimento file».',
+    'Nella notifica USB scegli “Trasferimento file”.',
   'If it still fails, unplug and reconnect the cable, then press Try connection again.':
-    'Se ancora non funziona, scollega e ricollega il cavo, poi premi Riprova la connessione.',
+    'Se ancora non funziona, scollega e ricollega il cavo, poi premi “Riprova la connessione”.',
   'The phone is locked': 'Il telefono è bloccato',
   'Unlock the phone screen and, if Android asks, tap Allow to give access to your files. Then try again.':
-    'Sblocca lo schermo del telefono e, se Android lo chiede, tocca «Consenti» per dare accesso ai file. Poi riprova.',
+    'Sblocca lo schermo del telefono e, se Android lo chiede, tocca “Consenti” per dare accesso ai file. Poi riprova.',
   'More than one phone is connected': 'Sono collegati più telefoni',
   'Disconnect the other Android devices and keep only the one you want to use.':
     'Scollega gli altri dispositivi Android e lascia solo quello che vuoi usare.',
@@ -302,7 +301,7 @@ const italian = {
     'Nessun telefono in modalità Trasferimento file',
   'The phone did not respond': 'Il telefono non ha risposto',
   'Unlock the phone, unplug the cable and plug it back in, then choose File Transfer on the phone.':
-    'Sblocca il telefono, scollega e ricollega il cavo, poi scegli «Trasferimento file» sul telefono.',
+    'Sblocca il telefono, scollega e ricollega il cavo, poi scegli “Trasferimento file” sul telefono.',
   'The connection did not work': 'La connessione non è riuscita',
   'Unlock the phone, reconnect the cable and try again.':
     'Sblocca il telefono, ricollega il cavo e riprova.',
@@ -310,11 +309,11 @@ const italian = {
   'Check the cable and choose File Transfer in the USB notification on the phone.':
     'Controlla il cavo e scegli “Trasferimento file” nella notifica USB del telefono.',
   'It is the macOS Photos / Image Capture service: OpenMTP can free the phone for you.':
-    'È il servizio di Foto / Acquisizione Immagini di macOS: OpenMTP può liberare il telefono per te.',
+    'È il servizio Foto / Acquisizione Immagine di macOS: OpenMTP può liberare il telefono per te.',
   'Close it so OpenMTP can use the phone. It will be asked to quit normally, like with ⌘Q.':
     'Chiudila per permettere a OpenMTP di usare il telefono. Verrà chiusa normalmente, come con ⌘Q.',
   'macOS Image Capture / PTPCamera':
-    'Acquisizione Immagini di macOS (ptpcamerad)',
+    'Acquisizione Immagine di macOS (ptpcamerad)',
   'Free of': 'liberi su',
   selected: 'selezionati',
   item: 'elemento',
@@ -354,45 +353,45 @@ const italian = {
   'Device connection error. Please reconnect the USB cable and try again.':
     'Errore di connessione del dispositivo. Ricollega il cavo USB e riprova.',
   'An error occurred while setting up the Phone':
-    'Si è verificato un errore durante la configurazione dello smartphone',
+    'Si è verificato un errore durante la configurazione del telefono',
   'An error occurred while setting up the MTP Device':
     'Si è verificato un errore durante la configurazione del dispositivo MTP',
   'No Phone or MTP device found.':
-    'Nessuno smartphone o dispositivo MTP rilevato.',
+    'Nessun telefono o dispositivo MTP rilevato.',
   'Unlock your Phone and refresh again':
-    'Sblocca lo smartphone e aggiorna nuovamente',
+    'Sblocca il telefono e aggiorna di nuovo',
   'Multiple MTP devices found': 'Rilevati più dispositivi MTP',
   "Accept MTP access to your Phone's storage and refresh again":
-    'Consenti l’accesso MTP alla memoria dello smartphone e riprova',
+    'Consenti l’accesso MTP alla memoria del telefono e riprova',
   'An error occurred while fetching the device information':
     'Si è verificato un errore durante il recupero delle informazioni del dispositivo',
   'An error occurred while fetching the storage information':
     'Si è verificato un errore durante il recupero delle informazioni sulla memoria',
   'Your Phone storage is inaccessible.':
-    'La memoria dello smartphone non è accessibile.',
-  'Phone storage is full': 'La memoria dello smartphone è piena',
+    'La memoria del telefono non è accessibile.',
+  'Phone storage is full': 'La memoria del telefono è piena',
   'An error occurred while listing the Phone directory! Try again.':
-    'Si è verificato un errore nel caricamento delle cartelle dello smartphone! Riprova.',
+    'Si è verificato un errore nel caricamento delle cartelle del telefono. Riprova.',
   'File not found': 'File non trovato',
   'Operation not permitted': 'Operazione non consentita',
   'The file is inaccessible': 'Il file non è accessibile',
   'Invalid path': 'Percorso non valido',
   'An error occurred while transferring the file! Try again.':
-    'Si è verificato un errore durante il trasferimento del file! Riprova.',
+    'Si è verificato un errore durante il trasferimento del file. Riprova.',
   'An error occurred while reading the MTP file object! Try again.':
-    'Si è verificato un errore durante la lettura dell’oggetto MTP! Riprova.',
+    'Si è verificato un errore durante la lettura dell’oggetto MTP. Riprova.',
   'An error occurred while sending the object! Try again.':
-    'Si è verificato un errore durante l’invio dell’oggetto! Riprova.',
+    'Si è verificato un errore durante l’invio dell’oggetto. Riprova.',
   'An unexpected error occurred. Please try again.':
     'Si è verificato un errore imprevisto. Riprova.',
   'Could not complete! Try again.':
     'Impossibile completare l’operazione. Riprova.',
   "Quit 'Android File Transfer' app (by Google) and Refresh.":
-    "Chiudi l'app 'Android File Transfer' (di Google) e aggiorna.",
+    'Chiudi l’app “Android File Transfer” (di Google) e aggiorna.',
   'Your Phone is not responding. Reload or reconnect the device.':
-    'Lo smartphone non risponde. Ricarica la pagina o ricollega il cavo.',
+    'Il telefono non risponde. Aggiorna o ricollega il cavo.',
   'Your Phone storage is not accessible.':
-    'La memoria dello smartphone non è accessibile.',
+    'La memoria del telefono non è accessibile.',
   'Search files and folders': 'Cerca file e cartelle',
   'Waiting for typing to finish': 'Attendo che tu finisca di scrivere\u2026',
   'Current folder': 'Cartella corrente',
@@ -431,9 +430,9 @@ const italian = {
   'Search stopped at the safety limit':
     'Ricerca fermata al limite di sicurezza',
   'Potential USB conflict detected: {apps}. Quit the listed apps completely, then refresh the connection.':
-    'Rilevato un potenziale conflitto USB: {apps}. Chiudi completamente le applicazioni indicate e riaggiorna la connessione.',
+    'Possibile conflitto USB: {apps}. Chiudi del tutto le app indicate, poi aggiorna la connessione.',
   'An error occurred while initializing the device. Unlock the phone and reconnect the USB cable.':
-    'Si è verificato un errore durante l’inizializzazione del dispositivo. Sblocca lo smartphone e ricollega il cavo USB.',
+    'Si è verificato un errore durante l’inizializzazione del dispositivo. Sblocca il telefono e ricollega il cavo USB.',
   // app menu and updates (main process, update windows)
   'About {app}': 'Informazioni su {app}',
   'Check For Updates': 'Controlla aggiornamenti',
@@ -465,9 +464,9 @@ const italian = {
   'Progress…': 'Avanzamento…',
   'Update Error': 'Errore di aggiornamento',
   'A network error occurred. Try again!':
-    'Si è verificato un errore di rete. Riprova!',
+    'Si è verificato un errore di rete. Riprova.',
   'Something went wrong while updating the app. Try again!':
-    'Qualcosa è andato storto durante l’aggiornamento. Riprova!',
+    'Qualcosa è andato storto durante l’aggiornamento. Riprova.',
   'No Updates Found': 'Nessun aggiornamento',
   'You have the latest version installed.': 'Hai già l’ultima versione.',
   'Update in progress': 'Aggiornamento in corso',
@@ -531,6 +530,30 @@ const italian = {
   'Release notes:': 'Note di rilascio:',
   No: 'No',
   'Select Storage': 'Scegli la memoria',
+  '{mode} mode': 'Modalità {mode}',
+  // rename, new folder, replace and delete dialogs
+  'Rename file': 'Rinomina file',
+  'Rename folder': 'Rinomina cartella',
+  'Some phones don’t allow renaming.':
+    'Alcuni telefoni non permettono di rinominare.',
+  'File name': 'Nome del file',
+  'Folder name': 'Nome della cartella',
+  'New folder on the phone': 'Nuova cartella sul telefono',
+  'New folder on this Mac': 'Nuova cartella su questo Mac',
+  Create: 'Crea',
+  'Enter a name': 'Scrivi un nome',
+  'Enter a folder name': 'Scrivi il nome della cartella',
+  'A name can’t contain {characters}': 'Il nome non può contenere {characters}',
+  '“{name}” already exists here': '“{name}” esiste già qui',
+  'Replace existing items?': 'Sostituire gli elementi esistenti?',
+  'Items with the same name are already here: files will be replaced and folders merged.':
+    'Qui ci sono già elementi con lo stesso nome: i file verranno sostituiti e le cartelle unite.',
+  Replace: 'Sostituisci',
+  'Delete permanently?': 'Eliminare definitivamente?',
+  'The selected items will be deleted from the phone. You can’t undo this.':
+    'Gli elementi selezionati verranno eliminati dal telefono. Non si può annullare.',
+  'The selected items will be deleted from this Mac without going to the Trash. You can’t undo this.':
+    'Gli elementi selezionati verranno eliminati da questo Mac senza passare dal Cestino. Non si può annullare.',
 };
 
 const dictionaries = {

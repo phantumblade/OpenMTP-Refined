@@ -27,6 +27,8 @@ class Confirm extends PureComponent {
       classes: styles,
       titleText = `Confirm Action`,
       bodyText,
+      btnPositiveText = 'Yes',
+      btnNegativeText = 'No',
       trigger,
       fullWidthDialog,
       maxWidthDialog,
@@ -52,14 +54,14 @@ class Confirm extends PureComponent {
             color="secondary"
             className={classNames(styles.btnNegative)}
           >
-            No
+            {btnNegativeText}
           </Button>
           <Button
             onClick={() => this._handleBtnClick({ confirm: true })}
             color="primary"
             className={classNames(styles.btnPositive)}
           >
-            Yes
+            {btnPositiveText}
           </Button>
         </DialogActions>
       </Dialog>
