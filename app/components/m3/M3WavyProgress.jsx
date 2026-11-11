@@ -67,6 +67,36 @@ const indeterminateSegments = (elapsed) => {
   ].map(([tail, head]) => [tail, head]);
 };
 
+// The track only fills the space the active segments leave free, with the
+// same 4dp gap on both sides of each segment (never a line under the wave).
+export const trackAround = (spans, start, end) => {
+  const centre = HEIGHT / 2;
+  const clearance = GAP + STROKE;
+  const pieces = [];
+  let cursor = start;
+
+  spans
+    .filter(([from, to]) => to - from >= 0.5)
+    .sort((a, b) => a[0] - b[0])
+    .forEach(([from, to]) => {
+      if (from - clearance - cursor >= 0.5) {
+        pieces.push([cursor, from - clearance]);
+      }
+
+      cursor = Math.max(cursor, to + clearance);
+    });
+
+  if (end - cursor >= 0.5) {
+    pieces.push([cursor, end]);
+  }
+
+  return pieces
+    .map(
+      ([from, to]) => `M${from.toFixed(2)} ${centre}L${to.toFixed(2)} ${centre}`
+    )
+    .join('');
+};
+
 export default function M3WavyProgress({
   value = 0,
   indeterminate = false,
@@ -115,14 +145,17 @@ export default function M3WavyProgress({
           : (elapsed / 1000) * INDETERMINATE_WAVELENGTH;
         const segments = indeterminateSegments(elapsed);
 
-        [activeRef, active2Ref].forEach((ref, i) => {
-          const [tail, head] = segments[i];
+        const spans = segments.map(([tail, head]) => [
+          half + tail * (width - STROKE),
+          half + head * (width - STROKE),
+        ]);
 
+        [activeRef, active2Ref].forEach((ref, i) => {
           ref.current.setAttribute(
             'd',
             wavePath(
-              half + tail * (width - STROKE),
-              half + head * (width - STROKE),
+              spans[i][0],
+              spans[i][1],
               AMPLITUDE,
               INDETERMINATE_WAVELENGTH,
               -phase
@@ -131,7 +164,7 @@ export default function M3WavyProgress({
         });
         trackRef.current.setAttribute(
           'd',
-          `M${half} ${HEIGHT / 2}L${width - half} ${HEIGHT / 2}`
+          trackAround(spans, half, width - half)
         );
       } else {
         // Transfer progress arrives in bursts (e.g. when a file completes).
