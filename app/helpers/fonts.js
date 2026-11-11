@@ -13,6 +13,13 @@ export const SYSTEM_FONT_FAMILY = [
   '"Segoe UI Symbol"',
 ].join(',');
 
+// Google Sans Flex (variable: weight, width, roundness), the typeface of
+// Material 3 Expressive; bundled offline, see styles/scss/themes/fonts.scss
+export const GOOGLE_SANS_FLEX_FONT_FAMILY = [
+  '"Google Sans Flex"',
+  SYSTEM_FONT_FAMILY,
+].join(',');
+
 export const FACULTY_GLYPHIC_FONT_FAMILY = [
   '"Faculty Glyphic"',
   SYSTEM_FONT_FAMILY,
@@ -23,7 +30,9 @@ export const getAppFontFamily = (appFontFamily) => {
     case APP_FONT_FAMILY_TYPE.facultyGlyphic:
       return FACULTY_GLYPHIC_FONT_FAMILY;
     case APP_FONT_FAMILY_TYPE.system:
-    default:
       return SYSTEM_FONT_FAMILY;
+    case APP_FONT_FAMILY_TYPE.googleSansFlex:
+    default:
+      return GOOGLE_SANS_FLEX_FONT_FAMILY;
   }
 };

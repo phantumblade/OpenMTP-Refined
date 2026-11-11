@@ -1,4 +1,4 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { PureComponent } from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Drawer from '@material-ui/core/Drawer';
@@ -25,6 +25,46 @@ import M3LoadingIndicator from '../../../components/m3/M3LoadingIndicator';
 import M3WavyProgress from '../../../components/m3/M3WavyProgress';
 import MaterialSymbol from '../../../components/m3/MaterialSymbol';
 import { isTransferPhaseActive } from '../../../helpers/fileTransfer';
+import { formatStorageSize, getDiskSpace } from '../../../helpers/diskSpace';
+import { getSelectedStorage } from '../actions';
+
+// Free space as a small ring: the filled arc is the used share.
+function StorageRing({ used, className }) {
+  const radius = 7;
+  const length = 2 * Math.PI * radius;
+  const share = Math.min(1, Math.max(0, used));
+
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      width={18}
+      height={18}
+      className={className}
+      aria-hidden="true"
+    >
+      <circle
+        cx={10}
+        cy={10}
+        r={radius}
+        fill="none"
+        stroke="currentColor"
+        strokeOpacity={0.24}
+        strokeWidth={3}
+      />
+      <circle
+        cx={10}
+        cy={10}
+        r={radius}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={3}
+        strokeLinecap="round"
+        strokeDasharray={`${share * length} ${length}`}
+        transform="rotate(-90 10 10)"
+      />
+    </svg>
+  );
+}
 
 export default class ToolbarAreaPane extends PureComponent {
   activeToolbarList = ({ ...args }) => {
@@ -194,6 +234,61 @@ export default class ToolbarAreaPane extends PureComponent {
     const deviceBrand = getDeviceBrand(deviceInfo?.Manufacturer);
     const deviceModel = deviceInfo?.Model;
 
+    // free and total space of what this pane shows: the phone's selected
+    // storage, or the Mac volume of the current folder
+    let space = null;
+
+    if (isMtp) {
+      const info = getSelectedStorage(mtpStoragesList)?.data?.info;
+      const total = parseInt(info?.MaxCapability ?? 0, 10);
+
+      if (mtpDevice.isAvailable && total > 0) {
+        space = {
+          free: parseInt(info?.FreeSpaceInBytes ?? 0, 10),
+          total,
+        };
+      }
+    } else {
+      const disk = getDiskSpace(currentBrowsePath[deviceType]);
+
+      if (disk) {
+        space = { free: disk.freeBytes, total: disk.totalBytes };
+      }
+    }
+
+    const spaceLabel =
+      space &&
+      t('{free} free', { free: formatStorageSize(space.free, appLanguage) });
+    const spaceTitle =
+      space &&
+      t('{free} free of {total}', {
+        free: formatStorageSize(space.free, appLanguage),
+        total: formatStorageSize(space.total, appLanguage),
+      });
+    const storageMeter = space && (
+      <span className={styles.deviceSpace}>
+        <StorageRing
+          used={1 - space.free / space.total}
+          className={styles.deviceSpaceRing}
+        />
+        <span className={styles.deviceSpaceText}>{spaceLabel}</span>
+      </span>
+    );
+
+    // toolbar actions, one container per group
+    const actionGroups = [];
+
+    Object.keys(_toolbarList).forEach((key) => {
+      const item = _toolbarList[key];
+      const last = actionGroups[actionGroups.length - 1];
+
+      if (last && last.group === item.group) {
+        last.keys.push(key);
+      } else {
+        actionGroups.push({ group: item.group, keys: [key] });
+      }
+    });
+
     return (
       <div className={styles.root}>
         <ConfirmDialog
@@ -300,8 +395,11 @@ export default class ToolbarAreaPane extends PureComponent {
             {isMtp && (
               <Tooltip
                 title={
+                  // eslint-disable-next-line no-nested-ternary
                   mtpDevice.isAvailable
-                    ? t('Select Storage')
+                    ? spaceTitle
+                      ? `${t('Select Storage')} · ${spaceTitle}`
+                      : t('Select Storage')
                     : t('Try connection again')
                 }
               >
@@ -352,63 +450,88 @@ export default class ToolbarAreaPane extends PureComponent {
                       </span>
                     )}
                   </span>
+                  {storageMeter}
+                </button>
+              </Tooltip>
+            )}
+
+            {/* the Mac side of the same header: volume and free space; it
+                opens the side menu like the menu button */}
+            {!isMtp && (
+              <Tooltip title={spaceTitle || t('Menu')}>
+                <button
+                  type="button"
+                  className={classNames(styles.deviceButton, styles.noAppDrag)}
+                  onClick={onToggleDrawer(true)}
+                >
+                  <MaterialSymbol
+                    name="laptop_mac"
+                    size={20}
+                    className={styles.deviceButtonIcon}
+                  />
+                  <span className={styles.deviceButtonText}>
+                    <span className={styles.deviceModel}>Mac</span>
+                  </span>
+                  {storageMeter}
                 </button>
               </Tooltip>
             )}
 
             <div className={styles.toolbarInnerWrapper}>
-              {Object.keys(_toolbarList).map((a, index, actionKeys) => {
-                const item = _toolbarList[a];
-                const previousItem = _toolbarList[actionKeys[index - 1]];
-                const startsGroup =
-                  index > 0 && previousItem?.group !== item.group;
-                const isActive =
-                  a === 'multiSelect' && multiSelectMode[deviceType];
-                const itemLabel = t(isActive ? 'Finish selection' : item.label);
+              {actionGroups.map(({ group, keys }) => (
+                <div
+                  key={group}
+                  role="group"
+                  className={`${styles.toolbarGroup} ${styles.noAppDrag}`}
+                >
+                  {keys.map((a) => {
+                    const item = _toolbarList[a];
+                    const isActive =
+                      a === 'multiSelect' && multiSelectMode[deviceType];
+                    const itemLabel = t(
+                      isActive ? 'Finish selection' : item.label
+                    );
 
-                return (
-                  <Fragment key={a}>
-                    {startsGroup && (
-                      <span
-                        className={styles.toolbarDivider}
-                        aria-hidden="true"
-                      />
-                    )}
-                    <Tooltip title={itemLabel}>
-                      <div className={`${styles.navBtns} ${styles.noAppDrag}`}>
-                        <IconButton
-                          aria-label={itemLabel}
-                          disabled={!item.enabled}
-                          disableRipple
-                          onClick={() => onToolbarAction(a)}
-                          className={classNames({
-                            [styles.disabledNavBtns]: !item.enabled,
-                            [styles.invertedNavBtns]: item.invert,
-                            [styles.imageBtn]: item.image,
-                            [styles.activeNavBtn]: isActive,
-                          })}
-                        >
-                          {item.image && (
-                            <img
-                              alt={item.label}
-                              src={imgsrc(item.image, false)}
-                              className={styles.navBtnImages}
-                            />
-                          )}
+                    return (
+                      <Tooltip key={a} title={itemLabel}>
+                        <div className={styles.navBtns}>
+                          <IconButton
+                            aria-label={itemLabel}
+                            aria-pressed={
+                              a === 'multiSelect' ? isActive : undefined
+                            }
+                            disabled={!item.enabled}
+                            disableRipple
+                            onClick={() => onToolbarAction(a)}
+                            className={classNames({
+                              [styles.disabledNavBtns]: !item.enabled,
+                              [styles.invertedNavBtns]: item.invert,
+                              [styles.imageBtn]: item.image,
+                              [styles.activeNavBtn]: isActive,
+                            })}
+                          >
+                            {item.image && (
+                              <img
+                                alt={item.label}
+                                src={imgsrc(item.image, false)}
+                                className={styles.navBtnImages}
+                              />
+                            )}
 
-                          {item.icon && (
-                            <AnimatedActionIcon
-                              name={item.icon}
-                              active={isActive}
-                              className={styles.navBtnIcons}
-                            />
-                          )}
-                        </IconButton>
-                      </div>
-                    </Tooltip>
-                  </Fragment>
-                );
-              })}
+                            {item.icon && (
+                              <AnimatedActionIcon
+                                name={item.icon}
+                                active={isActive}
+                                className={styles.navBtnIcons}
+                              />
+                            )}
+                          </IconButton>
+                        </div>
+                      </Tooltip>
+                    );
+                  })}
+                </div>
+              ))}
             </div>
           </Toolbar>
         </AppBar>

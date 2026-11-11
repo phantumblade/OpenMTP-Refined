@@ -30,8 +30,22 @@ export const APP_LANGUAGE_TYPE = {
 };
 
 export const APP_FONT_FAMILY_TYPE = {
+  googleSansFlex: 'googleSansFlex',
   system: 'system',
   facultyGlyphic: 'facultyGlyphic',
+};
+
+// Colour the Material 3 palette is generated from; "system" follows the
+// macOS accent colour (see scripts/m3/generate-color-tokens.mjs)
+export const APP_ACCENT_COLOR_TYPE = {
+  system: 'system',
+  blue: 'blue',
+  purple: 'purple',
+  pink: 'pink',
+  red: 'red',
+  orange: 'orange',
+  yellow: 'yellow',
+  green: 'green',
 };
 
 // Material 3 colour spec the palette is generated with (see

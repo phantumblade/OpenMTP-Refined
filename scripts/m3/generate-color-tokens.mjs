@@ -19,6 +19,18 @@ const SEED = '#007af5';
 const TERTIARY_SEED = '#eca743';
 const OUTPUT = new URL('../../app/styles/m3/colorTokens.js', import.meta.url);
 
+// App colours the user can pick in Settings besides the brand blue, named
+// like the macOS accent colours so "Like macOS" can follow the system one.
+// Warm colours take the brand blue as tertiary, the others the icon orange.
+const ACCENTS = {
+  purple: { seed: '#a550a7', tertiary: TERTIARY_SEED },
+  pink: { seed: '#f74f9e', tertiary: TERTIARY_SEED },
+  red: { seed: '#ff5257', tertiary: SEED },
+  orange: { seed: '#f7821b', tertiary: SEED },
+  yellow: { seed: '#ffc600', tertiary: SEED },
+  green: { seed: '#62ba46', tertiary: TERTIARY_SEED },
+};
+
 const roles = Object.getOwnPropertyNames(MaterialDynamicColors)
   .filter((name) => MaterialDynamicColors[name] instanceof DynamicColor)
   .filter((name) => !/PaletteKeyColor$/.test(name))
@@ -32,9 +44,15 @@ const roles = Object.getOwnPropertyNames(MaterialDynamicColors)
 const SPEC_VERSIONS = { classic: '2021', vibrant: '2025' };
 
 // M3 contrast levels: 0 standard, 0.5 medium, 1 high
-const buildScheme = (isDark, contrastLevel = 0, specVersion = '2021') => {
-  const source = Hct.fromInt(argbFromHex(SEED));
-  const tertiary = Hct.fromInt(argbFromHex(TERTIARY_SEED));
+const buildScheme = (
+  isDark,
+  contrastLevel = 0,
+  specVersion = '2021',
+  seed = SEED,
+  tertiarySeed = TERTIARY_SEED
+) => {
+  const source = Hct.fromInt(argbFromHex(seed));
+  const tertiary = Hct.fromInt(argbFromHex(tertiarySeed));
   const vibrant = new SchemeVibrant(source, isDark, 0, specVersion);
   // Vibrant primary and neutrals, custom tertiary (M3 allows a custom
   // key colour per role)
@@ -71,17 +89,28 @@ const buildScheme = (isDark, contrastLevel = 0, specVersion = '2021') => {
   return tokens;
 };
 
-const buildStyle = (specVersion) => ({
+const buildStyle = (specVersion, seed, tertiarySeed) => ({
   standard: {
-    light: buildScheme(false, 0, specVersion),
-    dark: buildScheme(true, 0, specVersion),
+    light: buildScheme(false, 0, specVersion, seed, tertiarySeed),
+    dark: buildScheme(true, 0, specVersion, seed, tertiarySeed),
   },
   // used when macOS "Increase contrast" is on
   highContrast: {
-    light: buildScheme(false, 1, specVersion),
-    dark: buildScheme(true, 1, specVersion),
+    light: buildScheme(false, 1, specVersion, seed, tertiarySeed),
+    dark: buildScheme(true, 1, specVersion, seed, tertiarySeed),
   },
 });
+const accents = Object.fromEntries(
+  Object.entries(ACCENTS).map(([name, { seed, tertiary }]) => [
+    name,
+    Object.fromEntries(
+      Object.entries(SPEC_VERSIONS).map(([style, spec]) => [
+        style,
+        buildStyle(spec, seed, tertiary),
+      ])
+    ),
+  ])
+);
 const styles = Object.fromEntries(
   Object.entries(SPEC_VERSIONS).map(([style, spec]) => [
     style,
@@ -113,10 +142,15 @@ export const m3VibrantColorTokens = ${format(styles.vibrant.standard)};
 export const m3VibrantHighContrastColorTokens = ${format(
     styles.vibrant.highContrast
   )};
+
+// The other app colours: accent -> style -> contrast -> theme -> roles.
+export const m3AccentColorTokens = ${format(accents)};
 `
 );
 
 // eslint-disable-next-line no-console
 console.log(
-  `Wrote ${roles.length} roles x 2 styles x 2 themes x 2 contrasts to ${OUTPUT.pathname}`
+  `Wrote ${roles.length} roles x ${
+    Object.keys(ACCENTS).length + 1
+  } colours x 2 styles x 2 themes x 2 contrasts to ${OUTPUT.pathname}`
 );

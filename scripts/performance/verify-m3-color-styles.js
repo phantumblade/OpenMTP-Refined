@@ -4,6 +4,7 @@ const {
   m3HighContrastColorTokens,
   m3VibrantColorTokens,
   m3VibrantHighContrastColorTokens,
+  m3AccentColorTokens,
 } = require('../../app/styles/m3/colorTokens');
 
 const luminance = (hex) => {
@@ -43,6 +44,15 @@ function main() {
     classic: [m3ColorTokens, m3HighContrastColorTokens],
     vibrant: [m3VibrantColorTokens, m3VibrantHighContrastColorTokens],
   };
+
+  // every other app colour, in both styles
+  Object.entries(m3AccentColorTokens).forEach(([accent, accentStyles]) => {
+    Object.entries(accentStyles).forEach(
+      ([style, { standard, highContrast }]) => {
+        styles[`${accent} ${style}`] = [standard, highContrast];
+      }
+    );
+  });
 
   Object.entries(styles).forEach(([style, [standard, highContrast]]) => {
     [

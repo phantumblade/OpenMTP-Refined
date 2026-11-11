@@ -29,6 +29,12 @@ export const getAppColorStyleSetting = () => {
   return setting?.appColorStyle ?? initialState.appColorStyle;
 };
 
+export const getAppAccentColorSetting = () => {
+  const setting = settingsStorage.getItems(['appAccentColor']);
+
+  return setting?.appAccentColor ?? initialState.appAccentColor;
+};
+
 export const getMtpModeSetting = () => {
   const setting = settingsStorage.getItems(['mtpMode']);
 

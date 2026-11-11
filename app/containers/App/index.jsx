@@ -16,6 +16,7 @@ import ErrorBoundary from '../ErrorBoundary';
 import Routes from '../../routing';
 import { bootLoader } from '../../helpers/bootHelper';
 import { settingsStorage } from '../../helpers/storageHelper';
+import { upgradeSavedLook } from '../../helpers/designGeneration';
 import SettingsDialog from '../Settings';
 import { withReducer } from '../../store/reducers/withReducer';
 import reducers from './reducers';
@@ -25,13 +26,12 @@ import {
   makeAppThemeModeSettings,
   makeAppLanguage,
   makeAppFontFamily,
+  makeAppAccentColor,
   makeAppColorStyle,
-  makeMtpMode,
 } from '../Settings/selectors';
 import { getAppThemeMode } from '../../helpers/theme';
 import { getMainWindowRendererProcess } from '../../helpers/windowHelper';
 import { log } from '../../utils/log';
-import { makeMtpDevice, makeMtpStoragesList } from '../HomePage/selectors';
 import { analyticsService } from '../../services/analytics';
 
 class App extends Component {
@@ -45,6 +45,7 @@ class App extends Component {
 
   componentWillMount() {
     try {
+      upgradeSavedLook();
       this.setFreshInstall();
 
       if (this.allowWritingJsonToSettings) {
@@ -86,11 +87,21 @@ class App extends Component {
   };
 
   getMuiTheme = () => {
-    const { appThemeModeSettings, appFontFamily, appColorStyle } = this.props;
+    const {
+      appThemeModeSettings,
+      appFontFamily,
+      appColorStyle,
+      appAccentColor,
+    } = this.props;
     const appThemeMode = getAppThemeMode(appThemeModeSettings);
 
     return createMuiTheme(
-      materialUiTheme({ appThemeMode, appFontFamily, appColorStyle })
+      materialUiTheme({
+        appThemeMode,
+        appFontFamily,
+        appColorStyle,
+        appAccentColor,
+      })
     );
   };
 
@@ -145,13 +156,7 @@ class App extends Component {
   }
 
   render() {
-    const {
-      classes: styles,
-      mtpDevice,
-      mtpStoragesList,
-      mtpMode,
-      appLanguage,
-    } = this.props;
+    const { classes: styles, appLanguage } = this.props;
     const muiTheme = this.getMuiTheme();
 
     document.documentElement.lang = appLanguage;
@@ -160,12 +165,7 @@ class App extends Component {
       <div className={styles.root}>
         <MuiThemeProvider theme={muiTheme}>
           <CssBaseline />
-          <Titlebar
-            mtpDevice={mtpDevice}
-            mtpStoragesList={mtpStoragesList}
-            mtpMode={mtpMode}
-            appLanguage={appLanguage}
-          />
+          <Titlebar />
           <Alerts />
           <ErrorBoundary>
             <SettingsDialog />
@@ -202,9 +202,7 @@ const mapStateToProps = (state) => {
     appLanguage: makeAppLanguage(state),
     appFontFamily: makeAppFontFamily(state),
     appColorStyle: makeAppColorStyle(state),
-    mtpDevice: makeMtpDevice(state),
-    mtpMode: makeMtpMode(state),
-    mtpStoragesList: makeMtpStoragesList(state),
+    appAccentColor: makeAppAccentColor(state),
   };
 };
 

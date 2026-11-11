@@ -19,6 +19,26 @@ import { baseName } from '../../../utils/files';
 import { niceBytes } from '../../../utils/funcs';
 import { translate } from '../../../i18n';
 
+// 54 s, 3 min 05 s, 1 h 12 min
+export const formatDuration = (ms) => {
+  const seconds = Math.round(ms / 1000);
+
+  if (seconds < 60) {
+    return `${seconds} s`;
+  }
+
+  const minutes = Math.floor(seconds / 60);
+
+  if (minutes < 60) {
+    return `${minutes} min ${String(seconds % 60).padStart(2, '0')} s`;
+  }
+
+  return `${Math.floor(minutes / 60)} h ${String(minutes % 60).padStart(
+    2,
+    '0'
+  )} min`;
+};
+
 class FileTransferDialog extends PureComponent {
   constructor(props) {
     super(props);
@@ -185,6 +205,31 @@ class FileTransferDialog extends PureComponent {
         )}`
       : `${filesSentVal} / ${totalFilesVal} ${translate(appLanguage, 'files')}`;
 
+    // what was copied, shown when the transfer ends
+    const elapsedMs =
+      transfer.startedAt && transfer.lastActivityAt
+        ? Math.max(0, transfer.lastActivityAt - transfer.startedAt)
+        : 0;
+    const summary = [
+      {
+        label: translate(appLanguage, countVal === '1' ? 'item' : 'items'),
+        value: countVal,
+      },
+      transfer.totalFileSize > 0 && {
+        label: translate(appLanguage, 'copied'),
+        value: niceBytes(transfer.totalFileSize),
+      },
+      elapsedMs >= 1000 && {
+        label: translate(appLanguage, 'time taken'),
+        value: formatDuration(elapsedMs),
+      },
+      elapsedMs >= 1000 &&
+        transfer.totalFileSize > 0 && {
+          label: translate(appLanguage, 'average speed'),
+          value: `${niceBytes((transfer.totalFileSize / elapsedMs) * 1000)}/s`,
+        },
+    ].filter(Boolean);
+
     return (
       <Dialog
         disableBackdropClick={active}
@@ -290,6 +335,17 @@ class FileTransferDialog extends PureComponent {
               indeterminate
               aria-label={translate(appLanguage, 'Transfer progress')}
             />
+          )}
+
+          {transfer.phase === FILE_TRANSFER_PHASE.completed && (
+            <dl className={styles.summary}>
+              {summary.map(({ label, value }) => (
+                <div key={label} className={styles.summaryCell}>
+                  <dd className={styles.summaryValue}>{value}</dd>
+                  <dt className={styles.summaryLabel}>{label}</dt>
+                </div>
+              ))}
+            </dl>
           )}
 
           {transfer.phase === FILE_TRANSFER_PHASE.failed && (

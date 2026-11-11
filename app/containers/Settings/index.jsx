@@ -151,6 +151,16 @@ class Settings extends Component {
     );
   };
 
+  _handleAppAccentColorChange = (event, value, deviceType) => {
+    this._handleSetCommonSettingsChange(
+      {
+        key: 'appAccentColor',
+        value,
+      },
+      deviceType
+    );
+  };
+
   _handleAppColorStyleChange = (event, value, deviceType) => {
     this._handleSetCommonSettingsChange(
       {
@@ -263,6 +273,7 @@ class Settings extends Component {
         onAppThemeModeChange={this._handleSetAppThemeModeChange}
         onAppLanguageChange={this._handleAppLanguageChange}
         onAppFontFamilyChange={this._handleAppFontFamilyChange}
+        onAppAccentColorChange={this._handleAppAccentColorChange}
         onAppColorStyleChange={this._handleAppColorStyleChange}
         onAppMenuStyleChange={this._handleAppMenuStyleChange}
         onShowLocalPaneChange={this._handleShowLocalPaneChange}

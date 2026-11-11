@@ -2,6 +2,7 @@ import React, { PureComponent, Fragment } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
+import classNames from 'classnames';
 import {
   ArchiveOutlined as ArchiveOutlinedIcon,
   AudiotrackOutlined as AudiotrackOutlinedIcon,
@@ -15,7 +16,10 @@ import {
   MovieOutlined as MovieOutlinedIcon,
 } from '../../../components/m3/symbolIcons';
 import FileExplorerTableGridRender from './FileExplorerTableBodyGridRender';
-import { styles } from '../styles/FileExplorerTableBodyGridWrapperRender';
+import {
+  styles,
+  GRID_ENTER_MS,
+} from '../styles/FileExplorerTableBodyGridWrapperRender';
 import { calculateGridWindow } from '../../../utils/virtualWindow';
 import { getFileCategory } from '../../../helpers/fileExplorerIcons';
 import { isFolderLocked } from '../../../helpers/folderAccess';
@@ -58,7 +62,11 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
     this.itemIndexByPath = new Map();
     this.selectedPathsSource = null;
     this.selectedPathsSet = new Set();
+    this.enteredPath = this.browsePath();
+    this.enterTimer = null;
     this.state = {
+      // true while the tiles of a freshly opened folder animate in
+      entering: true,
       source: props.tableSort,
       startIndex: 0,
       endIndex: Math.min(props.tableSort.length, 50),
@@ -107,6 +115,7 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
     }
 
     this.scheduleWindowUpdate();
+    this.endEnteringLater();
   }
 
   componentDidUpdate(prevProps) {
@@ -114,6 +123,14 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
 
     if (prevProps.tableSort !== tableSort) {
       this.scheduleWindowUpdate();
+
+      // a new list for another folder: play the entrance once
+      if (this.browsePath() !== this.enteredPath) {
+        this.enteredPath = this.browsePath();
+        // eslint-disable-next-line react/no-did-update-set-state
+        this.setState({ entering: true });
+        this.endEnteringLater();
+      }
     }
 
     if (
@@ -125,6 +142,8 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
   }
 
   componentWillUnmount() {
+    clearTimeout(this.enterTimer);
+
     if (this.animationFrame) {
       window.cancelAnimationFrame(this.animationFrame);
     }
@@ -346,6 +365,21 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
     });
   };
 
+  browsePath = () => {
+    const { currentBrowsePath, deviceType } = this.props;
+
+    return typeof currentBrowsePath === 'string'
+      ? currentBrowsePath
+      : currentBrowsePath?.[deviceType];
+  };
+
+  endEnteringLater = () => {
+    clearTimeout(this.enterTimer);
+    this.enterTimer = setTimeout(() => {
+      this.setState({ entering: false });
+    }, GRID_ENTER_MS);
+  };
+
   // folders closed to OpenMTP (by the user or macOS) get a lock badge
   isLocked = (item) => {
     const { deviceType, folderAccess } = this.props;
@@ -373,6 +407,7 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
       favoritePaths,
       orderBy,
     } = this.props;
+    const { entering } = this.state;
 
     if (orderBy === 'extension') {
       return (
@@ -380,7 +415,9 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
           <TableCell colSpan={6} className={styles.gridTableCell}>
             <div
               ref={this.setWrapper}
-              className={styles.wrapper}
+              className={classNames(styles.wrapper, {
+                [styles.wrapperEntering]: entering,
+              })}
               data-file-explorer-grid={deviceType}
               role="listbox"
               aria-multiselectable={multiSelectMode[deviceType]}
@@ -401,7 +438,9 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
         <TableCell colSpan={6} className={styles.gridTableCell}>
           <div
             ref={this.setWrapper}
-            className={styles.wrapper}
+            className={classNames(styles.wrapper, {
+              [styles.wrapperEntering]: entering,
+            })}
             data-file-explorer-grid={deviceType}
             role="listbox"
             aria-multiselectable={multiSelectMode[deviceType]}

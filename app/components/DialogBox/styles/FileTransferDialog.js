@@ -146,6 +146,49 @@ export const styles = (theme) => {
       color: m3.onSurface,
       fontWeight: 600,
     },
+    // end-of-transfer summary: connected cells, like an M3 button group
+    summary: {
+      display: 'flex',
+      gap: 2,
+      margin: 0,
+    },
+    summaryCell: {
+      flex: '1 1 auto',
+      padding: '14px 16px',
+      borderRadius: m3Shape.small,
+      backgroundColor: m3.surfaceContainer,
+      animation: `$summaryIn 420ms cubic-bezier(0.05, 0.7, 0.1, 1) both`,
+      '&:first-child': {
+        borderTopLeftRadius: m3Shape.large,
+        borderBottomLeftRadius: m3Shape.large,
+      },
+      '&:last-child': {
+        borderTopRightRadius: m3Shape.large,
+        borderBottomRightRadius: m3Shape.large,
+      },
+      '&:nth-child(2)': { animationDelay: '50ms' },
+      '&:nth-child(3)': { animationDelay: '100ms' },
+      '&:nth-child(4)': { animationDelay: '150ms' },
+      '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+    },
+    '@keyframes summaryIn': {
+      from: { opacity: 0, transform: 'translateY(10px) scale(0.94)' },
+      to: { opacity: 1, transform: 'none' },
+    },
+    summaryValue: {
+      ...m3Type.titleMedium,
+      margin: 0,
+      fontSize: 18,
+      fontWeight: 650,
+      color: m3.onSurface,
+      whiteSpace: 'nowrap',
+      fontVariantNumeric: 'tabular-nums',
+    },
+    summaryLabel: {
+      ...m3Type.labelMedium,
+      marginTop: 2,
+      color: m3.onSurfaceVariant,
+    },
     errorBox: {
       ...m3Type.bodyMedium,
       display: 'flex',

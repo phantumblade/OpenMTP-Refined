@@ -18,6 +18,7 @@ import M3Shape from '../../../components/m3/M3Shape';
 import FolderAccessSettings from './FolderAccessSettings';
 import { DEVICES_LABEL } from '../../../constants';
 import {
+  APP_ACCENT_COLOR_TYPE,
   DEVICE_TYPE,
   FILE_EXPLORER_VIEW_TYPE,
   APP_THEME_MODE_TYPE,
@@ -33,6 +34,33 @@ import { IpcEvents } from '../../../services/ipc-events/IpcEventType';
 import { isKalamModeSupported } from '../../../helpers/binaries';
 import { translate } from '../../../i18n';
 import { getAppFontFamily } from '../../../helpers/fonts';
+import { getSystemAccentColor } from '../../../helpers/accentColor';
+import {
+  m3AccentColorTokens,
+  m3VibrantColorTokens,
+} from '../../../styles/m3/colorTokens';
+
+// App colours in the order of the macOS accent colours; "system" follows
+// the one set in macOS.
+const ACCENT_COLORS = [
+  [APP_ACCENT_COLOR_TYPE.system, 'Like macOS'],
+  [APP_ACCENT_COLOR_TYPE.blue, 'Blue'],
+  [APP_ACCENT_COLOR_TYPE.purple, 'Purple'],
+  [APP_ACCENT_COLOR_TYPE.pink, 'Pink'],
+  [APP_ACCENT_COLOR_TYPE.red, 'Red'],
+  [APP_ACCENT_COLOR_TYPE.orange, 'Orange'],
+  [APP_ACCENT_COLOR_TYPE.yellow, 'Yellow'],
+  [APP_ACCENT_COLOR_TYPE.green, 'Green'],
+];
+
+// the swatch shows the colour as the Vibrant light theme paints it
+const accentSwatch = (accent) => {
+  const tokens =
+    m3AccentColorTokens[accent]?.vibrant.standard.light ??
+    m3VibrantColorTokens.light;
+
+  return { fill: tokens.primaryContainer, ink: tokens.onPrimaryContainer };
+};
 
 const isMas = electronIs.mas();
 
@@ -177,6 +205,7 @@ export default class SettingsDialog extends PureComponent {
       appLanguage,
       appFontFamily,
       appColorStyle,
+      appAccentColor,
       appMenuStyle,
       styles,
       enableAutoUpdateCheck,
@@ -200,6 +229,7 @@ export default class SettingsDialog extends PureComponent {
       onAppThemeModeChange,
       onAppLanguageChange,
       onAppFontFamilyChange,
+      onAppAccentColorChange,
       onAppColorStyleChange,
       onAppMenuStyleChange,
       onShowLocalPaneChange,
@@ -324,8 +354,25 @@ export default class SettingsDialog extends PureComponent {
                               onAppFontFamilyChange(event, event.target.value)
                             }
                           >
-                            <MenuItem value={APP_FONT_FAMILY_TYPE.system}>
-                              {t('System default (recommended)')}
+                            <MenuItem
+                              value={APP_FONT_FAMILY_TYPE.googleSansFlex}
+                              style={{
+                                fontFamily: getAppFontFamily(
+                                  APP_FONT_FAMILY_TYPE.googleSansFlex
+                                ),
+                              }}
+                            >
+                              {t('Google Sans Flex (recommended)')}
+                            </MenuItem>
+                            <MenuItem
+                              value={APP_FONT_FAMILY_TYPE.system}
+                              style={{
+                                fontFamily: getAppFontFamily(
+                                  APP_FONT_FAMILY_TYPE.system
+                                ),
+                              }}
+                            >
+                              {t('macOS system font')}
                             </MenuItem>
                             <MenuItem
                               value={APP_FONT_FAMILY_TYPE.facultyGlyphic}
@@ -387,6 +434,65 @@ export default class SettingsDialog extends PureComponent {
                     </RadioGroup>
                   ),
                   grouped: false,
+                })}
+
+                {this.renderSection({
+                  icon: 'colorize',
+                  title: t('App color'),
+                  description: t(
+                    'The color the whole Material 3 palette is built from.'
+                  ),
+                  children: (
+                    <div
+                      role="radiogroup"
+                      aria-label={t('App color')}
+                      className={styles.accentRow}
+                    >
+                      {ACCENT_COLORS.map(([accent, label]) => {
+                        const isSystem =
+                          accent === APP_ACCENT_COLOR_TYPE.system;
+                        const selected = appAccentColor === accent;
+                        const { fill, ink } = accentSwatch(
+                          isSystem ? getSystemAccentColor() : accent
+                        );
+
+                        return (
+                          <button
+                            key={accent}
+                            type="button"
+                            role="radio"
+                            aria-checked={selected}
+                            aria-label={t(label)}
+                            title={t(label)}
+                            className={classNames(styles.accentSwatch, {
+                              [styles.accentSwatchSelected]: selected,
+                              [styles.accentSwatchSystem]: isSystem,
+                            })}
+                            style={{ backgroundColor: fill, color: ink }}
+                            onClick={(event) =>
+                              onAppAccentColorChange(event, accent)
+                            }
+                          >
+                            {isSystem && !selected && (
+                              <MaterialSymbol name="laptop_mac" size={20} />
+                            )}
+                            {selected && (
+                              <MaterialSymbol
+                                name="check"
+                                size={22}
+                                weight={700}
+                              />
+                            )}
+                            {isSystem && (
+                              <span className={styles.accentSwatchLabel}>
+                                {t(label)}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ),
                 })}
 
                 {this.renderSection({

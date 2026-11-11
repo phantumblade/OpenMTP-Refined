@@ -127,6 +127,45 @@ export const styles = (theme) => {
       minWidth: 240,
       '& .MuiSelect-root': { padding: '10px 36px 10px 14px' },
     },
+    // app colour swatches: round at rest, a squarer shape when chosen
+    accentRow: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      alignItems: 'center',
+      gap: 10,
+      padding: '14px 16px',
+    },
+    accentSwatch: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      minWidth: 44,
+      height: 44,
+      padding: 0,
+      border: 'none',
+      borderRadius: 22,
+      fontFamily: 'inherit',
+      cursor: 'pointer',
+      outline: 'none',
+      transition: `border-radius ${m3Motion.fastSpatial}, transform ${m3Motion.fastSpatial}, box-shadow ${m3Motion.fastEffects}`,
+      '&:hover': { transform: 'scale(1.08)' },
+      '&:active': { transform: 'scale(0.94)', borderRadius: 12 },
+      '&:focus-visible': {
+        boxShadow: `0 0 0 3px ${m3.surface}, 0 0 0 6px ${m3.secondary}`,
+      },
+    },
+    accentSwatchSelected: {
+      borderRadius: 14,
+      boxShadow: `0 0 0 3px ${m3.surface}, 0 0 0 5px ${m3.primary}`,
+    },
+    accentSwatchSystem: {
+      padding: '0 16px 0 12px',
+    },
+    accentSwatchLabel: {
+      ...m3Type.labelLarge,
+      whiteSpace: 'nowrap',
+    },
     fontPreview: {
       ...m3Type.bodyLarge,
       color: m3.onSurface,

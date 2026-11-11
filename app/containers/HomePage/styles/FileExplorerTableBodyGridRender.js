@@ -17,11 +17,21 @@ export const styles = (theme) => ({
     borderRadius: m3Shape.large,
     // M3 Expressive: selection morphs the shape with the spatial spring,
     // colours change with the effects spring
-    transition: `background-color ${m3Motion.defaultEffects}, border-radius ${m3Motion.fastSpatial}`,
+    transition: `background-color ${m3Motion.defaultEffects}, border-radius ${m3Motion.fastSpatial}, transform ${m3Motion.fastSpatial}`,
     cursor: 'default',
     outline: 'none',
     '&:hover': {
       backgroundColor: alphaHex(theme.palette.m3.onSurface, m3State.hover),
+      // the icon lifts towards the pointer
+      '& $fileTypeIconWrapper': {
+        transform: 'translateY(-2px) scale(1.04)',
+      },
+    },
+    // pressing squeezes the tile and squares its corners, the spring
+    // brings it back on release
+    '&:active': {
+      borderRadius: m3Shape.medium,
+      transform: 'scale(0.96)',
     },
     // M3 focus indicator, keyboard focus only
     '&:focus-visible': {
@@ -94,8 +104,8 @@ export const styles = (theme) => ({
       color: theme.palette.m3.onSecondaryContainer,
       fontWeight: 600,
     },
-    '& $fileTypeIconWrapper': {
-      transform: 'scale(1.05)',
+    '& $fileTypeIconWrapper, &:hover $fileTypeIconWrapper': {
+      transform: 'scale(1.06)',
     },
   },
   itemMultiSelect: {
@@ -147,8 +157,8 @@ export const styles = (theme) => ({
     textAlign: `center`,
   },
   itemFileNameWrapper: {
-    marginLeft: 12,
-    marginRight: 12,
+    marginLeft: 4,
+    marginRight: 4,
     marginTop: -8,
     textAlign: `center`,
   },

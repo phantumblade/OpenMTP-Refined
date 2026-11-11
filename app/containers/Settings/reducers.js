@@ -4,6 +4,7 @@ import {
   FILE_EXPLORER_VIEW_TYPE,
   APP_THEME_MODE_TYPE,
   APP_FONT_FAMILY_TYPE,
+  APP_ACCENT_COLOR_TYPE,
   APP_COLOR_STYLE_TYPE,
   APP_MENU_STYLE_TYPE,
   MTP_MODE,
@@ -12,6 +13,7 @@ import {
 import { checkIf } from '../../utils/checkIf';
 import { isPrereleaseVersion } from '../../utils/funcs';
 import { detectSystemLanguage } from '../../helpers/systemLanguage';
+import { DESIGN_GENERATION } from '../../helpers/designGeneration';
 
 export const initialState = {
   freshInstall: 0,
@@ -37,8 +39,11 @@ export const initialState = {
   appThemeMode: APP_THEME_MODE_TYPE.auto,
   // first launch follows the Mac's language; later the saved choice wins
   appLanguage: detectSystemLanguage(),
-  appFontFamily: APP_FONT_FAMILY_TYPE.system,
-  appColorStyle: APP_COLOR_STYLE_TYPE.classic,
+  appFontFamily: APP_FONT_FAMILY_TYPE.googleSansFlex,
+  appColorStyle: APP_COLOR_STYLE_TYPE.vibrant,
+  appAccentColor: APP_ACCENT_COLOR_TYPE.blue,
+  // generation of the default look; see helpers/designGeneration
+  designGeneration: DESIGN_GENERATION,
   appMenuStyle: APP_MENU_STYLE_TYPE.standard,
   showLocalPane: true,
   showLocalPaneOnLeftSide: true,

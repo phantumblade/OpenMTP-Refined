@@ -7,6 +7,7 @@ import {
   nativeTheme,
   nativeImage,
   shell,
+  systemPreferences,
 } from 'electron';
 import electronIs from 'electron-is';
 import usbDetect from 'usb-detection';
@@ -39,6 +40,7 @@ import { isKalamModeSupported } from './helpers/binaries';
 import { fileExistsSync } from './helpers/fileOps';
 import { applyCustomAppIcon } from './helpers/customAppIcon';
 import { isExternalUrl, navigationDecision } from './helpers/navigationPolicy';
+import { upgradeSavedLook } from './helpers/designGeneration';
 
 const remote = getRemoteWindow();
 
@@ -133,7 +135,28 @@ async function installExtensions() {
   );
 }
 
+// The app colour "Like macOS" follows the system accent colour: repaint when
+// it changes in System Settings.
+function followSystemAccentColor() {
+  try {
+    systemPreferences.subscribeNotification(
+      'AppleColorPreferencesChangedNotification',
+      () => {
+        mainWindow?.webContents?.send('nativeThemeUpdated', {
+          shouldUseDarkColors: nativeTheme.shouldUseDarkColors,
+        });
+      }
+    );
+  } catch (e) {
+    log.error(e, `main.dev -> followSystemAccentColor`);
+  }
+}
+
 async function createWindow() {
+  // settings from an older version move to the current default look before
+  // the window picks its background colour
+  upgradeSavedLook();
+
   try {
     if (ENV_FLAVOR.allowDevelopmentEnvironment) {
       await installExtensions();
@@ -401,6 +424,8 @@ if (!isDeviceBootable) {
       } catch (e) {
         log.error(e, `main.dev -> whenReady`);
       }
+
+      followSystemAccentColor();
 
       app.on('activate', async () => {
         // On macOS it's common to re-create a window in the app when the

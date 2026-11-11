@@ -20,8 +20,19 @@ export const styles = (theme) => {
     toolbarInnerWrapper: {
       display: 'flex',
       alignItems: 'center',
+      gap: 6,
       marginLeft: 'auto',
-      paddingRight: 7,
+      paddingLeft: 8,
+      paddingRight: 8,
+    },
+    // M3 Expressive toolbar: each group of actions sits in its own pill
+    toolbarGroup: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 2,
+      padding: 4,
+      borderRadius: 22,
+      backgroundColor: m3.surfaceContainer,
     },
     toolbar: {
       width: `auto`,
@@ -39,18 +50,26 @@ export const styles = (theme) => {
       zIndex: 9999,
     },
     appBar: {},
+    // icon buttons: round at rest, squarer while pressed, and a filled
+    // rounded square when toggled on (M3 Expressive icon button shapes)
     navBtns: {
-      paddingLeft: 1,
       '& button': {
         width: 36,
         height: 36,
         padding: 8,
-        borderRadius: 9,
-        color: theme.palette.text.primary,
-        transition: 'background-color 160ms ease, color 160ms ease',
+        borderRadius: 18,
+        color: m3.onSurfaceVariant,
+        transition: `border-radius ${m3Motion.fastSpatial}, background-color ${m3Motion.fastEffects}, color ${m3Motion.fastEffects}`,
         '&:hover': {
-          backgroundColor: theme.palette.toolbarButtonHover,
-          color: theme.palette.secondary.main,
+          backgroundColor: alphaHex(m3.onSurfaceVariant, 0.08),
+          color: m3.onSurface,
+        },
+        '&:active': {
+          borderRadius: 10,
+          backgroundColor: alphaHex(m3.onSurfaceVariant, 0.12),
+        },
+        '&.Mui-disabled': {
+          color: alphaHex(m3.onSurface, 0.38),
         },
         '&.Mui-focusVisible': {
           outline: `3px solid ${theme.palette.focusRing}`,
@@ -62,8 +81,9 @@ export const styles = (theme) => {
       },
     },
     activeNavBtn: {
-      backgroundColor: `${theme.palette.toolbarButtonActive} !important`,
-      color: `${theme.palette.secondary.main} !important`,
+      borderRadius: '12px !important',
+      backgroundColor: `${m3.primary} !important`,
+      color: `${m3.onPrimary} !important`,
     },
     // M3 modal navigation drawer: large end corners, level 1 elevation
     drawerPaper: {
@@ -85,11 +105,11 @@ export const styles = (theme) => {
       gap: 6,
       minWidth: 0,
       maxWidth: 360,
-      height: 32,
+      height: 40,
       marginLeft: 8,
-      padding: '0 14px 0 8px',
+      padding: '0 16px 0 12px',
       border: 'none',
-      borderRadius: 16,
+      borderRadius: 20,
       backgroundColor: m3.surfaceContainerHighest,
       color: m3.onSurfaceVariant,
       fontFamily: 'inherit',
@@ -100,7 +120,7 @@ export const styles = (theme) => {
         backgroundColor: m3.surfaceContainerHigh,
       },
       '&:active:not(:disabled)': {
-        borderRadius: m3Shape.small,
+        borderRadius: m3Shape.medium,
       },
       '&:focus-visible': {
         boxShadow: `0 0 0 3px ${m3.secondary}`,
@@ -136,8 +156,29 @@ export const styles = (theme) => {
       textTransform: 'uppercase',
       opacity: 0.8,
     },
+    // free space next to the name: ring + amount; the amount gives way
+    // first when the pane gets narrow
+    deviceSpace: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 6,
+      flexShrink: 0,
+      marginLeft: 4,
+      paddingLeft: 10,
+      borderLeft: `1px solid ${alphaHex(m3.onSurfaceVariant, 0.24)}`,
+    },
+    deviceSpaceRing: {
+      flexShrink: 0,
+    },
+    deviceSpaceText: {
+      ...m3Type.labelMedium,
+      whiteSpace: 'nowrap',
+      fontVariantNumeric: 'tabular-nums',
+      '@media (max-width: 1180px)': { display: 'none' },
+    },
     deviceModel: {
       ...m3Type.labelLarge,
+      fontWeight: 650,
       minWidth: 0,
       overflow: 'hidden',
       textOverflow: 'ellipsis',
@@ -182,16 +223,20 @@ export const styles = (theme) => {
       background: alphaHex(theme.palette.m3.primary, 0.3),
     },
     menuButton: {
-      width: 38,
-      height: 38,
-      marginLeft: 7,
-      borderRadius: 9,
-      color: theme.palette.text.primary,
+      width: 40,
+      height: 40,
+      marginLeft: 8,
+      borderRadius: 20,
+      color: m3.onSurfaceVariant,
       outline: 'none !important',
       boxShadow: 'none !important',
+      transition: `border-radius ${m3Motion.fastSpatial}, background-color ${m3Motion.fastEffects}`,
       '&:hover': {
-        backgroundColor: theme.palette.toolbarButtonHover,
-        color: theme.palette.secondary.main,
+        backgroundColor: alphaHex(m3.onSurfaceVariant, 0.08),
+        color: m3.onSurface,
+      },
+      '&:active': {
+        borderRadius: 12,
       },
       '&:focus, &:active, &.Mui-focusVisible': {
         outline: 'none !important',
@@ -209,12 +254,6 @@ export const styles = (theme) => {
       top: 0,
       left: 12,
       right: 12,
-    },
-    toolbarDivider: {
-      width: 1,
-      height: 22,
-      margin: '0 5px',
-      backgroundColor: theme.palette.divider,
     },
   };
 };

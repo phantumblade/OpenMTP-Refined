@@ -6,10 +6,15 @@ import {
   m3HighContrastColorTokens,
   m3VibrantColorTokens,
   m3VibrantHighContrastColorTokens,
+  m3AccentColorTokens,
 } from '../../../styles/m3/colorTokens';
 import { prefersHighContrast } from '../../../helpers/theme';
-import { getAppColorStyleSetting } from '../../../helpers/settings';
-import { APP_COLOR_STYLE_TYPE } from '../../../enums';
+import {
+  getAppAccentColorSetting,
+  getAppColorStyleSetting,
+} from '../../../helpers/settings';
+import { resolveAccentColor } from '../../../helpers/accentColor';
+import { APP_ACCENT_COLOR_TYPE, APP_COLOR_STYLE_TYPE } from '../../../enums';
 import {
   alphaHex,
   m3Elevation,
@@ -96,9 +101,14 @@ const COLOR_TOKENS = {
   },
 };
 
-export const getColorTokens = (colorStyle, highContrast) => {
-  const style =
-    COLOR_TOKENS[colorStyle] ?? COLOR_TOKENS[APP_COLOR_STYLE_TYPE.classic];
+export const getColorTokens = (
+  colorStyle,
+  highContrast,
+  accentColor = APP_ACCENT_COLOR_TYPE.blue
+) => {
+  // the brand blue keeps its own exports; the other colours are grouped
+  const styles = m3AccentColorTokens[accentColor] ?? COLOR_TOKENS;
+  const style = styles[colorStyle] ?? styles[APP_COLOR_STYLE_TYPE.classic];
 
   return highContrast ? style.highContrast : style.standard;
 };
@@ -107,9 +117,14 @@ export const getColorTokens = (colorStyle, highContrast) => {
 // "Increase contrast" is on
 export const getColorPalette = (
   highContrast = prefersHighContrast(),
-  colorStyle = getAppColorStyleSetting()
+  colorStyle = getAppColorStyleSetting(),
+  accentColor = getAppAccentColorSetting()
 ) => {
-  const tokens = getColorTokens(colorStyle, highContrast);
+  const tokens = getColorTokens(
+    colorStyle,
+    highContrast,
+    resolveAccentColor(accentColor)
+  );
 
   return {
     get light() {
@@ -121,8 +136,12 @@ export const getColorPalette = (
   };
 };
 
-export const getCurrentThemePalette = (appThemeMode, colorStyle) => {
-  return getColorPalette(undefined, colorStyle)[appThemeMode];
+export const getCurrentThemePalette = (
+  appThemeMode,
+  colorStyle,
+  accentColor
+) => {
+  return getColorPalette(undefined, colorStyle, accentColor)[appThemeMode];
 };
 
 // Material 3 (Expressive) styling for the MUI v4 components used across the
@@ -389,9 +408,13 @@ const m3ComponentOverrides = (m3) => ({
 });
 
 export const materialUiTheme = ({ ...args }) => {
-  const { appThemeMode, appFontFamily, appColorStyle } = args;
+  const { appThemeMode, appFontFamily, appColorStyle, appAccentColor } = args;
 
-  const palette = getCurrentThemePalette(appThemeMode, appColorStyle);
+  const palette = getCurrentThemePalette(
+    appThemeMode,
+    appColorStyle,
+    appAccentColor
+  );
   const fontFamily = getAppFontFamily(appFontFamily);
 
   return {
@@ -421,6 +444,9 @@ export const materialUiTheme = ({ ...args }) => {
             '--app-secondary-main-color': palette.secondary.main,
             '--app-native-system-color': palette.nativeSystemColor,
             '--app-font-family': fontFamily,
+            // Google Sans Flex at full roundness, the Expressive setting;
+            // other fonts ignore the axis
+            fontVariationSettings: '"ROND" 100',
             ...m3CssVariables(palette.m3),
             ...commonThemes.noselect,
           },

@@ -46,7 +46,9 @@ export const m3State = {
 };
 
 // Type scale (md.sys.typescale.*) in px; "emphasized" styles use a heavier
-// weight as recommended by M3 Expressive for hero text.
+// weight as recommended by M3 Expressive for hero text. Tracking is 0: the
+// scale is set in Google Sans Flex, whose spacing is built into the font
+// (the positive tracking of the Roboto scale made it look loose).
 export const m3Type = {
   displaySmall: { fontSize: 36, lineHeight: '44px', fontWeight: 400 },
   headlineLarge: { fontSize: 32, lineHeight: '40px', fontWeight: 400 },
@@ -69,61 +71,61 @@ export const m3Type = {
     fontSize: 14,
     lineHeight: '20px',
     fontWeight: 500,
-    letterSpacing: '0.007em',
+    letterSpacing: 0,
   },
   titleMedium: {
     fontSize: 16,
     lineHeight: '24px',
     fontWeight: 500,
-    letterSpacing: '0.009em',
+    letterSpacing: 0,
   },
   titleMediumEmphasized: {
     fontSize: 16,
     lineHeight: '24px',
     fontWeight: 600,
-    letterSpacing: '0.009em',
+    letterSpacing: 0,
   },
   bodyLarge: {
     fontSize: 16,
     lineHeight: '24px',
     fontWeight: 400,
-    letterSpacing: '0.03em',
+    letterSpacing: 0,
   },
   bodyMedium: {
     fontSize: 14,
     lineHeight: '20px',
     fontWeight: 400,
-    letterSpacing: '0.018em',
+    letterSpacing: 0,
   },
   bodySmall: {
     fontSize: 12,
     lineHeight: '16px',
     fontWeight: 400,
-    letterSpacing: '0.033em',
+    letterSpacing: 0,
   },
   labelLarge: {
     fontSize: 14,
     lineHeight: '20px',
     fontWeight: 500,
-    letterSpacing: '0.007em',
+    letterSpacing: 0,
   },
   labelLargeEmphasized: {
     fontSize: 14,
     lineHeight: '20px',
     fontWeight: 700,
-    letterSpacing: '0.007em',
+    letterSpacing: 0,
   },
   labelMedium: {
     fontSize: 12,
     lineHeight: '16px',
     fontWeight: 500,
-    letterSpacing: '0.04em',
+    letterSpacing: 0,
   },
   labelSmall: {
     fontSize: 11,
     lineHeight: '16px',
     fontWeight: 500,
-    letterSpacing: '0.045em',
+    letterSpacing: 0,
   },
 };
 
