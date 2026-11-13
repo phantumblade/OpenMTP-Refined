@@ -70,6 +70,13 @@ colours, radii or easings.
 - Motion answers a gesture or explains a state change: hover lift, press
   squeeze, selection morph, a folder's tiles rising in (first 28 staggered),
   dialogs, the transfer pill. Nothing loops except progress indicators.
+- Steps that replace each other (the backup guide) use the M3 shared axis:
+  out in 90ms towards the direction of travel, in from the other side.
+- Keyframes live in component sheets or app.global.scss, never in MUI theme
+  overrides (they come out empty there).
+- Interface size is a window zoom (80-130%), so every px rule and breakpoint
+  scales together; the M3 Expressive slider (bar handle, stop dots, value
+  label) sets it.
 - Switch handles slide and grow on the spatial spring; menus (right-click
   and select) unfold from their top edge, select menus below their field.
 - Never animate per item beyond the staggered first tiles; respect

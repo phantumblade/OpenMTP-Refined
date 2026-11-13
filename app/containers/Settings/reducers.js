@@ -45,6 +45,8 @@ export const initialState = {
   // generation of the default look; see helpers/designGeneration
   designGeneration: DESIGN_GENERATION,
   appMenuStyle: APP_MENU_STYLE_TYPE.standard,
+  // interface size in percent, or 'auto' (see helpers/uiScale)
+  appUiScale: 100,
   showLocalPane: true,
   showLocalPaneOnLeftSide: true,
   showDirectoriesFirst: true,

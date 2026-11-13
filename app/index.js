@@ -6,9 +6,12 @@ import Root from './containers/App/Root';
 import { history, store } from './store/configureStore';
 import './styles/scss/app.global.scss';
 import { observeTransfers } from './helpers/transferObserver';
+import { applyUiScale } from './helpers/uiScale';
 
 const MOUNT_POINT = document.getElementById('root');
 
 observeTransfers(store);
+// the saved interface size, before the first paint (no jump at launch)
+applyUiScale();
 
 render(<Root store={store} history={history} />, MOUNT_POINT);

@@ -33,6 +33,10 @@ Version 4.0.0 is the first release of the fork with its own version number.
   device, the direction, items and size, and chips for the destination
   folder (click to open it), the time taken and the average speed. Sizes
   use the app language's number format, like Finder.
+- Interface size in Settings → General: a Material 3 Expressive slider
+  from 80% to 130% scales icons, text and spacing together, or "Fit to the
+  screen" picks a smaller size on small laptop screens. It applies before
+  the window first appears, so there is no jump at launch.
 - The What's new panel shows this version's changes as a grid of cards that
   uses the window's width (one to three columns), with the photo backup
   featured.
@@ -82,6 +86,12 @@ Version 4.0.0 is the first release of the fork with its own version number.
   make room, then springs back.
 - Settings use two columns in a wide window (app colour next to colour
   style, theme next to menu style, hidden files next to grid view).
+- Select menus (language, font) really animate now: their opening
+  keyframes came out empty, so they popped in.
+- Going back with the path bar now plays the same entrance of the files as
+  opening a folder (it showed them all at once).
+- The photo backup guide changes step on a shared axis: the old step slides
+  out before the new one slides in from the side you are heading to.
 - The wavy progress bar no longer draws its track under the moving wave while
   a copy is being checked or prepared.
 - The rename, new folder, replace and delete dialogs, the storage and MTP

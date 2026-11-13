@@ -119,18 +119,25 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
   }
 
   componentDidUpdate(prevProps) {
-    const { tableSort, selectedPaths } = this.props;
+    const { tableSort, selectedPaths, currentBrowsePath } = this.props;
 
     if (prevProps.tableSort !== tableSort) {
       this.scheduleWindowUpdate();
+    }
 
-      // a new list for another folder: play the entrance once
-      if (this.browsePath() !== this.enteredPath) {
-        this.enteredPath = this.browsePath();
-        // eslint-disable-next-line react/no-did-update-set-state
-        this.setState({ entering: true });
-        this.endEnteringLater();
-      }
+    // another folder: play the entrance once. The list and the path arrive
+    // in two updates of the same task (list first when going back up, path
+    // first when opening a folder), before the browser paints, so checking
+    // on either change never shows the tiles before they rise in.
+    if (
+      (prevProps.tableSort !== tableSort ||
+        prevProps.currentBrowsePath !== currentBrowsePath) &&
+      this.browsePath() !== this.enteredPath
+    ) {
+      this.enteredPath = this.browsePath();
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({ entering: true });
+      this.endEnteringLater();
     }
 
     if (

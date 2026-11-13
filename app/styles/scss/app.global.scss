@@ -57,3 +57,19 @@
     transition: none !important;
   }
 }
+
+/* Select menus (MUI Menu) unfold from their top edge, like the right-click
+   menu. Kept here because keyframes declared in MUI theme overrides come out
+   empty. The clip ends outside the menu so it never cuts the shadow. */
+@keyframes m3-menu-open {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scaleY(0.9);
+    clip-path: inset(-16px -16px 70% -16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(-16px -16px -16px -16px);
+  }
+}

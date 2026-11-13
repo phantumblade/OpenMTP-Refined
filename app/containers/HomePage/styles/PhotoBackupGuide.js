@@ -1,6 +1,7 @@
 import { m3Motion, m3Shape, m3Type } from '../../../styles/m3/tokens';
 
 const EMPHASIZED_DECELERATE = 'cubic-bezier(0.05, 0.7, 0.1, 1)';
+const EMPHASIZED_ACCELERATE = 'cubic-bezier(0.3, 0, 0.8, 0.15)';
 const SPRING = 'cubic-bezier(0.42, 1.67, 0.21, 0.9)';
 
 // Photo backup guide: an illustrated stage (phone, link, Mac drawn with
@@ -29,11 +30,29 @@ export const styles = (theme) => {
       display: 'flex',
       alignItems: 'center',
       gap: 18,
-      animation: `$sceneIn 500ms ${EMPHASIZED_DECELERATE} both`,
     },
-    '@keyframes sceneIn': {
-      from: { opacity: 0, transform: 'scale(0.92)' },
+    // shared axis X: in from the side the user is heading to, out towards
+    // the other; the scene travels further than the text
+    sceneSlot: {
+      '--shift': '40px',
+      animation: `$axisIn 400ms ${EMPHASIZED_DECELERATE} both`,
+    },
+    fromStart: {
+      '--dir': -1,
+    },
+    '@keyframes axisIn': {
+      from: {
+        opacity: 0,
+        transform: 'translateX(calc(var(--shift) * var(--dir, 1)))',
+      },
       to: { opacity: 1, transform: 'none' },
+    },
+    '@keyframes axisOut': {
+      from: { opacity: 1, transform: 'none' },
+      to: {
+        opacity: 0,
+        transform: 'translateX(calc(var(--shift) * var(--dir, 1) * -0.5))',
+      },
     },
     // phone: a tall rounded slab
     phone: {
@@ -183,12 +202,9 @@ export const styles = (theme) => {
       animation: `$pop 500ms ${SPRING} 350ms both`,
     },
     body: {
+      '--shift': '24px',
       padding: '20px 24px 4px',
-      animation: `$textIn 400ms ${EMPHASIZED_DECELERATE} both`,
-    },
-    '@keyframes textIn': {
-      from: { opacity: 0, transform: 'translateY(8px)' },
-      to: { opacity: 1, transform: 'none' },
+      animation: `$axisIn 400ms ${EMPHASIZED_DECELERATE} both`,
     },
     stepLabel: {
       ...m3Type.labelLarge,
@@ -240,9 +256,14 @@ export const styles = (theme) => {
       display: 'flex',
       gap: 8,
     },
+    // last, so it wins over the enter animation of the scene and the text
+    leaving: {
+      animation: `$axisOut 90ms ${EMPHASIZED_ACCELERATE} both`,
+    },
     '@media (prefers-reduced-motion: reduce)': {
-      scene: { animation: 'none' },
+      sceneSlot: { animation: 'none' },
       body: { animation: 'none' },
+      leaving: { animation: 'none' },
       photoNew: { animation: 'none' },
       cable: { animation: 'none', transform: 'translateY(-50%)' },
       cablePlug: { animation: 'none' },

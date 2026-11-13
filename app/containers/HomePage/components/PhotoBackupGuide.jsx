@@ -18,6 +18,9 @@ const PHOTOS = [
   { saved: true },
 ];
 
+// a frame longer than the 90ms exit, so the old step has fully faded
+const LEAVE_MS = 120;
+
 export const GUIDE_STEPS = [
   {
     scene: 'connect',
@@ -47,7 +50,7 @@ class PhotoBackupGuide extends PureComponent {
   constructor(props) {
     super(props);
 
-    this.state = { step: 0 };
+    this.state = { step: 0, direction: 1, leaving: false };
   }
 
   componentDidUpdate(prevProps) {
@@ -55,8 +58,12 @@ class PhotoBackupGuide extends PureComponent {
 
     if (open && !prevProps.open) {
       // eslint-disable-next-line react/no-did-update-set-state
-      this.setState({ step: 0 });
+      this.setState({ step: 0, leaving: false });
     }
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.leaveTimer);
   }
 
   t = (key, values) => {
@@ -65,8 +72,30 @@ class PhotoBackupGuide extends PureComponent {
     return translate(appLanguage, key, values);
   };
 
-  go = (step) => {
-    this.setState({ step });
+  // M3 shared axis (X): the current step slides out towards where the user
+  // is heading, then the next one slides in from the other side
+  go = (next) => {
+    const { step, leaving } = this.state;
+
+    if (next === step || leaving) {
+      return;
+    }
+
+    const direction = next > step ? 1 : -1;
+    const reduced =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (reduced) {
+      this.setState({ step: next, direction });
+
+      return;
+    }
+
+    this.setState({ leaving: true, direction });
+    this.leaveTimer = setTimeout(() => {
+      this.setState({ step: next, leaving: false });
+    }, LEAVE_MS);
   };
 
   renderScene(scene) {
@@ -158,8 +187,12 @@ class PhotoBackupGuide extends PureComponent {
 
   render() {
     const { classes, open, onClose, onStart, canStart } = this.props;
-    const { step } = this.state;
+    const { step, direction, leaving } = this.state;
     const current = GUIDE_STEPS[step];
+    const motion = classNames({
+      [classes.leaving]: leaving,
+      [classes.fromStart]: !leaving && direction < 0,
+    });
     const last = step === GUIDE_STEPS.length - 1;
 
     return (
@@ -170,8 +203,15 @@ class PhotoBackupGuide extends PureComponent {
         classes={{ paper: classes.paper }}
         aria-labelledby="photo-backup-guide-title"
       >
-        <div className={classes.stage}>{this.renderScene(current.scene)}</div>
-        <div className={classes.body} key={step}>
+        <div className={classes.stage}>
+          <div
+            className={classNames(classes.sceneSlot, motion)}
+            key={current.scene}
+          >
+            {this.renderScene(current.scene)}
+          </div>
+        </div>
+        <div className={classNames(classes.body, motion)} key={step}>
           <span className={classes.stepLabel}>
             {this.t('Step {step} of {total}', {
               step: step + 1,

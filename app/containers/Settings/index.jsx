@@ -151,6 +151,16 @@ class Settings extends Component {
     );
   };
 
+  _handleAppUiScaleChange = (event, value, deviceType) => {
+    this._handleSetCommonSettingsChange(
+      {
+        key: 'appUiScale',
+        value,
+      },
+      deviceType
+    );
+  };
+
   _handleAppAccentColorChange = (event, value, deviceType) => {
     this._handleSetCommonSettingsChange(
       {
@@ -273,6 +283,7 @@ class Settings extends Component {
         onAppThemeModeChange={this._handleSetAppThemeModeChange}
         onAppLanguageChange={this._handleAppLanguageChange}
         onAppFontFamilyChange={this._handleAppFontFamilyChange}
+        onAppUiScaleChange={this._handleAppUiScaleChange}
         onAppAccentColorChange={this._handleAppAccentColorChange}
         onAppColorStyleChange={this._handleAppColorStyleChange}
         onAppMenuStyleChange={this._handleAppMenuStyleChange}

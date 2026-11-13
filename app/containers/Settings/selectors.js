@@ -69,6 +69,10 @@ export const makeFolderAccess = createSelector(make, (state) =>
   state ? state.folderAccess : initialState.folderAccess
 );
 
+export const makeAppUiScale = createSelector(make, (state) =>
+  state ? state.appUiScale ?? initialState.appUiScale : initialState.appUiScale
+);
+
 export const makeAppFontFamily = createSelector(make, (state) =>
   state ? state.appFontFamily : initialState.appFontFamily
 );

@@ -106,6 +106,13 @@ const italian = {
   'Change folder': 'Cambia cartella',
   'Back up now': 'Avvia il backup',
   'How it works': 'Come funziona',
+  'Interface size': 'Dimensione dell’interfaccia',
+  'Makes icons and text larger or smaller throughout the app.':
+    'Ingrandisce o rimpicciolisce icone e testo in tutta l’app.',
+  'Fit to the screen': 'Adatta allo schermo',
+  'Slightly smaller on small laptop screens, {size} on this screen.':
+    'Un po’ più piccola sugli schermi dei portatili piccoli: {size} su questo schermo.',
+  'Adjustable interface size': 'Dimensione dell’interfaccia regolabile',
   'Step {step} of {total}': 'Passo {step} di {total}',
   Back: 'Indietro',
   Next: 'Avanti',

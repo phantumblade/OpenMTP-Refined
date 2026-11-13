@@ -71,6 +71,17 @@ export class Kalam {
    * @private
    */
   _singleInitialize() {
+    // OPENMTP_NO_PHONE=1 (development and UI tests only): behave as if no
+    // phone were connected, without touching USB, so a test build never
+    // competes with another OpenMTP for the phone
+    if (process.env.OPENMTP_NO_PHONE === '1') {
+      return Promise.resolve({
+        error: 'No MTP device found',
+        stderr: 'ErrorMtpDetectFailed',
+        data: null,
+      });
+    }
+
     return new Promise((resolve) => {
       try {
         const onDonePtr = this.callbackDictionary.onCbResult;

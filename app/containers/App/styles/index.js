@@ -378,25 +378,12 @@ const m3ComponentOverrides = (m3) => ({
       borderRadius: m3Shape.large,
       backgroundColor: m3.surfaceContainerLow,
       boxShadow: m3Elevation.level2,
-      // "backwards": the keyframes only drive the opening, so MUI's own
-      // exit transition still runs when the menu closes
-      animation: `$menuOpen 320ms ${EMPHASIZED_DECELERATE} backwards`,
+      // keyframes in app.global.scss; "backwards": they only drive the
+      // opening, so MUI's own exit transition still runs when it closes
+      animation: `m3-menu-open 320ms ${EMPHASIZED_DECELERATE} backwards`,
       '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
     },
     list: { padding: '4px 0' },
-    '@keyframes menuOpen': {
-      from: {
-        opacity: 0,
-        transform: 'translateY(-6px) scaleY(0.9)',
-        clipPath: 'inset(-16px -16px 70% -16px)',
-      },
-      // the clip ends outside the menu so it never cuts the shadow
-      to: {
-        opacity: 1,
-        transform: 'none',
-        clipPath: 'inset(-16px -16px -16px -16px)',
-      },
-    },
   },
   MuiMenuItem: {
     root: {

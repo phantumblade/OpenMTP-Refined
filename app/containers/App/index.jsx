@@ -28,7 +28,9 @@ import {
   makeAppFontFamily,
   makeAppAccentColor,
   makeAppColorStyle,
+  makeAppUiScale,
 } from '../Settings/selectors';
+import { applyUiScale } from '../../helpers/uiScale';
 import { getAppThemeMode } from '../../helpers/theme';
 import { getMainWindowRendererProcess } from '../../helpers/windowHelper';
 import { log } from '../../utils/log';
@@ -60,11 +62,22 @@ class App extends Component {
 
   componentDidMount() {
     try {
+      const { appUiScale } = this.props;
+
       ipcRenderer.on('nativeThemeUpdated', this.nativeThemeUpdatedEvent);
+      applyUiScale(appUiScale);
 
       bootLoader.cleanRotationFiles();
     } catch (e) {
       log.error(e, `App -> componentDidMount`);
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    const { appUiScale } = this.props;
+
+    if (appUiScale !== prevProps.appUiScale) {
+      applyUiScale(appUiScale);
     }
   }
 
@@ -203,6 +216,7 @@ const mapStateToProps = (state) => {
     appFontFamily: makeAppFontFamily(state),
     appColorStyle: makeAppColorStyle(state),
     appAccentColor: makeAppAccentColor(state),
+    appUiScale: makeAppUiScale(state),
   };
 };
 

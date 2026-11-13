@@ -136,6 +136,20 @@ export const styles = (theme) => {
       alignItems: 'center',
       gap: 8,
     },
+    // icon, slider, icon and the value; room above for the value label
+    sliderRow: {
+      gap: 12,
+      paddingTop: 22,
+      paddingBottom: 14,
+    },
+    sliderValue: {
+      ...m3Type.titleMedium,
+      minWidth: 52,
+      textAlign: 'right',
+      fontWeight: 650,
+      fontVariantNumeric: 'tabular-nums',
+      color: m3.onSurface,
+    },
     rowSelect: {
       minWidth: 240,
       '& .MuiSelect-root': { padding: '10px 36px 10px 14px' },

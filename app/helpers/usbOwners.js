@@ -115,7 +115,8 @@ const run = (file, args) =>
   });
 
 export const getConnectedPhones = async () => {
-  if (process.platform !== 'darwin') {
+  // OPENMTP_NO_PHONE=1: a test build that never touches USB (see Kalam.js)
+  if (process.platform !== 'darwin' || process.env.OPENMTP_NO_PHONE === '1') {
     return [];
   }
 

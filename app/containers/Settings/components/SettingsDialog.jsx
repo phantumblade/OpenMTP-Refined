@@ -14,6 +14,7 @@ import Switch from '@material-ui/core/Switch';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import MaterialSymbol from '../../../components/m3/MaterialSymbol';
+import M3Slider from '../../../components/m3/M3Slider';
 import M3Shape from '../../../components/m3/M3Shape';
 import FolderAccessSettings from './FolderAccessSettings';
 import { DEVICES_LABEL } from '../../../constants';
@@ -35,6 +36,11 @@ import { isKalamModeSupported } from '../../../helpers/binaries';
 import { translate } from '../../../i18n';
 import { getAppFontFamily } from '../../../helpers/fonts';
 import { getSystemAccentColor } from '../../../helpers/accentColor';
+import {
+  UI_SCALE_AUTO,
+  UI_SCALE_STEPS,
+  resolveUiScale,
+} from '../../../helpers/uiScale';
 import {
   m3AccentColorTokens,
   m3VibrantColorTokens,
@@ -216,6 +222,7 @@ export default class SettingsDialog extends PureComponent {
       appThemeMode,
       appLanguage,
       appFontFamily,
+      appUiScale,
       appColorStyle,
       appAccentColor,
       appMenuStyle,
@@ -241,6 +248,7 @@ export default class SettingsDialog extends PureComponent {
       onAppThemeModeChange,
       onAppLanguageChange,
       onAppFontFamilyChange,
+      onAppUiScaleChange,
       onAppAccentColorChange,
       onAppColorStyleChange,
       onAppMenuStyleChange,
@@ -266,6 +274,7 @@ export default class SettingsDialog extends PureComponent {
       fileExplorerListingType[DEVICE_TYPE.mtp] === FILE_EXPLORER_VIEW_TYPE.grid;
 
     const showMtpModeSelection = isKalamModeSupported();
+    const uiScaleAuto = appUiScale === UI_SCALE_AUTO;
 
     return (
       <Dialog
@@ -419,6 +428,63 @@ export default class SettingsDialog extends PureComponent {
                           </span>
                         ),
                       })}
+                    </>
+                  ),
+                })}
+
+                {this.renderSection({
+                  icon: 'format_size',
+                  title: t('Interface size'),
+                  description: t(
+                    'Makes icons and text larger or smaller throughout the app.'
+                  ),
+                  children: (
+                    <>
+                      {this.renderSwitchRow({
+                        icon: 'fit_screen',
+                        title: t('Fit to the screen'),
+                        description: t(
+                          'Slightly smaller on small laptop screens, {size} on this screen.',
+                          { size: `${resolveUiScale(UI_SCALE_AUTO)}%` }
+                        ),
+                        checked: uiScaleAuto,
+                        onChange: (e) =>
+                          onAppUiScaleChange(
+                            e,
+                            uiScaleAuto
+                              ? resolveUiScale(UI_SCALE_AUTO)
+                              : UI_SCALE_AUTO
+                          ),
+                      })}
+                      <div
+                        className={classNames(styles.row, styles.sliderRow, {
+                          [styles.rowDisabled]: uiScaleAuto,
+                        })}
+                      >
+                        <MaterialSymbol
+                          name="text_decrease"
+                          size={22}
+                          className={styles.rowIcon}
+                        />
+                        <M3Slider
+                          values={UI_SCALE_STEPS}
+                          value={resolveUiScale(appUiScale)}
+                          disabled={uiScaleAuto}
+                          format={(value) => `${value}%`}
+                          aria-label={t('Interface size')}
+                          onChangeCommitted={(value) =>
+                            onAppUiScaleChange(null, value)
+                          }
+                        />
+                        <MaterialSymbol
+                          name="text_increase"
+                          size={22}
+                          className={styles.rowIcon}
+                        />
+                        <span className={styles.sliderValue}>
+                          {resolveUiScale(appUiScale)}%
+                        </span>
+                      </div>
                     </>
                   ),
                 })}
