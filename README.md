@@ -84,7 +84,7 @@ See the full list in the [CHANGELOG](CHANGELOG.md).
 **Requirements:** a Mac with Apple Silicon (M1 or newer). Developed and tested
 on macOS 26 Tahoe.
 
-1. Download **`OpenMTP-Refined-4.1.0-arm64.dmg`** from the
+1. Download **`OpenMTP-Refined-4.1.1-arm64.dmg`** from the
    [latest release](https://github.com/phantumblade/OpenMTP-Refined/releases/latest).
 2. Open the DMG and drag **OpenMTP** into **Applications**.
 3. Open OpenMTP from Applications. The first time, macOS shows a warning,
@@ -236,7 +236,7 @@ qualcosa non va.
 **Requisiti:** Mac con Apple Silicon (M1 o successivo). Sviluppata e provata su
 macOS 26 Tahoe.
 
-1. Scarica **`OpenMTP-Refined-4.1.0-arm64.dmg`** dall'
+1. Scarica **`OpenMTP-Refined-4.1.1-arm64.dmg`** dall'
    [ultima release](https://github.com/phantumblade/OpenMTP-Refined/releases/latest).
 2. Apri il DMG e trascina **OpenMTP** nella cartella **Applicazioni**.
 3. Apri OpenMTP da Applicazioni. La prima volta macOS mostra un avviso, perché
