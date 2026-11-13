@@ -18,7 +18,10 @@ import { DEBUG_PROD, ENV_FLAVOR, IS_DEV, IS_PROD } from './constants/env';
 import AppUpdate from './classes/AppUpdate';
 import { PATHS } from './constants/paths';
 import { settingsStorage } from './helpers/storageHelper';
-import { AUTO_UPDATE_CHECK_FIREUP_DELAY } from './constants';
+import {
+  AUTO_UPDATE_CHECK_FIREUP_DELAY,
+  AUTO_UPDATE_CHECK_INTERVAL,
+} from './constants';
 import { appEvents } from './utils/eventHandling';
 import { bootLoader } from './helpers/bootHelper';
 import { nonBootableDeviceWindow } from './helpers/createWindows';
@@ -389,6 +392,7 @@ if (!isDeviceBootable) {
           setTimeout(() => {
             autoAppUpdate.checkForUpdates();
           }, AUTO_UPDATE_CHECK_FIREUP_DELAY);
+          autoAppUpdate.startPeriodicChecks(AUTO_UPDATE_CHECK_INTERVAL);
         }
 
         // send attach and detach events to the renderer

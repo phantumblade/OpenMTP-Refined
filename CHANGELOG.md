@@ -42,6 +42,9 @@ Version 4.0.0 is the first release of the fork with its own version number.
   featured.
 - File tiles lift on hover, squeeze when pressed and rise in one after the
   other when a folder opens.
+- While OpenMTP stays open it looks for a new version every 6 hours too
+  (before, only at launch), downloading and verifying it in the background
+  like the check at launch.
 - Updates from this fork's GitHub releases. When it opens, OpenMTP looks for
   a newer version, downloads it in the background, checks its SHA-256 against
   the one GitHub publishes and asks to install and relaunch, or installs it

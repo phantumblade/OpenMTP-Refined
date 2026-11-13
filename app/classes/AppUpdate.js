@@ -267,9 +267,13 @@ export default class AppUpdate {
             return null;
           }
 
-          this.autoUpdater.on('update-not-available', () => {
-            this.updateStatus = UPDATER_STATUS.inactive;
-          });
+          // registered once: checks now repeat while the app stays open
+          if (!this.listeningForNoUpdate) {
+            this.listeningForNoUpdate = true;
+            this.autoUpdater.on('update-not-available', () => {
+              this.updateStatus = UPDATER_STATUS.inactive;
+            });
+          }
 
           this.autoUpdater.checkForUpdates();
 
@@ -281,6 +285,26 @@ export default class AppUpdate {
     } catch (e) {
       log.error(e, `AppUpdate -> checkForUpdates`);
     }
+  }
+
+  // Checks again every [intervalMs] while OpenMTP stays open, in the
+  // background like the check at launch: a new version is downloaded and
+  // verified, then offered. Nothing happens while a check or download is
+  // running, or once an update is ready (it waits for the user, or is
+  // installed when OpenMTP quits).
+  startPeriodicChecks(intervalMs) {
+    clearInterval(this.periodicCheckTimer);
+    this.periodicCheckTimer = setInterval(() => {
+      if (
+        this.autoUpdater.preparedUpdate ||
+        this.updateStatus !== UPDATER_STATUS.inactive
+      ) {
+        return;
+      }
+
+      this.interactive = false;
+      this.checkForUpdates();
+    }, intervalMs);
   }
 
   async forceCheck() {
