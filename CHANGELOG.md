@@ -5,6 +5,14 @@ All notable changes to this fork will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Version 4.0.0 is the first release of the fork with its own version number.
 
+## Unreleased
+
+### Changed
+
+- The update card in the side menu shows "Install and Relaunch" across the
+  card with "What's new" under it, instead of two buttons wrapping unevenly.
+- New README in English and Italian (README.it.md) with screenshots of 4.1.2.
+
 ## 4.1.2 — 2026-11-13
 
 ### Changed

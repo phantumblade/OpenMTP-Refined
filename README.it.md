@@ -73,7 +73,7 @@ Scegli una volta la cartella del Mac, poi premi **Avvia il backup**: OpenMTP con
 
 ```mermaid
 flowchart LR
-    A[📱 Fotocamera del telefono<br/>DCIM] -->|confronta| B{È già<br/>sul Mac?}
+    A[Fotocamera del telefono<br/>DCIM] -->|confronta| B{È già<br/>sul Mac?}
     B -->|no| C[Copia nella stessa<br/>sottocartella del Mac]
     B -->|sì, stesso file| D[Salta]
     B -->|stesso nome, file diverso| E[Lascialo com'è<br/>e segnalalo]
@@ -129,7 +129,8 @@ Dopo un aggiornamento, **Novità** mostra solo cosa è cambiato rispetto alla ve
 </tr>
 </table>
 
-> [!TIP] > **OpenMTP → Controlla aggiornamenti** controlla subito. **Installa aggiornamento da file…** installa un DMG o uno ZIP che hai già. Il controllo automatico si disattiva in **Impostazioni → Aggiornamenti**.
+> [!TIP]
+> Per controllare subito usa **OpenMTP → Controlla aggiornamenti**. **Installa aggiornamento da file…** installa un DMG o uno ZIP che hai già. Il controllo automatico si disattiva in **Impostazioni → Aggiornamenti**.
 
 ## Una connessione che funziona e basta
 

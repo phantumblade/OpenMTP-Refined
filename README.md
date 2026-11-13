@@ -73,7 +73,7 @@ Choose a Mac folder once, then press **Back up now**: OpenMTP compares the phone
 
 ```mermaid
 flowchart LR
-    A[📱 Phone camera<br/>DCIM] -->|compare| B{Already on<br/>the Mac?}
+    A[Phone camera<br/>DCIM] -->|compare| B{Already on<br/>the Mac?}
     B -->|no| C[Copy into the same<br/>sub-folder on the Mac]
     B -->|yes, same file| D[Skip]
     B -->|same name, different file| E[Leave it alone<br/>and report it]
@@ -129,7 +129,8 @@ After an update, **What's new** shows only what changed since the version you ha
 </tr>
 </table>
 
-> [!TIP] > **OpenMTP → Check For Updates** checks right away. **Install Update from File…** installs a DMG or ZIP you already have. Automatic checks can be turned off in **Settings → Updates**.
+> [!TIP]
+> To check right away, use **OpenMTP → Check For Updates**. **Install Update from File…** installs a DMG or ZIP you already have. Automatic checks can be turned off in **Settings → Updates**.
 
 ## A connection that just works
 
