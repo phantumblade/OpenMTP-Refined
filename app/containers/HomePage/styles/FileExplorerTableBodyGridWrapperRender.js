@@ -65,7 +65,7 @@ export const styles = (theme) => ({
     color: theme.palette.text.primary,
   },
   sectionTitle: {
-    transition: 'color 0.15s ease',
+    transition: 'color 150ms cubic-bezier(0.31, 0.94, 0.34, 1)',
   },
   sectionArrow: {
     fontSize: 10,

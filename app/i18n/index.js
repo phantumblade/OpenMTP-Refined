@@ -86,6 +86,36 @@ const italian = {
   Orange: 'Arancione',
   Yellow: 'Giallo',
   Green: 'Verde',
+  Transfers: 'Trasferimenti',
+  'In progress': 'In corso',
+  'Ready to paste': 'Pronti da incollare',
+  'Copied from {device}. Paste them with ⌘V in the other pane.':
+    'Copiati da {device}. Incollali con ⌘V nell’altro pannello.',
+  Clear: 'Svuota',
+  History: 'Cronologia',
+  'Clear history': 'Cancella cronologia',
+  'The copies you make will be listed here. To copy, select files, press ⌘C, then ⌘V in the other pane.':
+    'Qui trovi l’elenco delle copie fatte. Per copiare seleziona i file, premi ⌘C e poi ⌘V nell’altro pannello.',
+  'Open the destination folder': 'Apri la cartella di destinazione',
+  'Show details': 'Mostra i dettagli',
+  'Continue in the background': 'Continua in background',
+  'Back up photos to the Mac': 'Backup delle foto sul Mac',
+  'Photo backup': 'Backup foto',
+  'Copies to the Mac the phone’s new photos and videos, skipping the ones already copied.':
+    'Copia sul Mac le foto e i video nuovi del telefono, saltando quelli già copiati.',
+  'Change folder': 'Cambia cartella',
+  'Back up now': 'Avvia il backup',
+  'Connect the phone': 'Collega il telefono',
+  'Photo backup folder': 'Cartella del backup foto',
+  'Choose the Mac folder where the phone’s photos are copied.':
+    'Scegli la cartella del Mac in cui copiare le foto del telefono.',
+  'Use this folder': 'Usa questa cartella',
+  'The phone’s camera folder (DCIM) could not be read.':
+    'Non è stato possibile leggere la cartella della fotocamera del telefono (DCIM).',
+  '{count} files have the same name as a different file already in the backup: they were left untouched.':
+    '{count} file hanno lo stesso nome di un file diverso già presente nel backup: non sono stati toccati.',
+  'Everything is already backed up: no new files.':
+    'È già tutto nel backup: nessun file nuovo.',
   copied: 'copiati',
   'time taken': 'durata',
   'average speed': 'velocità media',

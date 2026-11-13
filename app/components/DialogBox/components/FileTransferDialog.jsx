@@ -180,6 +180,7 @@ class FileTransferDialog extends PureComponent {
       appLanguage,
       classes: styles,
       onClose,
+      onMinimize,
       onRetry,
       transfer,
       trigger,
@@ -206,9 +207,10 @@ class FileTransferDialog extends PureComponent {
       : `${filesSentVal} / ${totalFilesVal} ${translate(appLanguage, 'files')}`;
 
     // what was copied, shown when the transfer ends
+    const endedAt = transfer.completedAt || transfer.lastActivityAt;
     const elapsedMs =
-      transfer.startedAt && transfer.lastActivityAt
-        ? Math.max(0, transfer.lastActivityAt - transfer.startedAt)
+      transfer.startedAt && endedAt
+        ? Math.max(0, endedAt - transfer.startedAt)
         : 0;
     const summary = [
       {
@@ -348,6 +350,14 @@ class FileTransferDialog extends PureComponent {
             </dl>
           )}
 
+          {transfer.phase === FILE_TRANSFER_PHASE.completed &&
+            transfer.note && (
+              <div className={styles.noteBox}>
+                <MaterialSymbol name="info" size={22} />
+                <span>{transfer.note}</span>
+              </div>
+            )}
+
           {transfer.phase === FILE_TRANSFER_PHASE.failed && (
             <div className={styles.errorBox} role="alert">
               <MaterialSymbol name="error" size={22} fill={1} />
@@ -373,6 +383,18 @@ class FileTransferDialog extends PureComponent {
             </span>
           </div>
         </DialogContent>
+
+        {active && onMinimize && (
+          <div className={styles.actions}>
+            <M3Button
+              variant="text"
+              icon="close_fullscreen"
+              onClick={onMinimize}
+            >
+              {translate(appLanguage, 'Continue in the background')}
+            </M3Button>
+          </div>
+        )}
 
         {!active && (
           <div className={styles.actions}>

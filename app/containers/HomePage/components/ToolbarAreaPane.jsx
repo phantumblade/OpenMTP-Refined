@@ -19,7 +19,9 @@ import {
   getSelectedStorage,
   actionSetSelectedDirLists,
   setMultiSelectMode,
+  setTransferCenter,
 } from '../actions';
+import { startPhotoBackup } from '../photoBackup';
 import {
   makeDirectoryLists,
   makeMtpDevice,
@@ -249,6 +251,8 @@ class ToolbarAreaPane extends PureComponent {
       hideHiddenFiles,
       actionCreateReloadDirList,
       actionCreateSetMultiSelectMode,
+      actionCreateSetTransferCenter,
+      actionCreateStartPhotoBackup,
       multiSelectMode,
     } = this.props;
 
@@ -303,6 +307,16 @@ class ToolbarAreaPane extends PureComponent {
 
       case 'settings':
         this._handleToggleSettings(true);
+
+        break;
+
+      case 'transfers':
+        actionCreateSetTransferCenter({ open: true });
+
+        break;
+
+      case 'photoBackup':
+        actionCreateStartPhotoBackup();
 
         break;
 
@@ -449,6 +463,9 @@ class ToolbarAreaPane extends PureComponent {
 const mapDispatchToProps = (dispatch, _) =>
   bindActionCreators(
     {
+      actionCreateSetTransferCenter: setTransferCenter,
+      actionCreateStartPhotoBackup: startPhotoBackup,
+
       actionCreateSetFavoriteFolder:
         ({ ...args }) =>
         (_, getState) => {

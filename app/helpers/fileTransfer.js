@@ -17,12 +17,16 @@ const activePhases = new Set([
 
 export const initialFileTransferProgress = {
   toggle: false,
+  // the transfer goes on while its dialog is reduced to the floating pill
+  minimized: false,
   sessionId: null,
   phase: FILE_TRANSFER_PHASE.idle,
   route: null,
   sourceLabel: null,
   destinationLabel: null,
   destinationFolder: null,
+  sourceDeviceType: null,
+  destinationDeviceType: null,
   itemCount: 0,
   processedItems: 0,
   currentFile: null,
@@ -40,6 +44,8 @@ export const initialFileTransferProgress = {
   lastActivityAt: null,
   completedAt: null,
   errorMessage: null,
+  // extra line shown when the transfer ends (e.g. what a backup skipped)
+  note: null,
 };
 
 export function createTransferSessionId(

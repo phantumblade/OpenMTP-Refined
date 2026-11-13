@@ -73,6 +73,10 @@ export const makeAppFontFamily = createSelector(make, (state) =>
   state ? state.appFontFamily : initialState.appFontFamily
 );
 
+export const makePhotoBackupFolder = createSelector(make, (state) =>
+  state ? state.photoBackupFolder : initialState.photoBackupFolder
+);
+
 export const makeAppAccentColor = createSelector(make, (state) =>
   state ? state.appAccentColor : initialState.appAccentColor
 );

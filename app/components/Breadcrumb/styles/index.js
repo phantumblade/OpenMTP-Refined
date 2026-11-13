@@ -1,5 +1,5 @@
 import { mixins } from '../../../styles/js';
-import { alphaHex, m3State } from '../../../styles/m3/tokens';
+import { alphaHex, m3Motion, m3State } from '../../../styles/m3/tokens';
 
 export const styles = (theme) => {
   return {
@@ -49,7 +49,8 @@ export const styles = (theme) => {
       textDecoration: 'none',
       padding: '3px 8px',
       borderRadius: 6,
-      transition: 'background-color 150ms ease, color 150ms ease',
+      transition: `background-color ${m3Motion.fastEffects}, color ${m3Motion.fastEffects}, border-radius ${m3Motion.fastSpatial}`,
+      '&:active': { borderRadius: 3 },
       '&:hover': {
         color: theme.palette.m3.primary,
         backgroundColor: alphaHex(theme.palette.m3.onSurface, m3State.hover),

@@ -131,6 +131,18 @@ export const initialState = {
         icon: 'mtpMode',
         group: 'device',
       },
+      photoBackup: {
+        enabled: true,
+        label: 'Back up photos to the Mac',
+        icon: 'photoBackup',
+        group: 'device',
+      },
+      transfers: {
+        enabled: true,
+        label: 'Transfers',
+        icon: 'transfers',
+        group: 'application',
+      },
       settings: {
         enabled: true,
         label: 'Settings',
@@ -276,6 +288,7 @@ export const initialState = {
     },
   },
 
+  transferCenter: { open: false },
   folderAccessRequest: null,
   filesDrag: {
     sourceDeviceType: null,
@@ -392,6 +405,9 @@ export default function Home(state = initialState, action) {
           },
         },
       };
+
+    case actionTypes.SET_TRANSFER_CENTER:
+      return { ...state, transferCenter: { ...payload } };
 
     case actionTypes.SET_FILE_TRANSFER_PROGRESS:
       return {

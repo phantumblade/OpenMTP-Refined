@@ -2,6 +2,7 @@ import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import classNames from 'classnames';
 import { SymbolGlyph } from './m3/createSymbolIcon';
+import { m3Motion } from '../styles/m3/tokens';
 
 // Toolbar actions as Material Symbols (Rounded); the active state fills the
 // glyph, as M3 does for selected icons.
@@ -13,6 +14,8 @@ const symbols = {
   multiSelect: 'check_circle',
   storage: 'sd_card',
   mtpMode: 'usb',
+  transfers: 'swap_vert',
+  photoBackup: 'add_photo_alternate',
   settings: 'tune',
   faqs: 'help',
 };
@@ -26,9 +29,12 @@ const styles = (theme) => ({
     color: 'currentColor',
     fill: 'currentColor',
     stroke: 'none',
-    transition: 'transform 180ms ease, color 180ms ease',
+    // spatial spring for the turn, effects spring for the colour
+    transition: `transform ${m3Motion.fastSpatial}, color ${m3Motion.fastEffects}`,
     '&:hover': {
-      '&[data-name="refresh"]': { transform: 'rotate(45deg)' },
+      '&[data-name="refresh"]': { transform: 'rotate(60deg)' },
+      '&[data-name="up"]': { transform: 'translateY(-1.5px)' },
+      '&[data-name="transfers"]': { transform: 'scaleY(1.12)' },
     },
     '&:focus': { outline: 'none' },
   },

@@ -7,6 +7,13 @@ import {
   m3Type,
 } from '../../../styles/m3/tokens';
 
+// The header gives way in steps as the window narrows, always dropping whole
+// parts (never cutting a label): first the free-space amount, then the name
+// (it stays in the pane's status bar and in the tooltip), then the ring.
+const COMPACT_SPACE = '@media (max-width: 1400px)';
+const COMPACT_NAME = '@media (max-width: 1200px)';
+const COMPACT_TOOLBAR = '@media (max-width: 1000px)';
+
 export const styles = (theme) => {
   const { m3 } = theme.palette;
 
@@ -24,6 +31,7 @@ export const styles = (theme) => {
       marginLeft: 'auto',
       paddingLeft: 8,
       paddingRight: 8,
+      [COMPACT_TOOLBAR]: { gap: 4, paddingLeft: 4, paddingRight: 6 },
     },
     // M3 Expressive toolbar: each group of actions sits in its own pill
     toolbarGroup: {
@@ -33,6 +41,7 @@ export const styles = (theme) => {
       padding: 4,
       borderRadius: 22,
       backgroundColor: m3.surfaceContainer,
+      [COMPACT_TOOLBAR]: { gap: 0, padding: 2, borderRadius: 18 },
     },
     toolbar: {
       width: `auto`,
@@ -78,6 +87,7 @@ export const styles = (theme) => {
         '@media (prefers-reduced-motion: reduce)': {
           transition: 'none',
         },
+        [COMPACT_TOOLBAR]: { width: 32, height: 32, padding: 6 },
       },
     },
     activeNavBtn: {
@@ -128,6 +138,8 @@ export const styles = (theme) => {
       '&:disabled': {
         cursor: 'default',
       },
+      [COMPACT_NAME]: { padding: '0 12px' },
+      [COMPACT_TOOLBAR]: { marginLeft: 4, padding: '0 10px' },
     },
     deviceButtonConnected: {
       backgroundColor: m3.primaryContainer,
@@ -146,6 +158,7 @@ export const styles = (theme) => {
       gap: 6,
       whiteSpace: 'nowrap',
       overflow: 'hidden',
+      [COMPACT_NAME]: { display: 'none' },
     },
     deviceBrand: {
       ...m3Type.labelLarge,
@@ -166,6 +179,8 @@ export const styles = (theme) => {
       marginLeft: 4,
       paddingLeft: 10,
       borderLeft: `1px solid ${alphaHex(m3.onSurfaceVariant, 0.24)}`,
+      [COMPACT_NAME]: { marginLeft: 0, paddingLeft: 0, borderLeft: 'none' },
+      [COMPACT_TOOLBAR]: { display: 'none' },
     },
     deviceSpaceRing: {
       flexShrink: 0,
@@ -174,7 +189,7 @@ export const styles = (theme) => {
       ...m3Type.labelMedium,
       whiteSpace: 'nowrap',
       fontVariantNumeric: 'tabular-nums',
-      '@media (max-width: 1180px)': { display: 'none' },
+      [COMPACT_SPACE]: { display: 'none' },
     },
     deviceModel: {
       ...m3Type.labelLarge,
@@ -227,6 +242,7 @@ export const styles = (theme) => {
       height: 40,
       marginLeft: 8,
       borderRadius: 20,
+      [COMPACT_TOOLBAR]: { width: 36, height: 36, marginLeft: 4 },
       color: m3.onSurfaceVariant,
       outline: 'none !important',
       boxShadow: 'none !important',

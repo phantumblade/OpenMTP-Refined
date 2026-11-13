@@ -9,6 +9,26 @@ Version 4.0.0 is the first release of the fork with its own version number.
 
 ### Added
 
+- Expressive look. Google Sans Flex is the interface font and Vibrant the
+  default colour style; settings saved by an older version move to them once
+  and can be changed back in Settings.
+- App colour: the whole palette can be built from blue, purple, pink, red,
+  orange, yellow or green, or follow the macOS accent colour.
+- Pane header: the actions sit in grouped pills, and a chip shows the device
+  with its free space (the phone, and the Mac volume of the current folder)
+  instead of the text in the window title.
+- Transfers panel (new button in the phone pane): the running copy, the items
+  ready to be pasted and the history of past copies, with a shortcut to the
+  destination folder. The history is kept in the app's profile folder and
+  stores no file names.
+- A copy can continue in the background: the dialog shrinks into a floating
+  pill, and macOS shows a notification when the copy ends.
+- Photo backup: one button copies to a Mac folder the photos and videos of
+  the phone's camera folder (DCIM) that the folder doesn't have yet, keeping
+  the phone's sub-folders. Files already on the Mac are never overwritten.
+- The transfer dialog ends with a summary: items, size, time, average speed.
+- File tiles lift on hover, squeeze when pressed and rise in one after the
+  other when a folder opens.
 - Updates from this fork's GitHub releases. When it opens, OpenMTP looks for
   a newer version, downloads it in the background, checks its SHA-256 against
   the one GitHub publishes and asks to install and relaunch, or installs it
@@ -36,6 +56,8 @@ Version 4.0.0 is the first release of the fork with its own version number.
 
 ### Fixed
 
+- The wavy progress bar no longer draws its track under the moving wave while
+  a copy is being checked or prepared.
 - The rename, new folder, replace and delete dialogs, the storage and MTP
   mode pickers, the window title ("Kalam Mode") and the "Root" folder of the
   path bar were still in English with the app in Italian. The dialogs now

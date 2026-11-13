@@ -189,6 +189,17 @@ export const styles = (theme) => {
       marginTop: 2,
       color: m3.onSurfaceVariant,
     },
+    noteBox: {
+      ...m3Type.bodyMedium,
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12,
+      marginTop: 12,
+      padding: '12px 16px',
+      borderRadius: m3Shape.large,
+      backgroundColor: m3.tertiaryContainer,
+      color: m3.onTertiaryContainer,
+    },
     errorBox: {
       ...m3Type.bodyMedium,
       display: 'flex',

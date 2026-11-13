@@ -48,6 +48,10 @@ export const makeStorageId = createSelector(make, (state) =>
   state ? getSelectedStorageIdFromState(state) : {}
 );
 
+export const makeTransferCenter = createSelector(make, (state) =>
+  state ? state.transferCenter : initialState.transferCenter
+);
+
 export const makeFileTransferClipboard = createSelector(make, (state) =>
   state ? state.fileTransfer.clipboard : initialState.fileTransfer.clipboard
 );

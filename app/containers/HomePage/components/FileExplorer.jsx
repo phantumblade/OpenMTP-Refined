@@ -1959,6 +1959,10 @@ class FileExplorer extends Component {
       ),
       destinationLabel: translate(appLanguage, DEVICES_LABEL[deviceType]),
       destinationFolder,
+      sourceDeviceType: fileTransferClipboard.source,
+      destinationDeviceType: deviceType,
+      // a new transfer always starts with its dialog open
+      minimized: false,
       itemCount: queue.length,
       startedAt,
       lastActivityAt: startedAt,
@@ -2163,6 +2167,13 @@ class FileExplorer extends Component {
 
     this.pendingTransferSession = null;
     actionCreateClearFileTransferProgress();
+  };
+
+  // the copy continues behind the floating pill (see TransferCenter)
+  _handleTransferDialogMinimize = () => {
+    const { actionCreateSetFileTransferProgress } = this.props;
+
+    actionCreateSetFileTransferProgress({ minimized: true });
   };
 
   _handleTransferRetry = () => {
@@ -2498,7 +2509,9 @@ class FileExplorer extends Component {
     } = this.state;
     const { rename, newFolder } = toggleDialog;
     const togglePasteDialog =
-      deviceType === DEVICE_TYPE.mtp && fileTransferProgess.toggle;
+      deviceType === DEVICE_TYPE.mtp &&
+      fileTransferProgess.toggle &&
+      !fileTransferProgess.minimized;
     const t = (key, values) => translate(appLanguage, key, values);
 
     return (
@@ -2556,6 +2569,7 @@ class FileExplorer extends Component {
           appLanguage={appLanguage}
           onClose={this._handleTransferDialogClose}
           onRetry={this._handleTransferRetry}
+          onMinimize={this._handleTransferDialogMinimize}
         />
         <ConfirmDialog
           fullWidthDialog
@@ -3016,6 +3030,8 @@ const mapDispatchToProps = (dispatch, _) =>
               sourceLabel: transferSourceLabel,
               destinationLabel: transferDestinationLabel,
               destinationFolder,
+              sourceDeviceType: fileTransferClipboard.source,
+              destinationDeviceType: deviceType,
               itemCount: transferItemsTotal,
               totalFiles: transferItemsTotal,
               startedAt,

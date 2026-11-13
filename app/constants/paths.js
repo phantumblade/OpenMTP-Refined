@@ -35,6 +35,7 @@ const logDir = join(profileDir, `./logs`);
 const logFile = join(logDir, `./${APP_NAME}-${logFileName}`);
 const settingsFile = join(profileDir, `./settings.json`);
 const identifierFile = join(profileDir, `./identifier.json`);
+const transferHistoryFile = join(profileDir, `./transfer-history.json`);
 
 export const PATHS = {
   root: resolve(root),
@@ -49,6 +50,7 @@ export const PATHS = {
   logFile: resolve(logFile),
   settingsFile: resolve(settingsFile),
   identifierFile: resolve(identifierFile),
+  transferHistoryFile: resolve(transferHistoryFile),
   prevProfileDir: resolve(prevProfileDir),
   desktopDir: join(homeDir, `/Desktop`),
   documentsDir: join(homeDir, `/Documents`),

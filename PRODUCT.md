@@ -20,23 +20,32 @@ selezionato, dove finiranno i file e se un'operazione è realmente iniziata.
 
 ## Brand Personality
 
-Professionale, chiara, efficiente. L'app deve risultare familiare a chi usa un
-file manager moderno, con dettagli visivi curati ma subordinati al lavoro.
+Espressiva, chiara, affidabile. L'app segue il Material 3 Expressive con la
+stessa mano del sito AnalogIA: colore pieno, carattere Google Sans Flex,
+forme che cambiano e movimento a molla. Deve sembrare un prodotto curato e
+riconoscibile, non un file manager generico, senza mai rendere meno leggibile
+lo stato della connessione o di una copia.
 
 ## Anti-references
 
 - Interfacce datate con icone generiche o controlli ambigui.
-- Animazioni decorative, pulsanti pulsanti o movimento che rallenta il flusso.
+- Aspetto "neutro di sistema": grigi, bordi sottili, nessuna identità.
+- Movimento che fa aspettare: ogni animazione risponde a un gesto o spiega
+  un cambio di stato, e dura poco.
 - Stati di trasferimento silenziosi che lasciano l'utente nel dubbio.
-- Effetti visivi incoerenti tra tema chiaro e scuro.
+- Etichette tagliate con i puntini: se lo spazio manca si toglie un elemento
+  intero, non mezza parola.
+- Effetti visivi incoerenti tra tema chiaro e scuro, o tra i colori dell'app.
 
 ## Design Principles
 
 1. Mostrare subito stato, direzione e avanzamento delle operazioni.
 2. Rendere selezione, ricerca e navigazione prevedibili anche con molti file.
-3. Usare il movimento per spiegare un cambiamento, non come decorazione.
-4. Conservare una grammatica visiva coerente tra Mac, telefono e temi.
-5. Preferire prestazioni e controllo dell'utente agli effetti costosi.
+3. Colore, forma e movimento sono l'identità: ogni componente usa i ruoli
+   colore M3, le forme e le molle del sistema, mai valori propri.
+4. Conservare una grammatica visiva coerente tra Mac, telefono, temi e colori.
+5. Preferire prestazioni e controllo dell'utente agli effetti costosi: niente
+   animazioni proporzionali al numero di file.
 
 ## Accessibility & Inclusion
 

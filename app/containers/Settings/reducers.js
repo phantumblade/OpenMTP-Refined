@@ -54,6 +54,9 @@ export const initialState = {
     [FILE_TRANSFER_DIRECTION.upload]: true,
     [FILE_TRANSFER_DIRECTION.download]: true,
   },
+  // Mac folder the phone's camera photos are backed up to (asked on the
+  // first backup)
+  photoBackupFolder: null,
   // local folders pinned to the sidebar: [{ path, name }]
   favoriteFolders: [],
   // OpenMTP's choice per macOS-protected folder (see helpers/folderAccess)

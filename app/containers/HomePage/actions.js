@@ -59,6 +59,7 @@ function shouldDeferMtpOperation(getState, deviceType, operation) {
 }
 
 const actionTypesList = [
+  'SET_TRANSFER_CENTER',
   'SET_FOCUSSED_FILE_EXPLORER_DEVICE_TYPE',
   'SET_CURRENT_BROWSE_PATH',
   'SET_SORTING_DIR_LISTS',
@@ -1176,6 +1177,14 @@ export function setFileTransferClipboard({ ...data }) {
     payload: {
       ...data,
     },
+  };
+}
+
+// the Transfers panel (running copy, items ready to paste, history)
+export function setTransferCenter({ open }) {
+  return {
+    type: actionTypes.SET_TRANSFER_CENTER,
+    payload: { open: Boolean(open) },
   };
 }
 

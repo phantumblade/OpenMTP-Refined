@@ -142,6 +142,13 @@ export default class ToolbarAreaPane extends PureComponent {
             enabled: !isMtpTransferActive,
           };
           break;
+
+        case 'photoBackup':
+          _activeToolbarList[a] = {
+            ...item,
+            enabled: isMtp && mtpDevice.isAvailable && enabled,
+          };
+          break;
         default:
           break;
       }

@@ -1,279 +1,99 @@
 ---
 name: OpenMTP Refined
-description: A calm dual-pane workbench for reliable Mac and Android file transfers.
-colors:
-  accent-blue: "#007AF5"
-  accent-blue-strong: "#006AD9"
-  light-canvas: "#FFFFFF"
-  light-surface-subtle: "#F5F6F8"
-  light-surface-bar: "#FBFBFB"
-  light-text-primary: "#1D1D1F"
-  light-text-secondary: "#00000099"
-  light-divider: "#0000001F"
-  light-selection: "#006AD91F"
-  light-selection-hover: "#006AD914"
-  light-focus-ring: "#006AD96B"
-  dark-canvas: "#242424"
-  dark-surface-subtle: "#292A2D"
-  dark-surface-bar: "#313131"
-  dark-text-primary: "#FFFFFF"
-  dark-text-secondary: "#FFFFFFA6"
-  dark-divider: "#FFFFFF1F"
-  dark-selection: "#529CFF33"
-  dark-selection-hover: "#529CFF24"
-  dark-selection-border: "#72ADFF"
-  dark-focus-ring: "#72ADFF85"
-  success: "#2E9D62"
-  error: "#F33950"
-  warning: "#F57C00"
-typography:
-  title:
-    fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Text, Segoe UI, Helvetica Neue, Arial, sans-serif"
-    fontSize: "18px"
-    fontWeight: 700
-    lineHeight: 1.25
-  heading:
-    fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Text, Segoe UI, Helvetica Neue, Arial, sans-serif"
-    fontSize: "15px"
-    fontWeight: 700
-    lineHeight: 1.35
-  body:
-    fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Text, Segoe UI, Helvetica Neue, Arial, sans-serif"
-    fontSize: "13px"
-    fontWeight: 400
-    lineHeight: 1.45
-  label:
-    fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Text, Segoe UI, Helvetica Neue, Arial, sans-serif"
-    fontSize: "11px"
-    fontWeight: 600
-    lineHeight: 1.3
-  data:
-    fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace"
-    fontSize: "11px"
-    fontWeight: 600
-    lineHeight: 1.3
-rounded:
-  control-sm: "6px"
-  control: "7px"
-  field: "9px"
-  item: "10px"
-  popover: "12px"
-  dialog: "14px"
-  pill: "999px"
-spacing:
-  xxs: "4px"
-  xs: "6px"
-  sm: "8px"
-  md: "12px"
-  lg: "16px"
-  xl: "24px"
-components:
-  button-primary:
-    backgroundColor: "{colors.accent-blue}"
-    textColor: "{colors.light-canvas}"
-    typography: "{typography.label}"
-    rounded: "{rounded.control}"
-    padding: "3px 9px"
-    height: "26px"
-  search-field:
-    backgroundColor: "{colors.light-canvas}"
-    textColor: "{colors.light-text-primary}"
-    typography: "{typography.body}"
-    rounded: "{rounded.field}"
-    padding: "0 10px"
-    height: "36px"
-  filter-popover:
-    backgroundColor: "{colors.light-canvas}"
-    textColor: "{colors.light-text-primary}"
-    rounded: "{rounded.popover}"
-    padding: "16px"
-    width: "310px"
-  file-tile:
-    backgroundColor: "{colors.light-canvas}"
-    textColor: "{colors.light-text-primary}"
-    rounded: "{rounded.item}"
-    padding: "5px"
-    width: "118px"
-    height: "155px"
-  selected-file-tile:
-    backgroundColor: "{colors.light-selection}"
-    textColor: "{colors.light-text-primary}"
-    rounded: "{rounded.item}"
-    padding: "5px"
-    width: "118px"
-    height: "155px"
+description: An expressive dual-pane workbench for Mac and Android file transfers, built on Material 3 Expressive.
 ---
 
 # Design System: OpenMTP Refined
 
 ## Overview
 
-**Creative North Star: "The Dual Workbench"**
+**Creative North Star: "The Expressive Workbench"**
 
-OpenMTP Refined is a focused two-device workspace. The Mac and Android panes are peers, each with the same navigation grammar, while connection and transfer state remain unmistakable. The interface should feel familiar to a macOS user without pretending to be Finder: compact, precise, and optimized for long file-management sessions.
+Two panes, Mac and phone, with the same grammar. The look is Material 3
+Expressive, in the same hand as the AnalogIA site: saturated colour roles,
+Google Sans Flex at full roundness, shapes that morph and spring motion. State
+(connection, selection, transfer) always wins over decoration.
 
-Visual personality is restrained and functional. Neutral surfaces carry almost the entire interface; blue is reserved for actions, focus, selection, and live state. Rounded geometry softens the dense workspace, but it must never turn operational controls into decorative cards.
+Sources of truth, in order: the M3 tokens in `app/styles/m3/tokens.js`, the
+generated colour roles in `app/styles/m3/colorTokens.js`, the M3 components in
+`app/components/m3/`. Components consume those; they never define their own
+colours, radii or easings.
 
-The system explicitly rejects dated generic icons, ambiguous controls, decorative animation, silent transfer states, and light/dark inconsistencies. Every visual change must improve orientation, confidence, or speed.
+## Colour
 
-**Key Characteristics:**
-
-- Symmetric dual-pane structure with clear source and destination context.
-- Finder-familiar hierarchy, density, keyboard behavior, and file affordances.
-- Restrained blue accent used only for interaction and state.
-- Compact controls with generous focus targets and unambiguous selected states.
-- Equivalent light, dark, keyboard, loading, error, and reduced-motion behavior.
-
-**The Transfer Direction Rule.** A transfer action must always identify its source, destination, item count, and current phase before destructive or time-consuming work begins.
-
-**The Two-Pane Parity Rule.** A component used on both sides must keep the same geometry, state vocabulary, and interaction model. Device-specific differences may change content, never basic behavior.
-
-## Colors
-
-The palette is a restrained cool-neutral system with one interaction blue and semantic colors used only when meaning requires them. The frontmatter tokens are normative; light and dark roles must be mapped semantically rather than selected by raw value inside components.
-
-### Primary
-
-- **Transfer Blue** (`accent-blue`): primary actions, interactive icons, active filters, links, and progress.
-- **Selection Blue** (`accent-blue-strong` / `dark-selection-border`): selected borders, keyboard focus anchors, and current-location emphasis.
-
-### Neutral
-
-- **Canvas** (`light-canvas` / `dark-canvas`): main content and popover surfaces.
-- **Quiet Surface** (`light-surface-subtle` / `dark-surface-subtle`): status areas, device badges, and contextual grouping.
-- **Structural Bar** (`light-surface-bar` / `dark-surface-bar`): toolbars, search rows, headers, and footers.
-- **Primary Ink** (`light-text-primary` / `dark-text-primary`): filenames, titles, selected labels, and essential metrics.
-- **Secondary Ink** (`light-text-secondary` / `dark-text-secondary`): metadata, secondary instructions, and inactive state descriptions.
-- **Divider** (`light-divider` / `dark-divider`): one-pixel structural separation only.
-
-### Semantic
-
-- **Connected Green** (`success`): confirmed connection and completed operations.
-- **Transfer Red** (`error`): inaccessible storage, failed transfers, and destructive warnings.
-- **Attention Orange** (`warning`): recoverable conditions that require user attention.
-
-**The One Accent Rule.** Blue is never decorative. It marks something actionable, selected, focused, transferring, or linked.
-
-**The Semantic Pair Rule.** Never communicate state by color alone. Pair every success, warning, error, or connection color with an icon and concise text.
-
-**The Theme Parity Rule.** A semantic role keeps the same meaning in both themes. Components consume role tokens, never theme-specific raw colors.
+- Every colour is an M3 colour role (`theme.palette.m3.*`, or the
+  `--md-sys-color-*` CSS variables). No raw hex values in components.
+- Roles are generated by `scripts/m3/generate-color-tokens.mjs` with Material
+  Color Utilities (Vibrant variant): 7 app colours (blue, purple, pink, red,
+  orange, yellow, green) x 2 styles (Vibrant = 2025 spec, default; Classic =
+  2021 spec) x standard and high contrast x light and dark. All pass 4.5:1
+  for text (7:1 in high contrast), checked by `verify-m3-color-styles`.
+- The app colour is a setting; "Like macOS" follows the system accent colour.
+  Tertiary is the app icon's orange (the brand blue for warm app colours).
+- Role usage: `surface` for panes; `surfaceContainer*` for bars, groups and
+  rows; `primary` for the active choice; `primaryContainer` for the connected
+  device and running work; `secondaryContainer` for selection;
+  `tertiaryContainer` for favourites, the selected menu item and the backup
+  card; `errorContainer` for problems.
+- Never pair a text role with a container that isn't its own.
 
 ## Typography
 
-**Display Font:** System sans stack, with SF Pro Text preferred on macOS.
+- Google Sans Flex (variable, bundled) with `"ROND" 100`, tracking 0. The
+  macOS system font is an option, never a per-component choice.
+- Scale: `m3Type` in tokens.js. Emphasis comes from weight (600-700), not
+  from another family. Numbers that change use `tabular-nums`.
+- Labels are never truncated with an ellipsis: when space runs out a whole
+  element is dropped (see the toolbar header's three steps).
 
-**Body Font:** System sans stack, with SF Pro Text preferred on macOS.
+## Shape
 
-**Label/Mono Font:** SF Mono, Menlo, or the platform monospace fallback for transfer diagnostics and tabular data only.
+- Radii from `m3Shape`. Pills (full radius) for buttons, chips and toolbar
+  groups; 16-28px for cards, sheets and dialogs.
+- Shape shows state: a pressed control gets squarer, a toggled icon button
+  becomes a filled rounded square, a selected tile grows its corners.
+- Connected groups (toolbar pills, sort buttons, summary cells, history rows,
+  menu groups): 2px gaps, small inner corners, large outer corners.
+- The M3 shape library (`M3Shape`) marks hero moments: section icons, the
+  connection screen, transfer status.
 
-**Character:** Native, compact, and quiet. A single system family minimizes rendering cost and preserves macOS familiarity; hierarchy comes from size, weight, spacing, and placement rather than decorative type.
+## Motion
 
-### Hierarchy
+- Two springs from `m3Motion`: spatial (overshoots; position, size, shape)
+  and effects (no overshoot; colour, opacity). Enter with emphasized
+  decelerate, exit faster with emphasized accelerate.
+- Motion answers a gesture or explains a state change: hover lift, press
+  squeeze, selection morph, a folder's tiles rising in (first 28 staggered),
+  dialogs, the transfer pill. Nothing loops except progress indicators.
+- Never animate per item beyond the staggered first tiles; respect
+  `prefers-reduced-motion` everywhere.
 
-- **Title** (700, 18px, 1.25): dialog titles and primary task headings.
-- **Heading** (700, 15px, 1.35): popover headings and compact section labels.
-- **Body** (400–600, 13px, 1.45): filenames, controls, explanations, and path content.
-- **Label** (600–700, 11px, 1.3): counters, table metadata, footer metrics, and compact buttons.
-- **Data** (600, 11px, 1.3): speed, progress diagnostics, and identifiers using tabular numerals.
+## Layout
 
-**The Operational Hierarchy Rule.** Filenames, paths, device identity, and transfer state outrank decorative or instructional copy.
-
-**The Native Type Rule.** Never introduce a display font into the application UI. Labels, data, controls, and navigation use the system stack.
-
-## Elevation
-
-The workspace is flat by default. One-pixel dividers and tonal layering organize the two panes, toolbars, and status areas. Shadows are reserved for surfaces that genuinely float above the workspace or for media thumbnails that need edge separation.
-
-### Shadow Vocabulary
-
-- **Thumbnail Edge** (`0 1px 3px rgba(0, 0, 0, 0.2)`): previews that would otherwise disappear into the canvas.
-- **Popover Lift** (`theme.shadows[10]`): date and type filter popovers only.
-- **Dialog Lift** (`0 20px 70px rgba(0, 0, 0, 0.28)`): transfer and blocking workflow dialogs.
-- **Feedback Lift** (`0 12px 36px rgba(0, 0, 0, 0.22)`): temporary snackbars only.
-
-**The Flat-by-Default Rule.** A resting toolbar, footer, list row, or file tile has no decorative shadow. If every surface floats, hierarchy has failed.
-
-**The One Floating Layer Rule.** Never stack a popover, card, and dialog elevation treatment inside one another.
+- Per pane, top to bottom: header (menu, device chip with name and free
+  space, action groups), search, sort bar, files, status bar, breadcrumb.
+- The header narrows in steps: free-space amount, then the name, then the
+  ring; action buttons shrink last.
+- Floating elements: connection status card (bottom of the phone pane),
+  transfer pill (bottom centre), Transfers side sheet (right).
 
 ## Components
 
-### Buttons
+- **Device chip**: icon, brand and model, storage ring and free space; it
+  opens the storage picker (phone) or the side menu (Mac).
+- **Action groups**: icon buttons in pill containers, one per task group.
+- **File tile**: lifts on hover, squeezes when pressed, larger corners and
+  secondary container when selected.
+- **Transfer dialog**: route, three named steps, wavy progress whose track
+  never runs under the wave, an end summary, "Continue in the background".
+- **Transfers sheet**: photo backup card, running copy, items ready to
+  paste, history.
 
-- **Shape:** compact rounded rectangle (`control`, 7px), never a floating pill for ordinary commands.
-- **Primary:** Transfer Blue container with light text; use only for the next decisive action, such as starting a transfer or applying a filter.
-- **Secondary:** text or quiet tonal treatment for cancel, reset, refresh, and reversible actions.
-- **Icon controls:** 36px square in toolbars, with 20px icons and a 9px corner radius.
-- **Hover / Focus:** quiet neutral hover, blue active state, and a visible 2–3px focus ring. Focus never depends on shadow alone.
-- **Disabled / Loading:** preserve geometry; reduce emphasis and replace the action with explicit progress feedback when work has begun.
+## Do / Don't
 
-### Chips
-
-- **Style:** use compact pills only for device state, counts, filters, and path segments.
-- **State:** inactive chips are neutral; active chips use selection tint plus blue text or border.
-- **Content:** labels remain short and never repeat nearby headings.
-
-### Cards / Containers
-
-- **Corner Style:** file tiles use `item` (10px); popovers use `popover` (12px); dialogs use `dialog` (14px).
-- **Background:** semantic canvas or quiet-surface tokens, never arbitrary one-off grays.
-- **Shadow Strategy:** flat at rest; use the Elevation vocabulary only for floating layers.
-- **Border:** one-pixel semantic dividers; no thick side-stripe accents.
-- **Internal Padding:** 5–8px for dense file tiles, 12–16px for contextual surfaces, and 24px only for dialog breathing room.
-
-### Inputs / Fields
-
-- **Style:** 36px height, 9px radius, one-pixel divider border, and canvas background.
-- **Focus:** selection border plus a 3px translucent focus ring.
-- **Error / Disabled:** show semantic color, icon, and explanatory text; never use opacity alone for errors.
-- **Search:** debounce expensive remote work, preserve text focus, and expose clear and filter actions without shifting the field.
-
-### Navigation
-
-- **Toolbar:** group navigation, refresh, selection, transfer, and settings actions by task. Use separators only between logical groups.
-- **Breadcrumbs:** horizontally scrollable, with a 6px hover shape and a clearly emphasized current segment.
-- **Sidebar:** no more than two hierarchy levels; collapsible when window width cannot support both panes.
-- **Keyboard:** every toolbar action has a tooltip and shortcut when appropriate. Arrow navigation and multi-selection must remain predictable.
-
-### File Tile and Row
-
-- **Preview:** image and video previews are 80px with an 8px radius; non-previewable formats use the shared icon vocabulary.
-- **Selection:** use the semantic selection tint. Multi-select adds a visible checkbox and a clear inset selection border without moving surrounding items.
-- **Metadata:** filename is primary; type, size, and date remain secondary and consistently aligned.
-- **Performance:** virtualize large directories and avoid animation or layout work proportional to the full item count.
-
-### Transfer Dialog
-
-- **Purpose:** explain source, destination, item count, phase, progress, speed, and recovery without ambiguity.
-- **Shape:** 14px radius with true dialog elevation.
-- **Progress:** preparation, transfer, and verification are distinct named phases. Never leave the user on an unexplained spinner.
-- **Failure:** preserve diagnostic context and offer a specific retry or recovery action.
-
-### Feedback and Motion
-
-- **Duration:** 140–200ms for hover, focus, selection, and compact disclosure transitions.
-- **Easing:** ease-out curves; no bounce, elastic, pulse, or decorative looping.
-- **Counters:** rolling values are allowed only when they communicate changed data and must update instantly under `prefers-reduced-motion`.
-- **Loading:** use stable skeletons or in-place progress without shifting the file grid.
-
-## Do's and Don'ts
-
-### Do:
-
-- **Do** keep source, destination, device identity, and transfer direction visible throughout an operation.
-- **Do** consume semantic theme roles for every state in both light and dark themes.
-- **Do** use the shared checkbox, button, icon, popover, and focus treatments rather than styling controls locally.
-- **Do** preserve familiar Finder-like navigation, keyboard shortcuts, selection, filtering, and contextual actions.
-- **Do** keep motion between 140–200ms and provide an immediate reduced-motion equivalent.
-- **Do** verify default, hover, focus, active, selected, disabled, loading, empty, error, and disconnected states before shipping a component.
-- **Do** measure large-folder rendering and remote MTP work before adding visual effects.
-
-### Don't:
-
-- **Don't** ship interfaces with dated generic icons or controls whose action is ambiguous.
-- **Don't** add decorative animation, pulsing buttons, bounce, or movement that slows the workflow.
-- **Don't** leave transfer states silent or make the user guess whether an operation started.
-- **Don't** allow a visual treatment to work in one theme and fail in the other.
-- **Don't** use thick colored side borders, gradient text, decorative glassmorphism, or nested cards.
-- **Don't** use blue as decoration or full-saturation color on inactive states.
-- **Don't** create a one-off checkbox, input, button, icon style, or raw color when a shared semantic component exists.
-- **Don't** hide a critical command exclusively in a toolbar; macOS menu commands and keyboard access must remain available.
+- Do verify every change in light and dark and with at least two app
+  colours.
+- Do keep source, destination and phase visible during a transfer.
+- Don't add a colour, radius, easing or font outside the tokens.
+- Don't truncate labels, use side-stripe borders, gradient text or nested
+  cards.
