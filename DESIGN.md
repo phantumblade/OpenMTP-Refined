@@ -29,7 +29,9 @@ colours, radii or easings.
   2021 spec) x standard and high contrast x light and dark. All pass 4.5:1
   for text (7:1 in high contrast), checked by `verify-m3-color-styles`.
 - The app colour is a setting; "Like macOS" follows the system accent colour.
-  Tertiary is the app icon's orange (the brand blue for warm app colours).
+  Tertiary is the app icon's orange for the brand blue, and a neighbouring
+  hue of the same family for the other colours (red with orange, purple with
+  pink…): never a colour that clashes with the chosen one.
 - Role usage: `surface` for panes; `surfaceContainer*` for bars, groups and
   rows; `primary` for the active choice; `primaryContainer` for the connected
   device and running work; `secondaryContainer` for selection;
@@ -53,7 +55,10 @@ colours, radii or easings.
 - Shape shows state: a pressed control gets squarer, a toggled icon button
   becomes a filled rounded square, a selected tile grows its corners.
 - Connected groups (toolbar pills, sort buttons, summary cells, history rows,
-  menu groups): 2px gaps, small inner corners, large outer corners.
+  menu groups): 2px gaps, small inner corners, large outer corners. A
+  pressed button in a connected group pinches its inner corners and widens
+  while its neighbours make room (as in AnalogIA); the chosen one is fully
+  round and shows the plain shape while pressed again.
 - The M3 shape library (`M3Shape`) marks hero moments: section icons, the
   connection screen, transfer status.
 
@@ -65,6 +70,8 @@ colours, radii or easings.
 - Motion answers a gesture or explains a state change: hover lift, press
   squeeze, selection morph, a folder's tiles rising in (first 28 staggered),
   dialogs, the transfer pill. Nothing loops except progress indicators.
+- Switch handles slide and grow on the spatial spring; menus (right-click
+  and select) unfold from their top edge, select menus below their field.
 - Never animate per item beyond the staggered first tiles; respect
   `prefers-reduced-motion` everywhere.
 

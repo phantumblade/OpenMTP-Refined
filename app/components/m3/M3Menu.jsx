@@ -3,7 +3,13 @@ import classNames from 'classnames';
 import Popover from '@material-ui/core/Popover';
 import { withStyles } from '@material-ui/core/styles';
 import MaterialSymbol from './MaterialSymbol';
-import { alphaHex, m3Shape, m3State, m3Type } from '../../styles/m3/tokens';
+import {
+  alphaHex,
+  m3Motion,
+  m3Shape,
+  m3State,
+  m3Type,
+} from '../../styles/m3/tokens';
 
 // Material 3 Expressive menu with groups (Compose SegmentedMenuTokens /
 // MenuDefaults): each group is its own surface, 2dp apart, with 16dp outer
@@ -84,7 +90,7 @@ const styles = (theme) => {
       textAlign: 'left',
       cursor: 'pointer',
       outline: 'none',
-      transition: 'background-color 120ms linear, border-radius 200ms ease',
+      transition: `background-color ${m3Motion.fastEffects}, color ${m3Motion.fastEffects}, border-radius ${m3Motion.fastSpatial}`,
       '&:hover, &:focus-visible': {
         backgroundColor: alphaHex(m3.onSurface, m3State.hover),
         borderRadius: m3Shape.medium,

@@ -144,6 +144,8 @@ export const getCurrentThemePalette = (
   return getColorPalette(undefined, colorStyle, accentColor)[appThemeMode];
 };
 
+const EMPHASIZED_DECELERATE = 'cubic-bezier(0.05, 0.7, 0.1, 1)';
+
 // Material 3 (Expressive) styling for the MUI v4 components used across the
 // app, so every dialog, button and snackbar follows the same M3 tokens.
 const m3ComponentOverrides = (m3) => ({
@@ -258,7 +260,10 @@ const m3ComponentOverrides = (m3) => ({
       '& $wrapper > *:first-child': { marginBottom: 4 },
     },
   },
-  // M3 switch: 52x32 track, 16dp handle growing to 24dp (28dp pressed)
+  // M3 switch: 52x32 track, 16dp handle growing to 24dp (28dp pressed).
+  // The handle travels and grows on the fast spatial spring, so it
+  // overshoots a little and settles, as in M3 Expressive; colours fade on
+  // the effects curve.
   MuiSwitch: {
     root: {
       width: 52,
@@ -272,6 +277,7 @@ const m3ComponentOverrides = (m3) => ({
       top: 0,
       left: 0,
       color: m3.outline,
+      transition: `transform ${m3Motion.fastSpatial}, color ${m3Motion.defaultEffects}, background-color ${m3Motion.fastEffects}`,
       '&:hover': { backgroundColor: alphaHex(m3.onSurface, m3State.hover) },
       '&$checked': {
         transform: 'translateX(20px)',
@@ -285,19 +291,13 @@ const m3ComponentOverrides = (m3) => ({
           width: 24,
           height: 24,
           margin: 0,
-          '&::after': {
-            content: '"check"',
-            fontFamily: '"Material Symbols Rounded"',
-            fontFeatureSettings: '"liga"',
-            fontSize: 16,
-            lineHeight: '24px',
-            color: m3.onPrimaryContainer,
-          },
+          '&::after': { opacity: 1, transform: 'none' },
         },
         '&:hover': { backgroundColor: alphaHex(m3.primary, m3State.hover) },
       },
       '&:active $thumb': { width: 28, height: 28, margin: -2 },
       '&$disabled + $track': { opacity: 0.12 },
+      '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
     },
     thumb: {
       width: 16,
@@ -308,6 +308,19 @@ const m3ComponentOverrides = (m3) => ({
       alignItems: 'center',
       justifyContent: 'center',
       transition: `width ${m3Motion.fastSpatial}, height ${m3Motion.fastSpatial}, margin ${m3Motion.fastSpatial}`,
+      // the check is always there, hidden until the switch is on, so it can
+      // grow in with the handle
+      '&::after': {
+        content: '"check"',
+        fontFamily: '"Material Symbols Rounded"',
+        fontFeatureSettings: '"liga"',
+        fontSize: 16,
+        lineHeight: '24px',
+        color: m3.onPrimaryContainer,
+        opacity: 0,
+        transform: 'scale(0.4) rotate(-45deg)',
+        transition: `opacity ${m3Motion.fastEffects}, transform ${m3Motion.fastSpatial}`,
+      },
     },
     track: {
       boxSizing: 'border-box',
@@ -316,9 +329,11 @@ const m3ComponentOverrides = (m3) => ({
       border: `2px solid ${m3.outline}`,
       backgroundColor: m3.surfaceContainerHighest,
       opacity: 1,
+      transition: `background-color ${m3Motion.defaultEffects}, border-color ${m3Motion.defaultEffects}`,
     },
-    colorPrimary: { '&$checked': { color: m3.primaryContainer } },
-    colorSecondary: { '&$checked': { color: m3.primaryContainer } },
+    // selected handle in on-primary (md.comp.switch.selected.handle.color)
+    colorPrimary: { '&$checked': { color: m3.onPrimary } },
+    colorSecondary: { '&$checked': { color: m3.onPrimary } },
   },
   MuiRadio: {
     root: { color: m3.onSurfaceVariant },
@@ -353,16 +368,35 @@ const m3ComponentOverrides = (m3) => ({
   MuiFormControlLabel: {
     label: { ...m3Type.bodyLarge, color: m3.onSurface },
   },
-  // M3 menu
   // Material 3 Expressive menu (Compose SegmentedMenuTokens), same as the
-  // app's own M3Menu: large corners, 44dp items, tertiary selection
+  // app's own M3Menu: large corners, 44dp items, tertiary selection. Select
+  // menus drop down below their field (props below) and unfold from the
+  // top on the emphasized decelerate curve, like the right-click menu.
   MuiMenu: {
     paper: {
+      marginTop: 4,
       borderRadius: m3Shape.large,
       backgroundColor: m3.surfaceContainerLow,
       boxShadow: m3Elevation.level2,
+      // "backwards": the keyframes only drive the opening, so MUI's own
+      // exit transition still runs when the menu closes
+      animation: `$menuOpen 320ms ${EMPHASIZED_DECELERATE} backwards`,
+      '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
     },
     list: { padding: '4px 0' },
+    '@keyframes menuOpen': {
+      from: {
+        opacity: 0,
+        transform: 'translateY(-6px) scaleY(0.9)',
+        clipPath: 'inset(-16px -16px 70% -16px)',
+      },
+      // the clip ends outside the menu so it never cuts the shadow
+      to: {
+        opacity: 1,
+        transform: 'none',
+        clipPath: 'inset(-16px -16px -16px -16px)',
+      },
+    },
   },
   MuiMenuItem: {
     root: {
@@ -372,12 +406,16 @@ const m3ComponentOverrides = (m3) => ({
       padding: '0 12px',
       borderRadius: m3Shape.extraSmall,
       color: m3.onSurface,
-      transition: 'background-color 120ms linear, border-radius 200ms ease',
+      transition: `background-color ${m3Motion.fastEffects}, color ${m3Motion.fastEffects}, border-radius ${m3Motion.fastSpatial}`,
       '&:hover': {
         backgroundColor: alphaHex(m3.onSurface, m3State.hover),
         borderRadius: m3Shape.medium,
       },
-      '&$selected, &$selected:hover': {
+      '&.Mui-focusVisible': {
+        backgroundColor: alphaHex(m3.onSurface, m3State.focus),
+        borderRadius: m3Shape.medium,
+      },
+      '&$selected, &$selected:hover, &$selected.Mui-focusVisible': {
         borderRadius: m3Shape.medium,
         backgroundColor: m3.tertiaryContainer,
         color: m3.onTertiaryContainer,
@@ -432,6 +470,15 @@ export const materialUiTheme = ({ ...args }) => {
       MuiDialog: {
         TransitionComponent: M3DialogTransition,
         transitionDuration: { enter: DIALOG_ENTER_MS, exit: DIALOG_EXIT_MS },
+      },
+      // select menus open below their field instead of covering it
+      MuiSelect: {
+        MenuProps: {
+          getContentAnchorEl: null,
+          anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
+          transformOrigin: { vertical: 'top', horizontal: 'left' },
+          transitionDuration: { enter: 0, exit: 150 },
+        },
       },
     },
 

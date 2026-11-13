@@ -20,7 +20,7 @@ const symbols = {
   faqs: 'help',
 };
 
-const styles = (theme) => ({
+const styles = () => ({
   root: {
     display: 'block',
     width: 20,
@@ -38,9 +38,8 @@ const styles = (theme) => ({
     },
     '&:focus': { outline: 'none' },
   },
-  active: {
-    color: theme.palette.secondary.main,
-  },
+  // the button around it sets the colour (on-primary when toggled on)
+  active: {},
 });
 
 function AnimatedActionIcon({ classes, name, active = false, className }) {

@@ -230,13 +230,6 @@ export const styles = (theme) => {
         background: `#f9f9f952`,
       },
     },
-    focussedFileExplorer: {
-      width: '100%',
-      height: 5,
-      marginTop: -5,
-      overflow: 'hidden',
-      background: alphaHex(theme.palette.m3.primary, 0.3),
-    },
     menuButton: {
       width: 40,
       height: 40,

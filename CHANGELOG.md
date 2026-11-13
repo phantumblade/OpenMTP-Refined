@@ -56,6 +56,21 @@ Version 4.0.0 is the first release of the fork with its own version number.
 
 ### Fixed
 
+- Every app colour now colours the whole interface: dialog buttons, select
+  menus and the vibrant right-click menu no longer turn blue with the warm
+  colours (each colour has its own matching accent).
+- A toggled toolbar button (multi-select) showed a filled square without its
+  icon.
+- The bar under the pane toolbar that marked the focused pane is gone.
+- Select menus open below their field, unfolding like the right-click menu,
+  instead of covering it.
+- Switches move with the M3 Expressive spring: the handle slides, grows and
+  settles, and the check grows in with it.
+- The "Sort by" buttons press like a Material 3 Expressive connected group:
+  the pressed button pinches its inner corners and widens while the others
+  make room, then springs back.
+- Settings use two columns in a wide window (app colour next to colour
+  style, theme next to menu style, hidden files next to grid view).
 - The wavy progress bar no longer draws its track under the moving wave while
   a copy is being checked or prepared.
 - The rename, new folder, replace and delete dialogs, the storage and MTP

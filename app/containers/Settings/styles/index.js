@@ -8,13 +8,26 @@ import {
 } from '../../../styles/m3/tokens';
 
 // Settings dialog, Material 3: full-width primary tabs with icons, sections
-// with an icon, title and explanation, and segmented lists of rows.
+// with an icon, title and explanation, and segmented lists of rows. In a
+// wide window the dialog grows and related sections sit side by side.
+const WIDE = '@media (min-width: 1180px)';
+
 export const styles = (theme) => {
   const { m3 } = theme.palette;
 
   return {
     dialogPaper: {
       height: 'min(780px, 92vh)',
+      maxWidth: 960,
+      [WIDE]: { maxWidth: 1120 },
+    },
+    pair: {
+      [WIDE]: {
+        display: 'grid',
+        gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
+        columnGap: 24,
+        alignItems: 'start',
+      },
     },
     title: {
       ...m3Type.headlineSmall,
@@ -132,19 +145,19 @@ export const styles = (theme) => {
       display: 'flex',
       flexWrap: 'wrap',
       alignItems: 'center',
-      gap: 10,
-      padding: '14px 16px',
+      gap: 8,
+      padding: '14px 12px',
     },
     accentSwatch: {
       display: 'inline-flex',
       alignItems: 'center',
       justifyContent: 'center',
       gap: 8,
-      minWidth: 44,
-      height: 44,
+      minWidth: 40,
+      height: 40,
       padding: 0,
       border: 'none',
-      borderRadius: 22,
+      borderRadius: 20,
       fontFamily: 'inherit',
       cursor: 'pointer',
       outline: 'none',
@@ -156,7 +169,7 @@ export const styles = (theme) => {
       },
     },
     accentSwatchSelected: {
-      borderRadius: 14,
+      borderRadius: 12,
       boxShadow: `0 0 0 3px ${m3.surface}, 0 0 0 5px ${m3.primary}`,
     },
     accentSwatchSystem: {

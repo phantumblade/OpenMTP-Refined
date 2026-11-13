@@ -130,6 +130,18 @@ export default class SettingsDialog extends PureComponent {
     );
   };
 
+  // two related sections side by side when the dialog is wide enough
+  renderPair = (first, second) => {
+    const { styles } = this.props;
+
+    return (
+      <div className={styles.pair}>
+        {first}
+        {second}
+      </div>
+    );
+  };
+
   renderRowContent = ({ icon, title, description }) => {
     const { styles } = this.props;
 
@@ -259,7 +271,7 @@ export default class SettingsDialog extends PureComponent {
       <Dialog
         open={open}
         fullWidth
-        maxWidth="md"
+        maxWidth="lg"
         classes={{ paper: styles.dialogPaper }}
         aria-labelledby="settings-dialogbox"
         disableEscapeKeyDown={false}
@@ -405,153 +417,161 @@ export default class SettingsDialog extends PureComponent {
                   ),
                 })}
 
-                {this.renderSection({
-                  icon: 'palette',
-                  title: t('Theme'),
-                  description: t('Light, dark or following macOS.'),
-                  children: (
-                    <RadioGroup
-                      className={styles.group}
-                      value={appThemeMode}
-                      onChange={onAppThemeModeChange}
-                    >
-                      {this.renderRadioRow({
-                        icon: 'light_mode',
-                        value: APP_THEME_MODE_TYPE.light,
-                        title: t('Light'),
-                      })}
-                      {this.renderRadioRow({
-                        icon: 'dark_mode',
-                        value: APP_THEME_MODE_TYPE.dark,
-                        title: t('Dark'),
-                      })}
-                      {this.renderRadioRow({
-                        icon: 'brightness_auto',
-                        value: APP_THEME_MODE_TYPE.auto,
-                        title: t('Auto'),
-                        description: t('Follows the macOS appearance.'),
-                      })}
-                    </RadioGroup>
-                  ),
-                  grouped: false,
-                })}
+                {this.renderPair(
+                  this.renderSection({
+                    icon: 'colorize',
+                    title: t('App color'),
+                    description: t(
+                      'The color the whole Material 3 palette is built from.'
+                    ),
+                    children: (
+                      <div
+                        role="radiogroup"
+                        aria-label={t('App color')}
+                        className={styles.accentRow}
+                      >
+                        {ACCENT_COLORS.map(([accent, label]) => {
+                          const isSystem =
+                            accent === APP_ACCENT_COLOR_TYPE.system;
+                          const selected = appAccentColor === accent;
+                          const { fill, ink } = accentSwatch(
+                            isSystem ? getSystemAccentColor() : accent
+                          );
 
-                {this.renderSection({
-                  icon: 'colorize',
-                  title: t('App color'),
-                  description: t(
-                    'The color the whole Material 3 palette is built from.'
-                  ),
-                  children: (
-                    <div
-                      role="radiogroup"
-                      aria-label={t('App color')}
-                      className={styles.accentRow}
-                    >
-                      {ACCENT_COLORS.map(([accent, label]) => {
-                        const isSystem =
-                          accent === APP_ACCENT_COLOR_TYPE.system;
-                        const selected = appAccentColor === accent;
-                        const { fill, ink } = accentSwatch(
-                          isSystem ? getSystemAccentColor() : accent
-                        );
+                          return (
+                            <button
+                              key={accent}
+                              type="button"
+                              role="radio"
+                              aria-checked={selected}
+                              aria-label={t(label)}
+                              title={t(label)}
+                              className={classNames(styles.accentSwatch, {
+                                [styles.accentSwatchSelected]: selected,
+                                [styles.accentSwatchSystem]: isSystem,
+                              })}
+                              style={{ backgroundColor: fill, color: ink }}
+                              onClick={(event) =>
+                                onAppAccentColorChange(event, accent)
+                              }
+                            >
+                              {isSystem && !selected && (
+                                <MaterialSymbol name="laptop_mac" size={20} />
+                              )}
+                              {selected && (
+                                <MaterialSymbol
+                                  name="check"
+                                  size={22}
+                                  weight={700}
+                                />
+                              )}
+                              {isSystem && (
+                                <span className={styles.accentSwatchLabel}>
+                                  {t(label)}
+                                </span>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ),
+                  }),
+                  this.renderSection({
+                    icon: 'format_paint',
+                    title: t('Color style'),
+                    description: t('How bold the Material 3 colors are.'),
+                    children: (
+                      <RadioGroup
+                        className={styles.group}
+                        value={appColorStyle}
+                        onChange={onAppColorStyleChange}
+                      >
+                        {this.renderRadioRow({
+                          icon: 'tonality',
+                          value: APP_COLOR_STYLE_TYPE.classic,
+                          title: t('Classic'),
+                          description: t(
+                            'Calm tonal colors and quiet surfaces.'
+                          ),
+                        })}
+                        {this.renderRadioRow({
+                          icon: 'colors',
+                          value: APP_COLOR_STYLE_TYPE.vibrant,
+                          title: t('Vibrant'),
+                          description: t(
+                            'Saturated colors and tinted surfaces.'
+                          ),
+                        })}
+                      </RadioGroup>
+                    ),
+                    grouped: false,
+                  })
+                )}
 
-                        return (
-                          <button
-                            key={accent}
-                            type="button"
-                            role="radio"
-                            aria-checked={selected}
-                            aria-label={t(label)}
-                            title={t(label)}
-                            className={classNames(styles.accentSwatch, {
-                              [styles.accentSwatchSelected]: selected,
-                              [styles.accentSwatchSystem]: isSystem,
-                            })}
-                            style={{ backgroundColor: fill, color: ink }}
-                            onClick={(event) =>
-                              onAppAccentColorChange(event, accent)
-                            }
-                          >
-                            {isSystem && !selected && (
-                              <MaterialSymbol name="laptop_mac" size={20} />
-                            )}
-                            {selected && (
-                              <MaterialSymbol
-                                name="check"
-                                size={22}
-                                weight={700}
-                              />
-                            )}
-                            {isSystem && (
-                              <span className={styles.accentSwatchLabel}>
-                                {t(label)}
-                              </span>
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ),
-                })}
-
-                {this.renderSection({
-                  icon: 'format_paint',
-                  title: t('Color style'),
-                  description: t('How bold the Material 3 colors are.'),
-                  children: (
-                    <RadioGroup
-                      className={styles.group}
-                      value={appColorStyle}
-                      onChange={onAppColorStyleChange}
-                    >
-                      {this.renderRadioRow({
-                        icon: 'tonality',
-                        value: APP_COLOR_STYLE_TYPE.classic,
-                        title: t('Classic'),
-                        description: t('Calm tonal colors and quiet surfaces.'),
-                      })}
-                      {this.renderRadioRow({
-                        icon: 'colors',
-                        value: APP_COLOR_STYLE_TYPE.vibrant,
-                        title: t('Vibrant'),
-                        description: t('Saturated colors and tinted surfaces.'),
-                      })}
-                    </RadioGroup>
-                  ),
-                  grouped: false,
-                })}
-
-                {this.renderSection({
-                  icon: 'menu_open',
-                  title: t('Menu style'),
-                  description: t(
-                    'The colors of the menu that opens with a right click.'
-                  ),
-                  children: (
-                    <RadioGroup
-                      className={styles.group}
-                      value={appMenuStyle}
-                      onChange={onAppMenuStyleChange}
-                    >
-                      {this.renderRadioRow({
-                        icon: 'list',
-                        value: APP_MENU_STYLE_TYPE.standard,
-                        title: t('Standard'),
-                        description: t('Neutral, like the rest of the window.'),
-                      })}
-                      {this.renderRadioRow({
-                        icon: 'auto_awesome',
-                        value: APP_MENU_STYLE_TYPE.vibrant,
-                        title: t('Vibrant'),
-                        description: t(
-                          'In the orange of the app icon, so it stands out.'
-                        ),
-                      })}
-                    </RadioGroup>
-                  ),
-                  grouped: false,
-                })}
+                {this.renderPair(
+                  this.renderSection({
+                    icon: 'palette',
+                    title: t('Theme'),
+                    description: t('Light, dark or following macOS.'),
+                    children: (
+                      <RadioGroup
+                        className={styles.group}
+                        value={appThemeMode}
+                        onChange={onAppThemeModeChange}
+                      >
+                        {this.renderRadioRow({
+                          icon: 'light_mode',
+                          value: APP_THEME_MODE_TYPE.light,
+                          title: t('Light'),
+                        })}
+                        {this.renderRadioRow({
+                          icon: 'dark_mode',
+                          value: APP_THEME_MODE_TYPE.dark,
+                          title: t('Dark'),
+                        })}
+                        {this.renderRadioRow({
+                          icon: 'brightness_auto',
+                          value: APP_THEME_MODE_TYPE.auto,
+                          title: t('Auto'),
+                          description: t('Follows the macOS appearance.'),
+                        })}
+                      </RadioGroup>
+                    ),
+                    grouped: false,
+                  }),
+                  this.renderSection({
+                    icon: 'menu_open',
+                    title: t('Menu style'),
+                    description: t(
+                      'The colors of the menu that opens with a right click.'
+                    ),
+                    children: (
+                      <RadioGroup
+                        className={styles.group}
+                        value={appMenuStyle}
+                        onChange={onAppMenuStyleChange}
+                      >
+                        {this.renderRadioRow({
+                          icon: 'list',
+                          value: APP_MENU_STYLE_TYPE.standard,
+                          title: t('Standard'),
+                          description: t(
+                            'Neutral, like the rest of the window.'
+                          ),
+                        })}
+                        {this.renderRadioRow({
+                          icon: 'auto_awesome',
+                          value: APP_MENU_STYLE_TYPE.vibrant,
+                          title: t('Vibrant'),
+                          description: t(
+                            'In a bright accent that goes with the app colour, so it stands out.'
+                          ),
+                        })}
+                      </RadioGroup>
+                    ),
+                    grouped: false,
+                  })
+                )}
 
                 {this.renderSection({
                   icon: 'usb',
@@ -609,77 +629,78 @@ export default class SettingsDialog extends PureComponent {
             {/* ----- File Manager Tab ----- */}
             {tabIndex === this.tabBodyRenderTabIndex(1) && (
               <>
-                {this.renderSection({
-                  icon: 'visibility',
-                  title: t('Show hidden files'),
-                  description: t(
-                    'Files whose name starts with a dot, usually system files.'
-                  ),
-                  children: (
-                    <>
-                      {this.renderSwitchRow({
-                        icon: 'laptop_mac',
-                        title: t(DEVICES_LABEL[DEVICE_TYPE.local]),
-                        checked: !hideHiddenFilesLocal,
-                        onChange: (e) =>
-                          onHiddenFilesChange(
-                            e,
-                            !hideHiddenFilesLocal,
-                            DEVICE_TYPE.local
-                          ),
-                      })}
-                      {this.renderSwitchRow({
-                        icon: 'mobile',
-                        title: t(DEVICES_LABEL[DEVICE_TYPE.mtp]),
-                        checked: !hideHiddenFilesMtp,
-                        onChange: (e) =>
-                          onHiddenFilesChange(
-                            e,
-                            !hideHiddenFilesMtp,
-                            DEVICE_TYPE.mtp
-                          ),
-                      })}
-                    </>
-                  ),
-                })}
-
-                {this.renderSection({
-                  icon: 'grid_view',
-                  title: t('View as grid'),
-                  description: t(
-                    'Large icons in a grid instead of a detailed list.'
-                  ),
-                  children: (
-                    <>
-                      {this.renderSwitchRow({
-                        icon: 'laptop_mac',
-                        title: t(DEVICES_LABEL[DEVICE_TYPE.local]),
-                        checked: fileExplorerListingTypeLocalGrid,
-                        onChange: (e) =>
-                          onFileExplorerListingType(
-                            e,
-                            fileExplorerListingTypeLocalGrid
-                              ? FILE_EXPLORER_VIEW_TYPE.list
-                              : FILE_EXPLORER_VIEW_TYPE.grid,
-                            DEVICE_TYPE.local
-                          ),
-                      })}
-                      {this.renderSwitchRow({
-                        icon: 'mobile',
-                        title: t(DEVICES_LABEL[DEVICE_TYPE.mtp]),
-                        checked: fileExplorerListingTypeMtpGrid,
-                        onChange: (e) =>
-                          onFileExplorerListingType(
-                            e,
-                            fileExplorerListingTypeMtpGrid
-                              ? FILE_EXPLORER_VIEW_TYPE.list
-                              : FILE_EXPLORER_VIEW_TYPE.grid,
-                            DEVICE_TYPE.mtp
-                          ),
-                      })}
-                    </>
-                  ),
-                })}
+                {this.renderPair(
+                  this.renderSection({
+                    icon: 'visibility',
+                    title: t('Show hidden files'),
+                    description: t(
+                      'Files whose name starts with a dot, usually system files.'
+                    ),
+                    children: (
+                      <>
+                        {this.renderSwitchRow({
+                          icon: 'laptop_mac',
+                          title: t(DEVICES_LABEL[DEVICE_TYPE.local]),
+                          checked: !hideHiddenFilesLocal,
+                          onChange: (e) =>
+                            onHiddenFilesChange(
+                              e,
+                              !hideHiddenFilesLocal,
+                              DEVICE_TYPE.local
+                            ),
+                        })}
+                        {this.renderSwitchRow({
+                          icon: 'mobile',
+                          title: t(DEVICES_LABEL[DEVICE_TYPE.mtp]),
+                          checked: !hideHiddenFilesMtp,
+                          onChange: (e) =>
+                            onHiddenFilesChange(
+                              e,
+                              !hideHiddenFilesMtp,
+                              DEVICE_TYPE.mtp
+                            ),
+                        })}
+                      </>
+                    ),
+                  }),
+                  this.renderSection({
+                    icon: 'grid_view',
+                    title: t('View as grid'),
+                    description: t(
+                      'Large icons in a grid instead of a detailed list.'
+                    ),
+                    children: (
+                      <>
+                        {this.renderSwitchRow({
+                          icon: 'laptop_mac',
+                          title: t(DEVICES_LABEL[DEVICE_TYPE.local]),
+                          checked: fileExplorerListingTypeLocalGrid,
+                          onChange: (e) =>
+                            onFileExplorerListingType(
+                              e,
+                              fileExplorerListingTypeLocalGrid
+                                ? FILE_EXPLORER_VIEW_TYPE.list
+                                : FILE_EXPLORER_VIEW_TYPE.grid,
+                              DEVICE_TYPE.local
+                            ),
+                        })}
+                        {this.renderSwitchRow({
+                          icon: 'mobile',
+                          title: t(DEVICES_LABEL[DEVICE_TYPE.mtp]),
+                          checked: fileExplorerListingTypeMtpGrid,
+                          onChange: (e) =>
+                            onFileExplorerListingType(
+                              e,
+                              fileExplorerListingTypeMtpGrid
+                                ? FILE_EXPLORER_VIEW_TYPE.list
+                                : FILE_EXPLORER_VIEW_TYPE.grid,
+                              DEVICE_TYPE.mtp
+                            ),
+                        })}
+                      </>
+                    ),
+                  })
+                )}
 
                 {this.renderSection({
                   icon: 'view_column',

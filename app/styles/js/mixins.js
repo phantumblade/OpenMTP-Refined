@@ -1,5 +1,10 @@
 // eslint-disable-next-line no-unused-vars
 import { checkIf } from '../../utils/checkIf';
+import { alphaHex, m3State } from '../m3/tokens';
+import { m3VibrantColorTokens } from '../m3/colorTokens';
+
+const stateLayer = (color, opacity) =>
+  `linear-gradient(${alphaHex(color, opacity)}, ${alphaHex(color, opacity)})`;
 
 export const commonThemes = {
   resetUl: {
@@ -48,62 +53,72 @@ export const commonThemes = {
 export default ({ theme }) => {
   checkIf(theme, 'object');
 
+  // components styled outside the app's theme (the App root itself) get
+  // the default scheme; they don't use the button mixins
+  const m3 = theme.palette?.m3 ?? m3VibrantColorTokens.light;
+
   return {
     ...commonThemes,
     a: {
       cursor: `pointer`,
       color: theme.palette.secondary.main,
     },
+    // M3 filled button in the app colour; hover and press add the
+    // on-primary state layer on top
     btnPositive: {
-      backgroundColor: theme.palette.secondary.main,
-      borderColor: theme.palette.secondary.main,
-      color: theme.palette.btnTextColor,
+      backgroundColor: m3.primary,
+      borderColor: m3.primary,
+      color: m3.onPrimary,
       '&:hover': {
-        backgroundColor: '#0069d9',
-        borderColor: '#0062cc',
+        backgroundColor: m3.primary,
+        backgroundImage: stateLayer(m3.onPrimary, m3State.hover),
       },
       '&:active': {
         boxShadow: 'none',
-        backgroundColor: '#0062cc',
-        borderColor: '#005cbf',
+        backgroundColor: m3.primary,
+        backgroundImage: stateLayer(m3.onPrimary, m3State.pressed),
       },
-      '&:focus': {
-        boxShadow: '0 0 0 0.2rem rgba(0,123,255,0.5)',
+      '&.Mui-focusVisible': {
+        outline: `3px solid ${m3.secondary}`,
+        outlineOffset: 2,
       },
     },
 
+    // M3 tonal button
     btnNegative: {
-      backgroundColor: `rgba(0, 122, 245, 0.08)`,
-      borderColor: `rgba(0, 122, 245, 0.08)`,
+      backgroundColor: m3.secondaryContainer,
+      borderColor: m3.secondaryContainer,
+      color: m3.onSecondaryContainer,
       '&:hover': {
-        backgroundColor: `rgba(0, 122, 245, 0.15)`,
-        borderColor: '#0062cc',
+        backgroundColor: m3.secondaryContainer,
+        backgroundImage: stateLayer(m3.onSecondaryContainer, m3State.hover),
       },
       '&:active': {
         boxShadow: 'none',
-        backgroundColor: `rgba(0, 122, 245, 0.23)`,
-        borderColor: '#005cbf',
+        backgroundColor: m3.secondaryContainer,
+        backgroundImage: stateLayer(m3.onSecondaryContainer, m3State.pressed),
       },
-      '&:focus': {
-        boxShadow: '0 0 0 0.2rem rgba(0,123,255,0.5)',
+      '&.Mui-focusVisible': {
+        outline: `3px solid ${m3.secondary}`,
+        outlineOffset: 2,
       },
     },
 
+    // M3 outlined button
     btnNegativeWhite: {
-      border: '1px solid rgba(0, 0, 0, 0.21)',
-      backgroundColor: '#fff',
-      color: '#000',
+      border: `1px solid ${m3.outline}`,
+      backgroundColor: 'transparent',
+      color: m3.onSurfaceVariant,
       '&:hover': {
-        backgroundColor: `rgba(255, 255, 255, 0.65)`,
-        borderColor: '1px solid rgba(0, 0, 0, 0.21)',
+        backgroundColor: alphaHex(m3.onSurfaceVariant, m3State.hover),
       },
       '&:active': {
         boxShadow: 'none',
-        backgroundColor: `rgba(255, 255, 255, 0.55)`,
-        borderColor: '1px solid rgba(0, 0, 0, 0.21)',
+        backgroundColor: alphaHex(m3.onSurfaceVariant, m3State.pressed),
       },
-      '&:focus': {
-        boxShadow: '0 0 0 0.2rem rgba(0,123,255,0.5)',
+      '&.Mui-focusVisible': {
+        outline: `3px solid ${m3.secondary}`,
+        outlineOffset: 2,
       },
     },
   };

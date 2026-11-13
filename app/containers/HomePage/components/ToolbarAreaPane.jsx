@@ -2,7 +2,6 @@
 
 import React, { PureComponent, Fragment } from 'react';
 import { ipcRenderer } from 'electron';
-import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -29,7 +28,6 @@ import {
   makeSidebarFavouriteList,
   makeToolbarList,
   makeCurrentBrowsePath,
-  makeFocussedFileExplorerDeviceType,
   makeMultiSelectMode,
   makeFileTransferProgess,
 } from '../selectors';
@@ -402,7 +400,6 @@ class ToolbarAreaPane extends PureComponent {
       classes: styles,
       deviceType,
       directoryLists,
-      focussedFileExplorerDeviceType,
       appThemeMode,
       showLocalPaneOnLeftSide,
       mtpMode,
@@ -448,12 +445,6 @@ class ToolbarAreaPane extends PureComponent {
           onDoubleClickToolBar={this._handleDoubleClickToolBar}
           onToolbarAction={this._handleToolbarAction}
           {...parentProps}
-        />
-        <div
-          className={classNames({
-            [styles.focussedFileExplorer]:
-              focussedFileExplorerDeviceType.value === deviceType,
-          })}
         />
       </Fragment>
     );
@@ -663,7 +654,6 @@ const mapStateToProps = (state, __) => {
     hideHiddenFiles: makeHideHiddenFiles(state),
     directoryLists: makeDirectoryLists(state),
     mtpStoragesList: makeMtpStoragesList(state),
-    focussedFileExplorerDeviceType: makeFocussedFileExplorerDeviceType(state),
     appThemeMode: makeAppThemeMode(state),
     mtpMode: makeMtpMode(state),
     showLocalPaneOnLeftSide: makeShowLocalPaneOnLeftSide(state),

@@ -21,14 +21,16 @@ const OUTPUT = new URL('../../app/styles/m3/colorTokens.js', import.meta.url);
 
 // App colours the user can pick in Settings besides the brand blue, named
 // like the macOS accent colours so "Like macOS" can follow the system one.
-// Warm colours take the brand blue as tertiary, the others the icon orange.
+// Their tertiary is a neighbouring hue of the same colour (purple next to
+// pink, red next to orange…), so menus, selections and highlights stay in
+// the family of the chosen colour instead of bringing in the brand blue.
 const ACCENTS = {
-  purple: { seed: '#a550a7', tertiary: TERTIARY_SEED },
-  pink: { seed: '#f74f9e', tertiary: TERTIARY_SEED },
-  red: { seed: '#ff5257', tertiary: SEED },
-  orange: { seed: '#f7821b', tertiary: SEED },
-  yellow: { seed: '#ffc600', tertiary: SEED },
-  green: { seed: '#62ba46', tertiary: TERTIARY_SEED },
+  purple: { seed: '#a550a7', tertiary: '#e0559a' },
+  pink: { seed: '#f74f9e', tertiary: '#ff6f61' },
+  red: { seed: '#ff5257', tertiary: '#f7821b' },
+  orange: { seed: '#f7821b', tertiary: '#e0a800' },
+  yellow: { seed: '#ffc600', tertiary: '#f7821b' },
+  green: { seed: '#62ba46', tertiary: '#2bb5a0' },
 };
 
 const roles = Object.getOwnPropertyNames(MaterialDynamicColors)
@@ -52,7 +54,7 @@ const buildScheme = (
   tertiarySeed = TERTIARY_SEED
 ) => {
   const source = Hct.fromInt(argbFromHex(seed));
-  const tertiary = Hct.fromInt(argbFromHex(tertiarySeed));
+  const tertiary = tertiarySeed && Hct.fromInt(argbFromHex(tertiarySeed));
   const vibrant = new SchemeVibrant(source, isDark, 0, specVersion);
   // Vibrant primary and neutrals, custom tertiary (M3 allows a custom
   // key colour per role)
@@ -64,10 +66,12 @@ const buildScheme = (
     specVersion,
     primaryPalette: vibrant.primaryPalette,
     secondaryPalette: vibrant.secondaryPalette,
-    tertiaryPalette: TonalPalette.fromHueAndChroma(
-      tertiary.hue,
-      Math.max(48, tertiary.chroma)
-    ),
+    tertiaryPalette: tertiary
+      ? TonalPalette.fromHueAndChroma(
+          tertiary.hue,
+          Math.max(48, tertiary.chroma)
+        )
+      : vibrant.tertiaryPalette,
     neutralPalette: vibrant.neutralPalette,
     neutralVariantPalette: vibrant.neutralVariantPalette,
   });
