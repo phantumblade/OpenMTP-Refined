@@ -19,7 +19,7 @@ import PhotoBackupGuide from '../HomePage/components/PhotoBackupGuide';
 import M3Button from '../../components/m3/M3Button';
 import { imgsrc } from '../../utils/imgsrc';
 import { APP_VERSION } from '../../constants/meta';
-import { latestUpdatePushVersion } from '../../constants/onboarding';
+import { selectWhatsNew, whatsNewLayout } from './whatsNewItems';
 import { translate } from '../../i18n';
 
 class Onboarding extends PureComponent {
@@ -29,15 +29,24 @@ class Onboarding extends PureComponent {
     this.state = {
       fireOnboarding: false,
       guideOpen: false,
+      selection: null,
     };
   }
 
   componentDidMount() {
     const { onboarding } = this.props;
     const { lastFiredVersion } = onboarding;
+    // the version whose panel was seen last is the one the user updates
+    // from: show only what is new since then (nothing new: no panel)
+    const selection = selectWhatsNew({
+      from: lastFiredVersion,
+      to: APP_VERSION,
+    });
 
     this.setState({
-      fireOnboarding: latestUpdatePushVersion !== lastFiredVersion,
+      selection,
+      fireOnboarding:
+        lastFiredVersion !== APP_VERSION && Boolean(selection.featured),
     });
   }
 
@@ -48,12 +57,14 @@ class Onboarding extends PureComponent {
       fireOnboarding: false,
     });
 
-    actionCreateOnboarding({ lastFiredVersion: latestUpdatePushVersion });
+    actionCreateOnboarding({ lastFiredVersion: APP_VERSION });
   };
 
   render() {
     const { classes: styles, appLanguage } = this.props;
-    const { fireOnboarding, guideOpen } = this.state;
+    const { fireOnboarding, guideOpen, selection } = this.state;
+    const welcome = selection?.mode !== 'update';
+    const layout = whatsNewLayout(selection?.cards.length ?? 4);
     const t = (key, values) => translate(appLanguage, key, values);
 
     return (
@@ -61,6 +72,8 @@ class Onboarding extends PureComponent {
         <Dialog
           className={styles.root}
           classes={{ paper: styles.paper }}
+          // narrower for a few changes, up to three columns for many
+          PaperProps={{ style: { '--dialog-width': `${layout.width}px` } }}
           maxWidth={false}
           scroll="paper"
           aria-labelledby="onboaring-dialogbox"
@@ -76,20 +89,28 @@ class Onboarding extends PureComponent {
             />
             <div className={styles.heroText}>
               <h2 id="onboaring-dialogbox" className={styles.headline}>
-                {t("What's new in OpenMTP Refined {version}", {
-                  version: APP_VERSION,
-                })}
+                {welcome
+                  ? t('Welcome to OpenMTP Refined')
+                  : t("What's new in OpenMTP Refined {version}", {
+                      version: APP_VERSION,
+                    })}
               </h2>
               <p className={styles.supportingText}>
-                {t(
-                  'Photo backup, a Transfers panel and a more colourful look.'
-                )}
+                {welcome
+                  ? t('Here is what it can do, at its best.')
+                  : t(
+                      selection.count === 1
+                        ? 'One new thing since version {from}, the one you had.'
+                        : '{count} new things since version {from}, the one you had.',
+                      { count: selection.count, from: selection.from }
+                    )}
               </p>
             </div>
           </div>
           <DialogContent className={styles.content}>
             <WhatsNew
               appLanguage={appLanguage}
+              selection={selection || undefined}
               onShowBackupGuide={() => this.setState({ guideOpen: true })}
             />
           </DialogContent>

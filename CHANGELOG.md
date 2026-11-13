@@ -5,6 +5,17 @@ All notable changes to this fork will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Version 4.0.0 is the first release of the fork with its own version number.
 
+## Unreleased
+
+### Changed
+
+- The What's new panel adapts to the version you update from: it shows only
+  what is new for you, the most important change featured and the others as
+  cards and chips in a grid sized to their number (one change: a single
+  card in a narrower panel). Coming from several versions back, each card
+  says which version it arrived in; a first install gets a welcome with the
+  best of the app. Nothing new: no panel.
+
 ## 4.1.1 — 2026-11-13
 
 ### Added

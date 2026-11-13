@@ -2,10 +2,10 @@ import { m3Shape, m3Type } from '../../../styles/m3/tokens';
 
 const EMPHASIZED_DECELERATE = 'cubic-bezier(0.05, 0.7, 0.1, 1)';
 
-// What's new as a bento grid: the featured card spans two columns, the
-// others fill as many columns as the dialog's width allows (three in a
-// wide window, two in a medium one, one in a narrow one), so the panel uses
-// the space it gets instead of a long scrolling list. Cards rise in one
+// What's new as a bento grid sized to its content: the component sets
+// --cols (columns in a wide window), --cols-medium and --featured-span from
+// the number of cards (whatsNewLayout), so every row is full whether there
+// is one change or twelve. Narrow windows use one column. Cards rise in one
 // after the other.
 const WIDE = '@media (min-width: 1080px)';
 const MEDIUM = '@media (min-width: 720px)';
@@ -26,8 +26,12 @@ export const styles = (theme) => {
       display: 'grid',
       gridTemplateColumns: 'minmax(0, 1fr)',
       gap: 12,
-      [MEDIUM]: { gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' },
-      [WIDE]: { gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' },
+      [MEDIUM]: {
+        gridTemplateColumns: 'repeat(var(--cols-medium, 2), minmax(0, 1fr))',
+      },
+      [WIDE]: {
+        gridTemplateColumns: 'repeat(var(--cols, 3), minmax(0, 1fr))',
+      },
     },
     card: {
       display: 'flex',
@@ -56,7 +60,35 @@ export const styles = (theme) => {
       padding: 24,
       backgroundColor: m3.primary,
       color: m3.onPrimary,
-      [WIDE]: { gridColumn: 'span 2' },
+      [WIDE]: { gridColumn: 'span var(--featured-span, 2)' },
+    },
+    // the only change: a roomier card, larger type
+    featuredAlone: {
+      padding: 32,
+      '& $featuredTitle': { ...m3Type.headlineMedium, fontWeight: 700 },
+    },
+    cardTop: {
+      display: 'flex',
+      alignItems: 'flex-start',
+      justifyContent: 'space-between',
+      gap: 8,
+      width: '100%',
+    },
+    // "New in 4.1" when the panel covers more than one version; outlined
+    // in the card's own content colour, so it fits every tone
+    versionTag: {
+      ...m3Type.labelMedium,
+      display: 'inline-flex',
+      alignItems: 'center',
+      alignSelf: 'flex-start',
+      height: 24,
+      marginBottom: 6,
+      padding: '0 10px',
+      boxSizing: 'border-box',
+      borderRadius: 12,
+      border: '1px solid currentColor',
+      fontWeight: 650,
+      whiteSpace: 'nowrap',
     },
     featuredShape: {
       flexShrink: 0,

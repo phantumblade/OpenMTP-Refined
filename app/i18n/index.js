@@ -106,6 +106,38 @@ const italian = {
   'Change folder': 'Cambia cartella',
   'Back up now': 'Avvia il backup',
   'How it works': 'Come funziona',
+  'Updates you can’t miss': 'Aggiornamenti che non ti sfuggono',
+  'A badge on the menu button and a card in the side menu tell you when a new version is ready, to install with one click.':
+    'Un badge sul pulsante del menu e una scheda nel menu laterale ti dicono quando è pronta una nuova versione, da installare con un clic.',
+  'Automatic updates': 'Aggiornamenti automatici',
+  'OpenMTP finds new versions by itself, checks they are genuine and installs them when you want.':
+    'OpenMTP trova da solo le nuove versioni, controlla che siano autentiche e le installa quando vuoi.',
+  'Icons and text from 80% to 130%, or fitted to the screen on small laptops.':
+    'Icone e testo dall’80% al 130%, oppure adattati allo schermo sui portatili piccoli.',
+  'Items, size, time taken and average speed of each copy.':
+    'Elementi, dimensione, durata e velocità media di ogni copia.',
+  'Each pane shows its device and how much space is left.':
+    'Ogni pannello mostra il suo dispositivo e quanto spazio resta.',
+  'Related settings side by side in a wide window.':
+    'Le impostazioni collegate affiancate quando la finestra è larga.',
+  'Settings, messages and this panel close with a click outside.':
+    'Impostazioni, messaggi e questo pannello si chiudono cliccando fuori.',
+  'A connection that just works': 'Una connessione che funziona e basta',
+  'A reliable connection': 'Connessione affidabile',
+  'OpenMTP frees the phone from the macOS services that hold on to it, and tells you why and what to do if something goes wrong.':
+    'OpenMTP libera il telefono dai servizi di macOS che lo trattengono e, se qualcosa va storto, ti dice perché e cosa fare.',
+  'Find yesterday’s photos or only the videos, with dates in your language’s format.':
+    'Trova le foto di ieri o solo i video, con le date nel formato della tua lingua.',
+  'Folder access you control': 'Accesso alle cartelle sotto controllo',
+  'Before macOS asks for Desktop, Documents or Downloads, OpenMTP explains why.':
+    'Prima che macOS chieda Scrivania, Documenti o Download, OpenMTP spiega perché.',
+  'New in {version}': 'Novità della {version}',
+  'Here is what it can do, at its best.':
+    'Ecco il meglio di quello che sa fare.',
+  'One new thing since version {from}, the one you had.':
+    'Una novità rispetto alla versione {from} che avevi.',
+  '{count} new things since version {from}, the one you had.':
+    '{count} novità rispetto alla versione {from} che avevi.',
   'OpenMTP {version} is available': 'È disponibile OpenMTP {version}',
   'Downloading OpenMTP {version}': 'Sto scaricando OpenMTP {version}',
   'OpenMTP {version} is ready': 'OpenMTP {version} è pronto',

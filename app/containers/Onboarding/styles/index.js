@@ -9,7 +9,7 @@ export const styles = (theme) => {
   return {
     root: {},
     paper: {
-      width: 'min(1080px, calc(100vw - 48px))',
+      width: 'min(var(--dialog-width, 1080px), calc(100vw - 48px))',
       maxWidth: 'none',
       maxHeight: 'calc(100vh - 48px)',
       margin: 24,
