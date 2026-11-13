@@ -1,4 +1,5 @@
 const assert = require('assert');
+const semver = require('semver');
 const { translate } = require('../../app/i18n');
 const {
   WHATS_NEW_ITEMS,
@@ -34,7 +35,10 @@ function main() {
   });
   assert.strictEqual(
     minor.count,
-    WHATS_NEW_ITEMS.filter((item) => item.since !== '4.0.0').length
+    WHATS_NEW_ITEMS.filter(
+      (item) =>
+        semver.gt(item.since, '4.0.0') && semver.lte(item.since, '4.1.1')
+    ).length
   );
   const weights = [minor.featured, ...minor.cards].map((item) => item.weight);
 
@@ -42,6 +46,12 @@ function main() {
     weights,
     [...weights].sort((a, b) => b - a)
   );
+
+  // from 4.1.1 to 4.1.2: the 4.1.2 change only
+  const next = selectWhatsNew({ from: '4.1.1', to: '4.1.2' });
+
+  assert.strictEqual(next.count, 1);
+  assert.strictEqual(next.featured.since, '4.1.2');
 
   // first install: a welcome with the best of every version
   const welcome = selectWhatsNew({ from: null, to: '4.1.1' });

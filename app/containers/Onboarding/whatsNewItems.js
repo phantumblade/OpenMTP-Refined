@@ -8,6 +8,16 @@ import semver from 'semver';
 // - description: shown when the item is the featured one or a card
 // - action: 'backupGuide' adds "How it works" (photo backup)
 export const WHATS_NEW_ITEMS = [
+  // 4.1.2
+  {
+    since: '4.1.2',
+    weight: 55,
+    icon: 'auto_awesome',
+    title: 'What’s new, made for you',
+    chip: 'What’s new made for you',
+    description:
+      'This panel now shows only what changed since the version you had, laid out to fit: one card or a whole grid.',
+  },
   // 4.1.1
   {
     since: '4.1.1',

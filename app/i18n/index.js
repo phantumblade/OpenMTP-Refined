@@ -106,6 +106,10 @@ const italian = {
   'Change folder': 'Cambia cartella',
   'Back up now': 'Avvia il backup',
   'How it works': 'Come funziona',
+  'What’s new, made for you': 'Novità su misura',
+  'What’s new made for you': 'Novità su misura',
+  'This panel now shows only what changed since the version you had, laid out to fit: one card or a whole grid.':
+    'Questo pannello ora mostra solo cosa è cambiato rispetto alla versione che avevi, disposto su misura: una scheda sola o una griglia intera.',
   'Updates you can’t miss': 'Aggiornamenti che non ti sfuggono',
   'A badge on the menu button and a card in the side menu tell you when a new version is ready, to install with one click.':
     'Un badge sul pulsante del menu e una scheda nel menu laterale ti dicono quando è pronta una nuova versione, da installare con un clic.',
