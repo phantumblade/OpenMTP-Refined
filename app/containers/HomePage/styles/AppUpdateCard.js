@@ -77,19 +77,21 @@ export const styles = (theme) => {
       fontWeight: 650,
       fontVariantNumeric: 'tabular-nums',
     },
+    // the side menu is narrow: the main action spans the card, "What's
+    // new" sits under it
     actions: {
       display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      flexWrap: 'wrap',
-      gap: 8,
-      marginTop: 12,
+      flexDirection: 'column',
+      alignItems: 'stretch',
+      gap: 4,
+      marginTop: 14,
     },
     notes: {
-      marginLeft: -12,
+      order: 2,
       color: `${m3.onPrimaryContainer} !important`,
     },
     install: {
+      order: 1,
       backgroundColor: `${m3.onPrimaryContainer} !important`,
       color: `${m3.primaryContainer} !important`,
       '&:focus-visible': {
