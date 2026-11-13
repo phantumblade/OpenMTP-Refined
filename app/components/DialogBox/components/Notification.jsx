@@ -42,6 +42,7 @@ class Notification extends PureComponent {
         aria-labelledby="notification-dialogbox"
         disableEscapeKeyDown={false}
         onEscapeKeyDown={() => this._handleBtnClick({ confirm: false })}
+        onBackdropClick={() => this._handleBtnClick({ confirm: false })}
       >
         <DialogTitle>{titleText}</DialogTitle>
         <DialogContent>

@@ -280,6 +280,12 @@ export default class SettingsDialog extends PureComponent {
             confirm: false,
           })
         }
+        // a click outside the dialog closes it, like Close
+        onBackdropClick={() =>
+          onDialogBoxCloseBtnClick({
+            confirm: false,
+          })
+        }
       >
         <h2 id="settings-dialogbox" className={styles.title}>
           {t('Settings')}

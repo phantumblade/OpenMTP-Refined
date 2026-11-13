@@ -105,6 +105,47 @@ const italian = {
     'Copia sul Mac le foto e i video nuovi del telefono, saltando quelli già copiati.',
   'Change folder': 'Cambia cartella',
   'Back up now': 'Avvia il backup',
+  'How it works': 'Come funziona',
+  'Step {step} of {total}': 'Passo {step} di {total}',
+  Back: 'Indietro',
+  Next: 'Avanti',
+  'Got it': 'Ho capito',
+  Yesterday: 'Ieri',
+  'Choose a folder on the Mac': 'Scegli una cartella sul Mac',
+  'Plug the phone in with a USB data cable, unlock it and choose “File transfer” in the Android USB notification.':
+    'Collega il telefono con un cavo USB per i dati, sbloccalo e scegli “Trasferimento file” nella notifica USB di Android.',
+  'The first time, OpenMTP asks where to keep the photos. It remembers the folder, and you can change it whenever you like.':
+    'La prima volta OpenMTP ti chiede dove tenere le foto. Ricorda la cartella, e puoi cambiarla quando vuoi.',
+  'Only what’s new is copied': 'Copia solo quello che è nuovo',
+  'OpenMTP compares the phone’s camera folder (DCIM) with the Mac folder and copies only the photos and videos that are missing, in the same sub-folders.':
+    'OpenMTP confronta la cartella della fotocamera del telefono (DCIM) con quella del Mac e copia solo le foto e i video che mancano, nelle stesse sottocartelle.',
+  'Nothing is overwritten or deleted': 'Niente viene sovrascritto o cancellato',
+  'A file with the same name but different content already on the Mac is left alone and reported. Nothing is ever deleted from the phone.':
+    'Se sul Mac c’è già un file con lo stesso nome ma diverso, viene lasciato com’è e segnalato. Dal telefono non viene mai cancellato nulla.',
+  "What's new in OpenMTP Refined {version}":
+    'Novità di OpenMTP Refined {version}',
+  'Photo backup, a Transfers panel and a more colourful look.':
+    'Backup delle foto, un pannello Trasferimenti e un aspetto più colorato.',
+  'Photo backup in one click': 'Backup delle foto in un clic',
+  'Copies to a Mac folder the phone’s new photos and videos, keeping its sub-folders. What is already on the Mac is skipped and never overwritten.':
+    'Copia in una cartella del Mac le foto e i video nuovi del telefono, con le stesse sottocartelle. Quello che è già sul Mac viene saltato e mai sovrascritto.',
+  'Transfers panel': 'Pannello Trasferimenti',
+  'The copy in progress, the files ready to paste and the history of past copies, a click away in the phone pane.':
+    'La copia in corso, i file pronti da incollare e la cronologia delle copie, a un clic nel pannello del telefono.',
+  'Copies in the background': 'Copie in background',
+  'A long copy shrinks into a floating pill, and macOS tells you when it ends.':
+    'Una copia lunga si riduce a una pillola mobile, e macOS ti avvisa quando finisce.',
+  'Your app colour': 'Il colore che vuoi',
+  'Blue, purple, pink, red, orange, yellow or green, or the macOS accent colour: the whole app follows it.':
+    'Blu, viola, rosa, rosso, arancione, giallo o verde, oppure il colore di macOS: tutta l’app lo segue.',
+  'Material 3 Expressive': 'Material 3 Expressive',
+  'Google Sans Flex, livelier colours and spring motion in buttons, switches, menus and tiles.':
+    'Google Sans Flex, colori più vivi e movimenti a molla in pulsanti, interruttori, menu e riquadri.',
+  'Also new': 'Inoltre',
+  'Summary at the end of a copy': 'Riepilogo a fine copia',
+  'Free space next to the device': 'Spazio libero accanto al dispositivo',
+  'Two-column Settings': 'Impostazioni su due colonne',
+  'Panels close with a click outside': 'I pannelli si chiudono cliccando fuori',
   'Connect the phone': 'Collega il telefono',
   'Photo backup folder': 'Cartella del backup foto',
   'Choose the Mac folder where the phone’s photos are copied.':

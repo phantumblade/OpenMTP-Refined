@@ -1,74 +1,157 @@
 import { m3Shape, m3Type } from '../../../styles/m3/tokens';
 
-// Values from the Material 3 Expressive list tokens (Compose ListTokens):
-// segmented items 2dp apart, 16dp outer / 4dp inner corners, 16dp side and
-// 10dp vertical padding, 24dp leading icon, 72dp two-line height.
+const EMPHASIZED_DECELERATE = 'cubic-bezier(0.05, 0.7, 0.1, 1)';
+
+// What's new as a bento grid: the featured card spans two columns, the
+// others fill as many columns as the dialog's width allows (three in a
+// wide window, two in a medium one, one in a narrow one), so the panel uses
+// the space it gets instead of a long scrolling list. Cards rise in one
+// after the other.
+const WIDE = '@media (min-width: 1080px)';
+const MEDIUM = '@media (min-width: 720px)';
+
 export const styles = (theme) => {
   const { m3 } = theme.palette;
 
+  const tone = (container, onContainer, accent, onAccent) => ({
+    backgroundColor: container,
+    color: onContainer,
+    '& $shape': { color: accent },
+    '& $icon': { color: onAccent },
+  });
+
   return {
     root: {},
-    section: {
-      '& + &': { marginTop: 20 },
+    grid: {
+      display: 'grid',
+      gridTemplateColumns: 'minmax(0, 1fr)',
+      gap: 12,
+      [MEDIUM]: { gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' },
+      [WIDE]: { gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' },
     },
-    sectionHeader: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: 14,
-      margin: '0 4px 12px',
-    },
-    sectionShape: {
-      color: m3.primaryContainer,
-    },
-    sectionIcon: {
-      color: m3.onPrimaryContainer,
-    },
-    sectionTitle: {
-      ...m3Type.titleMediumEmphasized,
-      color: m3.onSurface,
-    },
-    group: {
+    card: {
       display: 'flex',
       flexDirection: 'column',
-      gap: 2,
+      alignItems: 'flex-start',
+      gap: 10,
+      minWidth: 0,
+      padding: 20,
+      boxSizing: 'border-box',
+      borderRadius: m3Shape.extraLarge,
+      animation: `$cardIn 520ms ${EMPHASIZED_DECELERATE} both`,
+      animationDelay: 'calc(120ms + var(--i) * 60ms)',
+      '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+    },
+    '@keyframes cardIn': {
+      from: { opacity: 0, transform: 'translateY(16px) scale(0.97)' },
+      to: { opacity: 1, transform: 'none' },
+    },
+    // the featured card: two columns wide, in the app colour, icon beside
+    // the text
+    featured: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 20,
+      gridColumn: '1 / -1',
+      padding: 24,
+      backgroundColor: m3.primary,
+      color: m3.onPrimary,
+      [WIDE]: { gridColumn: 'span 2' },
+    },
+    featuredShape: {
+      flexShrink: 0,
+      color: m3.primaryContainer,
+    },
+    featuredIcon: {
+      color: m3.onPrimaryContainer,
+    },
+    cardText: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+      minWidth: 0,
+    },
+    featuredTitle: {
+      ...m3Type.headlineSmall,
+      margin: 0,
+      fontWeight: 700,
+    },
+    featuredDescription: {
+      ...m3Type.bodyLarge,
+      margin: '6px 0 0',
+    },
+    featuredAction: {
+      marginTop: 14,
+    },
+    primary: tone(
+      m3.primaryContainer,
+      m3.onPrimaryContainer,
+      m3.primary,
+      m3.onPrimary
+    ),
+    secondary: tone(
+      m3.secondaryContainer,
+      m3.onSecondaryContainer,
+      m3.secondary,
+      m3.onSecondary
+    ),
+    tertiary: tone(
+      m3.tertiaryContainer,
+      m3.onTertiaryContainer,
+      m3.tertiary,
+      m3.onTertiary
+    ),
+    neutral: tone(
+      m3.surfaceContainerHighest,
+      m3.onSurface,
+      m3.onSurfaceVariant,
+      m3.surfaceContainerHighest
+    ),
+    shape: {},
+    icon: {},
+    cardTitle: {
+      ...m3Type.titleLarge,
+      margin: '4px 0 0',
+      fontWeight: 700,
+    },
+    cardDescription: {
+      ...m3Type.bodyMedium,
+      margin: 0,
+      opacity: 0.92,
+    },
+    more: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      alignItems: 'center',
+      gap: '8px 12px',
+      marginTop: 16,
+      animation: `$cardIn 520ms ${EMPHASIZED_DECELERATE} 480ms both`,
+      '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+    },
+    moreLabel: {
+      ...m3Type.labelLarge,
+      color: m3.onSurfaceVariant,
+    },
+    chips: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: 8,
       margin: 0,
       padding: 0,
       listStyle: 'none',
     },
-    row: {
-      display: 'flex',
+    chip: {
+      ...m3Type.labelLarge,
+      display: 'inline-flex',
       alignItems: 'center',
-      gap: 16,
-      minHeight: 72,
-      padding: '10px 16px',
+      gap: 6,
+      minHeight: 32,
+      padding: '4px 14px 4px 10px',
       boxSizing: 'border-box',
-      borderRadius: m3Shape.extraSmall,
+      borderRadius: m3Shape.small,
       backgroundColor: m3.surfaceContainerLowest,
-      '&:first-child': {
-        borderTopLeftRadius: m3Shape.large,
-        borderTopRightRadius: m3Shape.large,
-      },
-      '&:last-child': {
-        borderBottomLeftRadius: m3Shape.large,
-        borderBottomRightRadius: m3Shape.large,
-      },
-    },
-    rowIcon: {
-      flexShrink: 0,
-      color: m3.onSurfaceVariant,
-    },
-    rowText: {
-      display: 'flex',
-      flexDirection: 'column',
-      minWidth: 0,
-    },
-    rowTitle: {
-      ...m3Type.bodyLarge,
       color: m3.onSurface,
-    },
-    rowDescription: {
-      ...m3Type.bodyMedium,
-      color: m3.onSurfaceVariant,
+      boxShadow: `inset 0 0 0 1px ${m3.outlineVariant}`,
     },
   };
 };

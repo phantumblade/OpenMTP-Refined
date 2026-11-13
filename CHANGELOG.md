@@ -27,6 +27,15 @@ Version 4.0.0 is the first release of the fork with its own version number.
   the phone's camera folder (DCIM) that the folder doesn't have yet, keeping
   the phone's sub-folders. Files already on the Mac are never overwritten.
 - The transfer dialog ends with a summary: items, size, time, average speed.
+- "How it works" for photo backup: a four-step illustrated guide, from the
+  Transfers panel and from the What's new panel.
+- The Transfers history is grouped by day; each copy shows the destination
+  device, the direction, items and size, and chips for the destination
+  folder (click to open it), the time taken and the average speed. Sizes
+  use the app language's number format, like Finder.
+- The What's new panel shows this version's changes as a grid of cards that
+  uses the window's width (one to three columns), with the photo backup
+  featured.
 - File tiles lift on hover, squeeze when pressed and rise in one after the
   other when a folder opens.
 - Updates from this fork's GitHub releases. When it opens, OpenMTP looks for
@@ -62,6 +71,8 @@ Version 4.0.0 is the first release of the fork with its own version number.
 - A toggled toolbar button (multi-select) showed a filled square without its
   icon.
 - The bar under the pane toolbar that marked the focused pane is gone.
+- Settings, confirmations and messages close with a click outside them,
+  like the What's new panel.
 - Select menus open below their field, unfolding like the right-click menu,
   instead of covering it.
 - Switches move with the M3 Expressive spring: the handle slides, grows and

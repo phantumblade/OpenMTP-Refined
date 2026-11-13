@@ -38,24 +38,56 @@ import {
   subscribeToTransferHistory,
 } from '../../../helpers/transferHistory';
 import { DEVICES_LABEL } from '../../../constants';
-import { niceBytes } from '../../../utils/funcs';
+import { DEVICE_TYPE } from '../../../enums';
+import { formatStorageSize } from '../../../helpers/diskSpace';
 import { translate } from '../../../i18n';
+import PhotoBackupGuide from './PhotoBackupGuide';
+import M3Shape from '../../../components/m3/M3Shape';
 
 const sameDay = (a, b) =>
   a.getFullYear() === b.getFullYear() &&
   a.getMonth() === b.getMonth() &&
   a.getDate() === b.getDate();
 
-// "18:42" for today, "12 nov, 18:42" for older transfers
-export const formatEndedAt = (endedAt, language, now = new Date()) => {
-  const date = new Date(endedAt);
-  const time = { hour: '2-digit', minute: '2-digit' };
+// "18:42": the history is grouped by day, so each row shows only the time
+export const formatEndedAt = (endedAt, language) =>
+  new Intl.DateTimeFormat(language, {
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(endedAt));
 
-  return new Intl.DateTimeFormat(
-    language,
-    sameDay(date, now) ? time : { day: 'numeric', month: 'short', ...time }
-  ).format(date);
+// "today", "yesterday", or the date ("Wednesday 12 November")
+export const historyDayKey = (endedAt) => {
+  const date = new Date(endedAt);
+
+  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 };
+
+export const formatHistoryDay = (endedAt, language, t, now = new Date()) => {
+  const date = new Date(endedAt);
+  const yesterday = new Date(now);
+
+  yesterday.setDate(now.getDate() - 1);
+
+  if (sameDay(date, now)) {
+    return t('Today');
+  }
+
+  if (sameDay(date, yesterday)) {
+    return t('Yesterday');
+  }
+
+  return new Intl.DateTimeFormat(language, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    ...(date.getFullYear() === now.getFullYear() ? {} : { year: 'numeric' }),
+  }).format(date);
+};
+
+// last part of a path, for the folder chip ("/DCIM/Camera" -> "Camera")
+const folderName = (folder) =>
+  folder.split('/').filter(Boolean).pop() || folder;
 
 // Transfers: the floating pill of a copy that continues in the background
 // and the side sheet with the running copy, the items ready to be pasted and
@@ -64,7 +96,7 @@ class TransferCenter extends PureComponent {
   constructor(props) {
     super(props);
 
-    this.state = { history: getTransferHistory() };
+    this.state = { history: getTransferHistory(), guideOpen: false };
   }
 
   componentDidMount() {
@@ -197,7 +229,19 @@ class TransferCenter extends PureComponent {
     return (
       <section className={classes.backup}>
         <div className={classes.backupHeader}>
-          <MaterialSymbol name="add_photo_alternate" size={24} />
+          <M3Shape
+            shape="Cookie9Sided"
+            size={48}
+            color="currentColor"
+            className={classes.backupShape}
+          >
+            <MaterialSymbol
+              name="add_photo_alternate"
+              size={26}
+              fill={1}
+              className={classes.backupIcon}
+            />
+          </M3Shape>
           <div className={classes.clipboardText}>
             <span className={classes.backupTitle}>
               {this.t('Photo backup')}
@@ -210,26 +254,37 @@ class TransferCenter extends PureComponent {
           </div>
         </div>
         {photoBackupFolder && (
-          <span className={classes.backupFolder}>{photoBackupFolder}</span>
+          <button
+            type="button"
+            className={classes.backupFolder}
+            title={photoBackupFolder}
+            disabled={busy}
+            onClick={() => {
+              this.close();
+              actionStartPhotoBackup({ chooseFolder: true });
+            }}
+          >
+            <MaterialSymbol name="folder" size={18} fill={1} />
+            <span className={classes.backupFolderName}>
+              {folderName(photoBackupFolder)}
+            </span>
+            <MaterialSymbol name="edit" size={16} />
+          </button>
         )}
         <div className={classes.backupActions}>
-          {photoBackupFolder && (
-            <M3Button
-              variant="text"
-              size="small"
-              disabled={busy}
-              onClick={() => {
-                this.close();
-                actionStartPhotoBackup({ chooseFolder: true });
-              }}
-            >
-              {this.t('Change folder')}
-            </M3Button>
-          )}
+          <M3Button
+            variant="text"
+            size="small"
+            icon="help"
+            className={classes.backupHelp}
+            onClick={() => this.setState({ guideOpen: true })}
+          >
+            {this.t('How it works')}
+          </M3Button>
           <M3Button
             variant="filled"
             size="small"
-            icon="backup"
+            icon={phoneConnected ? 'backup' : 'usb'}
             disabled={busy || !phoneConnected}
             onClick={() => {
               this.close();
@@ -330,6 +385,109 @@ class TransferCenter extends PureComponent {
     );
   }
 
+  deviceLabel = (type) =>
+    DEVICES_LABEL[type] ? this.t(DEVICES_LABEL[type]) : '—';
+
+  renderEntry(entry) {
+    const { classes, appLanguage } = this.props;
+    const failed = entry.status === 'failed';
+    const toPhone = entry.destinationDeviceType === DEVICE_TYPE.mtp;
+    const seconds = entry.elapsedMs / 1000;
+    const speed =
+      !failed && seconds >= 1 && entry.totalFileSize > 0
+        ? `${formatStorageSize(entry.totalFileSize / seconds, appLanguage)}/s`
+        : null;
+    const summary = [
+      this.countLabel(entry.itemCount),
+      entry.totalFileSize > 0
+        ? formatStorageSize(entry.totalFileSize, appLanguage)
+        : null,
+    ].filter(Boolean);
+    const canOpen = Boolean(
+      entry.destinationFolder && entry.destinationDeviceType
+    );
+
+    return (
+      <li key={entry.id} className={classes.entry}>
+        <span
+          className={classNames(classes.entryIcon, {
+            [classes.entryIconPhone]: toPhone && !failed,
+            [classes.entryIconFailed]: failed,
+          })}
+        >
+          <MaterialSymbol
+            // eslint-disable-next-line no-nested-ternary
+            name={failed ? 'error' : toPhone ? 'mobile' : 'laptop_mac'}
+            size={24}
+            fill={1}
+          />
+          {!failed && (
+            <span className={classes.entryBadge}>
+              <MaterialSymbol
+                name={toPhone ? 'arrow_upward' : 'arrow_downward'}
+                size={14}
+                weight={700}
+              />
+            </span>
+          )}
+        </span>
+        <div className={classes.entryText}>
+          <div className={classes.entryTop}>
+            <span className={classes.entryRoute}>
+              {this.deviceLabel(entry.sourceDeviceType)}
+              <MaterialSymbol
+                name="arrow_forward"
+                size={16}
+                weight={600}
+                className={classes.entryArrow}
+              />
+              {this.deviceLabel(entry.destinationDeviceType)}
+            </span>
+            <span className={classes.entryTime}>
+              {formatEndedAt(entry.endedAt, appLanguage)}
+            </span>
+          </div>
+          {failed ? (
+            <span className={classes.entryError}>
+              {entry.errorMessage || this.t('Transfer failed')}
+            </span>
+          ) : (
+            <span className={classes.entryMeta}>{summary.join(' · ')}</span>
+          )}
+          <div className={classes.chips}>
+            {canOpen && (
+              <button
+                type="button"
+                className={classNames(classes.chip, classes.chipAction)}
+                title={`${this.t('Open the destination folder')}: ${
+                  entry.destinationFolder
+                }`}
+                onClick={() => this.openFolder(entry)}
+              >
+                <MaterialSymbol name="folder_open" size={16} />
+                <span className={classes.chipText}>
+                  {folderName(entry.destinationFolder)}
+                </span>
+              </button>
+            )}
+            {entry.elapsedMs >= 1000 && (
+              <span className={classes.chip} title={this.t('time taken')}>
+                <MaterialSymbol name="timer" size={16} />
+                {formatDuration(entry.elapsedMs)}
+              </span>
+            )}
+            {speed && (
+              <span className={classes.chip} title={this.t('average speed')}>
+                <MaterialSymbol name="speed" size={16} />
+                {speed}
+              </span>
+            )}
+          </div>
+        </div>
+      </li>
+    );
+  }
+
   renderHistory() {
     const { classes, appLanguage } = this.props;
     const { history } = this.state;
@@ -338,14 +496,31 @@ class TransferCenter extends PureComponent {
       return (
         <section className={classes.section}>
           <h3 className={classes.sectionTitle}>{this.t('History')}</h3>
-          <p className={classes.empty}>
-            {this.t(
-              'The copies you make will be listed here. To copy, select files, press ⌘C, then ⌘V in the other pane.'
-            )}
-          </p>
+          <div className={classes.emptyCard}>
+            <MaterialSymbol name="history" size={32} />
+            <p className={classes.empty}>
+              {this.t(
+                'The copies you make will be listed here. To copy, select files, press ⌘C, then ⌘V in the other pane.'
+              )}
+            </p>
+          </div>
         </section>
       );
     }
+
+    // one connected list per day, newest first
+    const days = [];
+
+    history.forEach((entry) => {
+      const key = historyDayKey(entry.endedAt);
+      const last = days[days.length - 1];
+
+      if (last && last.key === key) {
+        last.entries.push(entry);
+      } else {
+        days.push({ key, endedAt: entry.endedAt, entries: [entry] });
+      }
+    });
 
     return (
       <section className={classes.section}>
@@ -355,71 +530,30 @@ class TransferCenter extends PureComponent {
             {this.t('Clear history')}
           </M3Button>
         </div>
-        <ul className={classes.list}>
-          {history.map((entry) => {
-            const failed = entry.status === 'failed';
-            const toPhone = entry.destinationDeviceType === 'mtp';
-            const details = [
-              this.countLabel(entry.itemCount),
-              entry.totalFileSize > 0 ? niceBytes(entry.totalFileSize) : null,
-              entry.elapsedMs >= 1000 ? formatDuration(entry.elapsedMs) : null,
-            ].filter(Boolean);
-
-            return (
-              <li key={entry.id} className={classes.entry}>
-                <span
-                  className={classNames(classes.entryIcon, {
-                    [classes.entryIconFailed]: failed,
-                  })}
-                >
-                  <MaterialSymbol
-                    // eslint-disable-next-line no-nested-ternary
-                    name={failed ? 'error' : toPhone ? 'upload' : 'download'}
-                    size={22}
-                    fill={failed ? 1 : 0}
-                  />
-                </span>
-                <div className={classes.entryText}>
-                  <span className={classes.entryTitle}>
-                    {this.routeLabel(entry)}
-                  </span>
-                  <span className={classes.entryMeta}>
-                    {failed
-                      ? entry.errorMessage || this.t('Transfer failed')
-                      : details.join(' · ')}
-                  </span>
-                  {entry.destinationFolder && (
-                    <span className={classes.entryPath}>
-                      {entry.destinationFolder}
-                    </span>
-                  )}
-                </div>
-                <div className={classes.entryEnd}>
-                  <span className={classes.entryTime}>
-                    {formatEndedAt(entry.endedAt, appLanguage)}
-                  </span>
-                  {entry.destinationFolder && entry.destinationDeviceType && (
-                    <button
-                      type="button"
-                      className={classes.entryAction}
-                      aria-label={this.t('Open the destination folder')}
-                      title={this.t('Open the destination folder')}
-                      onClick={() => this.openFolder(entry)}
-                    >
-                      <MaterialSymbol name="folder_open" size={20} />
-                    </button>
-                  )}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+        {days.map((day) => (
+          <div key={day.key} className={classes.day}>
+            <h4 className={classes.dayTitle}>
+              {formatHistoryDay(day.endedAt, appLanguage, this.t)}
+            </h4>
+            <ul className={classes.list}>
+              {day.entries.map((entry) => this.renderEntry(entry))}
+            </ul>
+          </div>
+        ))}
       </section>
     );
   }
 
   render() {
-    const { classes, transferCenter } = this.props;
+    const {
+      classes,
+      transferCenter,
+      appLanguage,
+      phoneConnected,
+      transfer,
+      actionStartPhotoBackup,
+    } = this.props;
+    const { guideOpen } = this.state;
 
     return (
       <>
@@ -448,6 +582,17 @@ class TransferCenter extends PureComponent {
             {this.renderHistory()}
           </div>
         </Drawer>
+        <PhotoBackupGuide
+          open={guideOpen}
+          appLanguage={appLanguage}
+          canStart={phoneConnected && !isTransferPhaseActive(transfer.phase)}
+          onClose={() => this.setState({ guideOpen: false })}
+          onStart={() => {
+            this.setState({ guideOpen: false });
+            this.close();
+            actionStartPhotoBackup();
+          }}
+        />
       </>
     );
   }

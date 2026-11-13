@@ -5,7 +5,7 @@ import {
 } from './transferHistory';
 import { getAppLanguageSetting } from './settings';
 import { translate } from '../i18n';
-import { niceBytes } from '../utils/funcs';
+import { formatStorageSize } from './diskSpace';
 import { log } from '../utils/log';
 
 // A copy that takes a while is usually left alone: tell the user when it
@@ -20,7 +20,9 @@ const notifyTransferEnded = (progress) => {
   const count = progress.itemCount || progress.totalFiles || 0;
   const details = [
     `${count} ${translate(language, count === 1 ? 'item' : 'items')}`,
-    progress.totalFileSize > 0 ? niceBytes(progress.totalFileSize) : null,
+    progress.totalFileSize > 0
+      ? formatStorageSize(progress.totalFileSize, language)
+      : null,
     progress.route,
   ].filter(Boolean);
 

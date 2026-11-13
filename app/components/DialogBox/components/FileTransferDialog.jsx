@@ -16,7 +16,7 @@ import {
   transferStepStates,
 } from '../../../helpers/fileTransfer';
 import { baseName } from '../../../utils/files';
-import { niceBytes } from '../../../utils/funcs';
+import { formatStorageSize } from '../../../helpers/diskSpace';
 import { translate } from '../../../i18n';
 
 // 54 s, 3 min 05 s, 1 h 12 min
@@ -201,9 +201,10 @@ class FileTransferDialog extends PureComponent {
       transfer.totalFiles || transfer.itemCount || 0
     );
     const transferredAmountVal = transfer.totalFileSize
-      ? `${niceBytes(transfer.totalFileSizeSent || 0)} / ${niceBytes(
-          transfer.totalFileSize
-        )}`
+      ? `${formatStorageSize(
+          transfer.totalFileSizeSent || 0,
+          appLanguage
+        )} / ${formatStorageSize(transfer.totalFileSize, appLanguage)}`
       : `${filesSentVal} / ${totalFilesVal} ${translate(appLanguage, 'files')}`;
 
     // what was copied, shown when the transfer ends
@@ -219,7 +220,7 @@ class FileTransferDialog extends PureComponent {
       },
       transfer.totalFileSize > 0 && {
         label: translate(appLanguage, 'copied'),
-        value: niceBytes(transfer.totalFileSize),
+        value: formatStorageSize(transfer.totalFileSize, appLanguage),
       },
       elapsedMs >= 1000 && {
         label: translate(appLanguage, 'time taken'),
@@ -228,7 +229,10 @@ class FileTransferDialog extends PureComponent {
       elapsedMs >= 1000 &&
         transfer.totalFileSize > 0 && {
           label: translate(appLanguage, 'average speed'),
-          value: `${niceBytes((transfer.totalFileSize / elapsedMs) * 1000)}/s`,
+          value: `${formatStorageSize(
+            (transfer.totalFileSize / elapsedMs) * 1000,
+            appLanguage
+          )}/s`,
         },
     ].filter(Boolean);
 

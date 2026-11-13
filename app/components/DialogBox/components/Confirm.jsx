@@ -43,6 +43,7 @@ class Confirm extends PureComponent {
         aria-labelledby="confirm-dialogbox"
         disableEscapeKeyDown={false}
         onEscapeKeyDown={() => this._handleBtnClick({ confirm: false })}
+        onBackdropClick={() => this._handleBtnClick({ confirm: false })}
       >
         <DialogTitle>{titleText}</DialogTitle>
         <DialogContent>

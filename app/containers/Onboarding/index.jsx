@@ -15,6 +15,7 @@ import {
   makeOnboarding,
 } from '../Settings/selectors';
 import WhatsNew from './components/WhatsNew';
+import PhotoBackupGuide from '../HomePage/components/PhotoBackupGuide';
 import M3Button from '../../components/m3/M3Button';
 import { imgsrc } from '../../utils/imgsrc';
 import { APP_VERSION } from '../../constants/meta';
@@ -27,6 +28,7 @@ class Onboarding extends PureComponent {
 
     this.state = {
       fireOnboarding: false,
+      guideOpen: false,
     };
   }
 
@@ -51,48 +53,63 @@ class Onboarding extends PureComponent {
 
   render() {
     const { classes: styles, appLanguage } = this.props;
-    const { fireOnboarding } = this.state;
+    const { fireOnboarding, guideOpen } = this.state;
     const t = (key, values) => translate(appLanguage, key, values);
 
     return (
-      <Dialog
-        disableBackdropClick
-        disableEscapeKeyDown
-        className={styles.root}
-        classes={{ paper: styles.paper }}
-        fullWidth
-        maxWidth="sm"
-        scroll="paper"
-        aria-labelledby="onboaring-dialogbox"
-        onClose={() => this._handleClose()}
-        open={fireOnboarding}
-      >
-        <div className={styles.hero}>
-          <img
-            className={styles.heroIcon}
-            src={imgsrc('app-icon.png')}
-            alt=""
-          />
-          <h2 className={styles.headline}>{t('Welcome to OpenMTP Refined')}</h2>
-          <p className={styles.supportingText}>
-            {t("Here's what's new in version {version}.", {
-              version: APP_VERSION,
-            })}
-          </p>
-        </div>
-        <DialogContent className={styles.content}>
-          <WhatsNew appLanguage={appLanguage} />
-        </DialogContent>
-        <DialogActions className={styles.actions}>
-          <M3Button
-            variant="filled"
-            size="small"
-            onClick={() => this._handleClose()}
-          >
-            {t('Get started')}
-          </M3Button>
-        </DialogActions>
-      </Dialog>
+      <>
+        <Dialog
+          className={styles.root}
+          classes={{ paper: styles.paper }}
+          maxWidth={false}
+          scroll="paper"
+          aria-labelledby="onboaring-dialogbox"
+          // Escape or a click outside closes it, like "Get started"
+          onClose={() => this._handleClose()}
+          open={fireOnboarding}
+        >
+          <div className={styles.hero}>
+            <img
+              className={styles.heroIcon}
+              src={imgsrc('app-icon.png')}
+              alt=""
+            />
+            <div className={styles.heroText}>
+              <h2 id="onboaring-dialogbox" className={styles.headline}>
+                {t("What's new in OpenMTP Refined {version}", {
+                  version: APP_VERSION,
+                })}
+              </h2>
+              <p className={styles.supportingText}>
+                {t(
+                  'Photo backup, a Transfers panel and a more colourful look.'
+                )}
+              </p>
+            </div>
+          </div>
+          <DialogContent className={styles.content}>
+            <WhatsNew
+              appLanguage={appLanguage}
+              onShowBackupGuide={() => this.setState({ guideOpen: true })}
+            />
+          </DialogContent>
+          <DialogActions className={styles.actions}>
+            <M3Button
+              variant="filled"
+              size="small"
+              onClick={() => this._handleClose()}
+            >
+              {t('Get started')}
+            </M3Button>
+          </DialogActions>
+        </Dialog>
+        <PhotoBackupGuide
+          open={guideOpen}
+          appLanguage={appLanguage}
+          canStart={false}
+          onClose={() => this.setState({ guideOpen: false })}
+        />
+      </>
     );
   }
 }

@@ -1,131 +1,147 @@
 import React, { PureComponent } from 'react';
+import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import MaterialSymbol from '../../../components/m3/MaterialSymbol';
 import M3Shape from '../../../components/m3/M3Shape';
+import M3Button from '../../../components/m3/M3Button';
 import { styles } from '../styles/WhatsNew';
 import { translate } from '../../../i18n';
 
-// What's new in 4.0, as Material 3 Expressive segmented lists grouped by
-// topic (the same section layout as the settings dialog).
-const SECTIONS = [
-  {
-    icon: 'cable',
-    title: 'Phone connection',
-    items: [
-      {
-        icon: 'link',
-        title: 'Fewer connection hiccups',
-        description:
-          'When the macOS Photos service holds on to your phone, OpenMTP releases it for you.',
-      },
-      {
-        icon: 'help',
-        title: 'Clear help when something goes wrong',
-        description:
-          'If the connection fails, OpenMTP tells you why and what to do next.',
-      },
-    ],
+// What's new in this version, most important first. The first item is the
+// featured card; the others fill a grid that has as many columns as the
+// window allows. `more` lists the smaller changes as chips.
+// Keep it current: every user-facing change belongs here (EN + IT).
+export const WHATS_NEW = {
+  featured: {
+    icon: 'add_photo_alternate',
+    shape: 'Cookie9Sided',
+    title: 'Photo backup in one click',
+    description:
+      'Copies to a Mac folder the phone’s new photos and videos, keeping its sub-folders. What is already on the Mac is skipped and never overwritten.',
   },
-  {
-    icon: 'folder_open',
-    title: 'Files and transfers',
-    items: [
-      {
-        icon: 'star',
-        title: 'Favorite folders',
-        description: 'Keep up to 5 folders one click away in the side menu.',
-      },
-      {
-        icon: 'filter_alt',
-        title: 'Filters by date and type',
-        description:
-          "Find yesterday's photos or only the videos, with dates in your language's format.",
-      },
-      {
-        icon: 'swap_vert',
-        title: 'Transfers you can follow',
-        description:
-          'See each step, the speed and the file being copied, on a smooth progress bar.',
-      },
-    ],
-  },
-  {
-    icon: 'shield_lock',
-    title: 'Privacy',
-    items: [
-      {
-        icon: 'folder_managed',
-        title: 'You decide which folders OpenMTP opens',
-        description:
-          'Before macOS asks for Desktop, Documents or Downloads, OpenMTP explains why. Change it anytime in Settings.',
-      },
-    ],
-  },
-  {
-    icon: 'palette',
-    title: 'Look and feel',
-    items: [
-      {
-        icon: 'brush',
-        title: 'Material 3 Expressive design',
-        description:
-          "Google's colors, shapes and motion, in light and dark themes.",
-      },
-      {
-        icon: 'translate',
-        title: 'In your language',
-        description:
-          "OpenMTP starts in your Mac's language. You can change it, and the font, in Settings.",
-      },
-    ],
-  },
-];
+  items: [
+    {
+      icon: 'swap_vert',
+      shape: 'Pill',
+      tone: 'secondary',
+      title: 'Transfers panel',
+      description:
+        'The copy in progress, the files ready to paste and the history of past copies, a click away in the phone pane.',
+    },
+    {
+      icon: 'picture_in_picture_alt',
+      shape: 'Clover4Leaf',
+      tone: 'tertiary',
+      title: 'Copies in the background',
+      description:
+        'A long copy shrinks into a floating pill, and macOS tells you when it ends.',
+    },
+    {
+      icon: 'palette',
+      shape: 'Sunny',
+      tone: 'primary',
+      title: 'Your app colour',
+      description:
+        'Blue, purple, pink, red, orange, yellow or green, or the macOS accent colour: the whole app follows it.',
+    },
+    {
+      icon: 'animation',
+      shape: 'SoftBurst',
+      tone: 'neutral',
+      title: 'Material 3 Expressive',
+      description:
+        'Google Sans Flex, livelier colours and spring motion in buttons, switches, menus and tiles.',
+    },
+  ],
+  more: [
+    { icon: 'summarize', title: 'Summary at the end of a copy' },
+    { icon: 'donut_large', title: 'Free space next to the device' },
+    { icon: 'view_column', title: 'Two-column Settings' },
+    { icon: 'ads_click', title: 'Panels close with a click outside' },
+  ],
+};
 
 class WhatsNew extends PureComponent {
   render() {
-    const { classes: styles, appLanguage } = this.props;
+    const { classes: styles, appLanguage, onShowBackupGuide } = this.props;
     const t = (key) => translate(appLanguage, key);
+    const { featured, items, more } = WHATS_NEW;
 
     return (
       <div className={styles.root}>
-        {SECTIONS.map((section) => (
-          <section key={section.title} className={styles.section}>
-            <div className={styles.sectionHeader}>
+        <div className={styles.grid}>
+          <article
+            className={classNames(styles.card, styles.featured)}
+            style={{ '--i': 0 }}
+          >
+            <M3Shape
+              shape={featured.shape}
+              size={64}
+              color="currentColor"
+              className={styles.featuredShape}
+            >
+              <MaterialSymbol
+                name={featured.icon}
+                size={32}
+                fill={1}
+                className={styles.featuredIcon}
+              />
+            </M3Shape>
+            <div className={styles.cardText}>
+              <h3 className={styles.featuredTitle}>{t(featured.title)}</h3>
+              <p className={styles.featuredDescription}>
+                {t(featured.description)}
+              </p>
+              {onShowBackupGuide && (
+                <M3Button
+                  variant="tonal"
+                  size="small"
+                  icon="help"
+                  className={styles.featuredAction}
+                  onClick={onShowBackupGuide}
+                >
+                  {t('How it works')}
+                </M3Button>
+              )}
+            </div>
+          </article>
+
+          {items.map((item, index) => (
+            <article
+              key={item.title}
+              className={classNames(styles.card, styles[item.tone])}
+              style={{ '--i': index + 1 }}
+            >
               <M3Shape
-                shape="Cookie9Sided"
-                size={40}
+                shape={item.shape}
+                size={48}
                 color="currentColor"
-                className={styles.sectionShape}
+                className={styles.shape}
               >
                 <MaterialSymbol
-                  name={section.icon}
-                  size={22}
+                  name={item.icon}
+                  size={24}
                   fill={1}
-                  className={styles.sectionIcon}
+                  className={styles.icon}
                 />
               </M3Shape>
-              <span className={styles.sectionTitle}>{t(section.title)}</span>
-            </div>
+              <h3 className={styles.cardTitle}>{t(item.title)}</h3>
+              <p className={styles.cardDescription}>{t(item.description)}</p>
+            </article>
+          ))}
+        </div>
 
-            <ul className={styles.group}>
-              {section.items.map((item) => (
-                <li key={item.title} className={styles.row}>
-                  <MaterialSymbol
-                    name={item.icon}
-                    size={24}
-                    className={styles.rowIcon}
-                  />
-                  <span className={styles.rowText}>
-                    <span className={styles.rowTitle}>{t(item.title)}</span>
-                    <span className={styles.rowDescription}>
-                      {t(item.description)}
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))}
+        <div className={styles.more}>
+          <span className={styles.moreLabel}>{t('Also new')}</span>
+          <ul className={styles.chips}>
+            {more.map((item) => (
+              <li key={item.title} className={styles.chip}>
+                <MaterialSymbol name={item.icon} size={18} />
+                {t(item.title)}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     );
   }
