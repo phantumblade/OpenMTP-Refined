@@ -281,18 +281,27 @@ class TransferCenter extends PureComponent {
           >
             {this.t('How it works')}
           </M3Button>
-          <M3Button
-            variant="filled"
-            size="small"
-            icon={phoneConnected ? 'backup' : 'usb'}
-            disabled={busy || !phoneConnected}
-            onClick={() => {
-              this.close();
-              actionStartPhotoBackup();
-            }}
-          >
-            {this.t(phoneConnected ? 'Back up now' : 'Connect the phone')}
-          </M3Button>
+          {phoneConnected ? (
+            <M3Button
+              variant="filled"
+              size="small"
+              icon="backup"
+              disabled={busy}
+              className={classes.backupStart}
+              onClick={() => {
+                this.close();
+                actionStartPhotoBackup();
+              }}
+            >
+              {this.t('Back up now')}
+            </M3Button>
+          ) : (
+            // nothing to press yet: say what is missing, readable on the card
+            <span className={classes.backupHint} role="status">
+              <MaterialSymbol name="usb" size={18} />
+              {this.t('Connect the phone to start')}
+            </span>
+          )}
         </div>
       </section>
     );

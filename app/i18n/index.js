@@ -106,6 +106,7 @@ const italian = {
   'Change folder': 'Cambia cartella',
   'Back up now': 'Avvia il backup',
   'How it works': 'Come funziona',
+  'Connect the phone to start': 'Collega il telefono per iniziare',
   'Interface size': 'Dimensione dell’interfaccia',
   'Makes icons and text larger or smaller throughout the app.':
     'Ingrandisce o rimpicciolisce icone e testo in tutta l’app.',

@@ -142,12 +142,14 @@ export const styles = (theme) => {
       alignItems: 'center',
       gap: 16,
     },
+    // the card's content colour as the fill: strong contrast on the card
+    // in both themes (primary is too close to the container in dark)
     backupShape: {
       flexShrink: 0,
-      color: m3.primary,
+      color: m3.onPrimaryContainer,
     },
     backupIcon: {
-      color: m3.onPrimary,
+      color: m3.primaryContainer,
     },
     backupTitle: {
       ...m3Type.titleLarge,
@@ -178,7 +180,7 @@ export const styles = (theme) => {
       transition: `border-radius ${m3Motion.fastSpatial}, background-color ${m3Motion.fastEffects}`,
       '&:hover': { backgroundColor: alphaHex(m3.onPrimaryContainer, 0.16) },
       '&:active': { borderRadius: m3Shape.extraSmall },
-      '&:disabled': { opacity: 0.5, cursor: 'default' },
+      '&:disabled': { opacity: 0.6, cursor: 'default' },
       '&:focus-visible': { boxShadow: `0 0 0 3px ${m3.secondary}` },
     },
     // long names wrap, never cut
@@ -194,6 +196,28 @@ export const styles = (theme) => {
       flexWrap: 'wrap',
       gap: 8,
       marginTop: 16,
+    },
+    // the standard disabled colours (on-surface at 10%/38%) vanish on the
+    // bright card: disabled here uses the card's own content colour
+    backupStart: {
+      backgroundColor: `${m3.onPrimaryContainer} !important`,
+      color: `${m3.primaryContainer} !important`,
+      '&:disabled': {
+        backgroundColor: `${alphaHex(m3.onPrimaryContainer, 0.12)} !important`,
+        color: `${alphaHex(m3.onPrimaryContainer, 0.6)} !important`,
+      },
+    },
+    backupHint: {
+      ...m3Type.labelLarge,
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 6,
+      minHeight: 40,
+      padding: '0 16px 0 12px',
+      boxSizing: 'border-box',
+      borderRadius: 20,
+      boxShadow: `inset 0 0 0 1px ${alphaHex(m3.onPrimaryContainer, 0.4)}`,
+      color: m3.onPrimaryContainer,
     },
     backupHelp: {
       marginLeft: -12,

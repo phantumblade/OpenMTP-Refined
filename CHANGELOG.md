@@ -86,6 +86,10 @@ Version 4.0.0 is the first release of the fork with its own version number.
   make room, then springs back.
 - Settings use two columns in a wide window (app colour next to colour
   style, theme next to menu style, hidden files next to grid view).
+- The photo backup card was hard to read in dark themes: without a phone
+  it showed a disabled button that vanished on the bright card; it now says
+  "Connect the phone to start" in the card's own text colour, and the start
+  button and icon use that colour as their fill in both themes.
 - Select menus (language, font) really animate now: their opening
   keyframes came out empty, so they popped in.
 - Going back with the path bar now plays the same entrance of the files as
