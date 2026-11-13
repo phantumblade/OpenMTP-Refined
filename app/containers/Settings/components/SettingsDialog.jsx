@@ -564,7 +564,7 @@ export default class SettingsDialog extends PureComponent {
                           value: APP_MENU_STYLE_TYPE.vibrant,
                           title: t('Vibrant'),
                           description: t(
-                            'In a bright accent that goes with the app colour, so it stands out.'
+                            'In the app colour, so it stands out.'
                           ),
                         })}
                       </RadioGroup>

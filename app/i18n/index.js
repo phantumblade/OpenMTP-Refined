@@ -299,8 +299,8 @@ const italian = {
     'I colori del menu che si apre con il clic destro.',
   'Neutral, like the rest of the window.':
     'Neutro, come il resto della finestra.',
-  'In a bright accent that goes with the app colour, so it stands out.':
-    'In un accento acceso abbinato al colore dell’app, per farlo risaltare.',
+  'In the app colour, so it stands out.':
+    'Nel colore dell’app, per farlo risaltare.',
   'Phone connection': 'Connessione al telefono',
   'How OpenMTP talks to Android phones over USB.':
     'Come OpenMTP comunica con i telefoni Android via USB.',

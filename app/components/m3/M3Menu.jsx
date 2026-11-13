@@ -15,10 +15,10 @@ import {
 // MenuDefaults): each group is its own surface, 2dp apart, with 16dp outer
 // and 8dp inner corners; 44dp items with a 20dp leading icon, a bodyLarge
 // label and the keyboard shortcut as trailing text; the selected item uses
-// the tertiary container. One drop shadow follows the outline of all the
+// the primary container (the app colour). One drop shadow follows the outline of all the
 // groups, so the gaps read as cuts in a single menu rather than as boxes.
 // colorStyle picks the MenuDefaults colors: 'standard' (surface container
-// low) or 'vibrant' (tertiary container, selected item in tertiary).
+// low) or 'vibrant' (primary container, selected item in primary).
 
 const EMPHASIZED_DECELERATE = 'cubic-bezier(0.05, 0.7, 0.1, 1)';
 
@@ -109,11 +109,11 @@ const styles = (theme) => {
     },
     itemSelected: {
       borderRadius: m3Shape.medium,
-      backgroundColor: m3.tertiaryContainer,
-      color: m3.onTertiaryContainer,
-      '& $icon, & $shortcut': { color: m3.onTertiaryContainer },
+      backgroundColor: m3.primaryContainer,
+      color: m3.onPrimaryContainer,
+      '& $icon, & $shortcut': { color: m3.onPrimaryContainer },
       '&:hover, &:focus-visible': {
-        backgroundColor: m3.tertiaryContainer,
+        backgroundColor: m3.primaryContainer,
       },
     },
     icon: {
@@ -131,27 +131,29 @@ const styles = (theme) => {
       color: m3.onSurfaceVariant,
       letterSpacing: '0.04em',
     },
+    // vibrant: the whole menu in the app colour (primary container), the
+    // selected item in primary
     vibrant: {
-      '& $group': { backgroundColor: m3.tertiaryContainer },
+      '& $group': { backgroundColor: m3.primaryContainer },
       '& $item': {
-        color: m3.onTertiaryContainer,
+        color: m3.onPrimaryContainer,
         '&:hover, &:focus-visible': {
-          backgroundColor: alphaHex(m3.onTertiaryContainer, m3State.hover),
+          backgroundColor: alphaHex(m3.onPrimaryContainer, m3State.hover),
         },
         '&:active': {
-          backgroundColor: alphaHex(m3.onTertiaryContainer, m3State.pressed),
+          backgroundColor: alphaHex(m3.onPrimaryContainer, m3State.pressed),
         },
         '&:focus-visible': {
-          boxShadow: `inset 0 0 0 2px ${m3.onTertiaryContainer}`,
+          boxShadow: `inset 0 0 0 2px ${m3.onPrimaryContainer}`,
         },
         '&:disabled': { backgroundColor: 'transparent' },
       },
-      '& $icon, & $shortcut': { color: m3.onTertiaryContainer },
+      '& $icon, & $shortcut': { color: m3.onPrimaryContainer },
       '& $itemSelected': {
-        backgroundColor: m3.tertiary,
-        color: m3.onTertiary,
-        '& $icon, & $shortcut': { color: m3.onTertiary },
-        '&:hover, &:focus-visible': { backgroundColor: m3.tertiary },
+        backgroundColor: m3.primary,
+        color: m3.onPrimary,
+        '& $icon, & $shortcut': { color: m3.onPrimary },
+        '&:hover, &:focus-visible': { backgroundColor: m3.primary },
       },
     },
   };

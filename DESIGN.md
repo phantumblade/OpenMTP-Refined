@@ -35,8 +35,8 @@ colours, radii or easings.
 - Role usage: `surface` for panes; `surfaceContainer*` for bars, groups and
   rows; `primary` for the active choice; `primaryContainer` for the connected
   device and running work; `secondaryContainer` for selection;
-  `tertiaryContainer` for favourites, the selected menu item and the backup
-  card; `errorContainer` for problems.
+  `tertiaryContainer` for favourites and the backup card; `primaryContainer`
+  for the selected menu item and the whole vibrant menu (the app colour); `errorContainer` for problems.
 - Never pair a text role with a container that isn't its own.
 
 ## Typography

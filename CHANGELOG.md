@@ -56,9 +56,9 @@ Version 4.0.0 is the first release of the fork with its own version number.
 
 ### Fixed
 
-- Every app colour now colours the whole interface: dialog buttons, select
-  menus and the vibrant right-click menu no longer turn blue with the warm
-  colours (each colour has its own matching accent).
+- Every app colour now colours the whole interface: dialog buttons, the
+  selected item of select menus and the vibrant right-click menu are in the
+  chosen colour instead of blue or the icon's orange.
 - A toggled toolbar button (multi-select) showed a filled square without its
   icon.
 - The bar under the pane toolbar that marked the focused pane is gone.

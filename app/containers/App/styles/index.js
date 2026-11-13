@@ -369,7 +369,7 @@ const m3ComponentOverrides = (m3) => ({
     label: { ...m3Type.bodyLarge, color: m3.onSurface },
   },
   // Material 3 Expressive menu (Compose SegmentedMenuTokens), same as the
-  // app's own M3Menu: large corners, 44dp items, tertiary selection. Select
+  // app's own M3Menu: large corners, 44dp items, selection in the app colour. Select
   // menus drop down below their field (props below) and unfold from the
   // top on the emphasized decelerate curve, like the right-click menu.
   MuiMenu: {
@@ -417,8 +417,8 @@ const m3ComponentOverrides = (m3) => ({
       },
       '&$selected, &$selected:hover, &$selected.Mui-focusVisible': {
         borderRadius: m3Shape.medium,
-        backgroundColor: m3.tertiaryContainer,
-        color: m3.onTertiaryContainer,
+        backgroundColor: m3.primaryContainer,
+        color: m3.onPrimaryContainer,
       },
     },
   },
