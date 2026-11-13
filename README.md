@@ -20,7 +20,7 @@ wrong.
 
 <p align="center">
   <a href="https://github.com/phantumblade/OpenMTP-Refined/releases/latest">
-    <img src="https://img.shields.io/badge/Download%20for%20Mac-OpenMTP%20Refined%204.0-1e6cf5?style=for-the-badge&logo=apple" alt="Download OpenMTP Refined for Mac">
+    <img src="https://img.shields.io/badge/Download%20for%20Mac-OpenMTP%20Refined%204.1-1e6cf5?style=for-the-badge&logo=apple" alt="Download OpenMTP Refined for Mac">
   </a>
 </p>
 
@@ -41,6 +41,23 @@ wrong.
 ![Dark theme](docs/images/readme/dual-pane-dark.png)
 
 > Screenshots use a demo account and demo file names.
+
+## What's new in 4.1
+
+- **Photo backup in one click** — copies to a Mac folder the phone's new photos
+  and videos (DCIM), keeping its sub-folders; what's already on the Mac is
+  skipped and never overwritten. "How it works" explains it in four steps.
+- **Transfers panel** — the copy in progress, the files ready to paste and the
+  history of past copies, grouped by day.
+- **Copies in the background** — a long copy shrinks into a floating pill, and
+  macOS tells you when it ends.
+- **Your app colour** — seven colours or the macOS accent colour, followed by
+  the whole app.
+- **Material 3 Expressive, all the way** — Google Sans Flex, livelier colours,
+  spring motion, a new toolbar with the device and its free space.
+- **Interface size** — from 80% to 130%, or fitted to the screen.
+- **Automatic updates** — from 4.1 on, OpenMTP finds new versions on its own
+  (at launch and every 6 hours), verifies them and asks to install them.
 
 ## What's new in 4.0
 
@@ -67,7 +84,7 @@ See the full list in the [CHANGELOG](CHANGELOG.md).
 **Requirements:** a Mac with Apple Silicon (M1 or newer). Developed and tested
 on macOS 26 Tahoe.
 
-1. Download **`OpenMTP-Refined-4.0.0-arm64.dmg`** from the
+1. Download **`OpenMTP-Refined-4.1.0-arm64.dmg`** from the
    [latest release](https://github.com/phantumblade/OpenMTP-Refined/releases/latest).
 2. Open the DMG and drag **OpenMTP** into **Applications**.
 3. Open OpenMTP from Applications. The first time, macOS shows a warning,
@@ -176,6 +193,25 @@ originale e rinnova tutto il resto: nuova interfaccia Material 3 Expressive,
 connessione al telefono molto più affidabile e spiegazioni chiare quando
 qualcosa non va.
 
+### Novità della 4.1
+
+- **Backup delle foto in un clic**: copia in una cartella del Mac le foto e i
+  video nuovi del telefono (DCIM), con le stesse sottocartelle; quello che è
+  già sul Mac viene saltato e mai sovrascritto. "Come funziona" lo spiega in
+  quattro passi.
+- **Pannello Trasferimenti**: la copia in corso, i file pronti da incollare e la
+  cronologia delle copie, divisa per giorno.
+- **Copie in background**: una copia lunga si riduce a una pillola mobile e
+  macOS ti avvisa quando finisce.
+- **Il colore che vuoi**: sette colori o il colore di macOS, seguito da tutta
+  l'app.
+- **Material 3 Expressive fino in fondo**: Google Sans Flex, colori più vivi,
+  movimenti a molla, una nuova barra con il dispositivo e lo spazio libero.
+- **Dimensione dell'interfaccia**: dall'80% al 130%, oppure adattata allo
+  schermo.
+- **Aggiornamenti automatici**: dalla 4.1 OpenMTP trova da solo le nuove
+  versioni (all'avvio e ogni 6 ore), le verifica e chiede di installarle.
+
 ### Novità della 4.0
 
 - **Design Material 3 Expressive**: sistema colori Google con tema chiaro e
@@ -200,7 +236,7 @@ qualcosa non va.
 **Requisiti:** Mac con Apple Silicon (M1 o successivo). Sviluppata e provata su
 macOS 26 Tahoe.
 
-1. Scarica **`OpenMTP-Refined-4.0.0-arm64.dmg`** dall'
+1. Scarica **`OpenMTP-Refined-4.1.0-arm64.dmg`** dall'
    [ultima release](https://github.com/phantumblade/OpenMTP-Refined/releases/latest).
 2. Apri il DMG e trascina **OpenMTP** nella cartella **Applicazioni**.
 3. Apri OpenMTP da Applicazioni. La prima volta macOS mostra un avviso, perché
