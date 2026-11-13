@@ -5,6 +5,15 @@ All notable changes to this fork will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Version 4.0.0 is the first release of the fork with its own version number.
 
+## Unreleased
+
+### Added
+
+- A new version shows inside the app: a badge on the menu button, like
+  Android's notification badges ("1" when the update is waiting, a dot
+  while it downloads), and at the bottom of the side menu a card with the
+  version, the download progress, "What's new" and "Install and Relaunch".
+
 ## 4.1.0 — 2026-11-13
 
 ### Added

@@ -20,4 +20,13 @@ export class IpcEvents {
   // sent once the new language is saved, so the main process can translate
   // the app menu again
   static APP_LANGUAGE_CHANGED = 'ipc.settings.appLanguageChanged';
+
+  // the state of the app update, for the badge and the card in the side
+  // menu: { state: idle | available | downloading | ready, version, percent }
+  static APP_UPDATE_STATUS = 'ipc.appUpdate.status';
+
+  static APP_UPDATE_STATUS_GET = 'ipc.appUpdate.status.get';
+
+  // the user asked to update from the side menu
+  static APP_UPDATE_INSTALL = 'ipc.appUpdate.install';
 }

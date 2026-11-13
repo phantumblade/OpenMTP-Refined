@@ -13,6 +13,7 @@ import {
 const COMPACT_SPACE = '@media (max-width: 1400px)';
 const COMPACT_NAME = '@media (max-width: 1200px)';
 const COMPACT_TOOLBAR = '@media (max-width: 1000px)';
+const BADGE_SPRING = 'cubic-bezier(0.42, 1.67, 0.21, 0.9)';
 
 export const styles = (theme) => {
   const { m3 } = theme.palette;
@@ -251,6 +252,56 @@ export const styles = (theme) => {
         outline: 'none !important',
         boxShadow: 'none !important',
       },
+    },
+    // M3 large badge (16dp, error colours) for a waiting app update; it
+    // pops in on the spatial spring. The small badge (6dp dot) marks a
+    // download in progress.
+    updateBadge: {
+      ...m3Type.labelSmall,
+      position: 'absolute',
+      top: 1,
+      right: 1,
+      display: 'grid',
+      placeItems: 'center',
+      minWidth: 16,
+      height: 16,
+      padding: '0 4px',
+      boxSizing: 'border-box',
+      borderRadius: 8,
+      backgroundColor: m3.error,
+      color: m3.onError,
+      fontSize: 11,
+      fontWeight: 700,
+      lineHeight: '16px',
+      fontVariantNumeric: 'tabular-nums',
+      boxShadow: `0 0 0 2px ${m3.surface}`,
+      pointerEvents: 'none',
+      animation: `$badgeIn 500ms ${BADGE_SPRING} both`,
+      '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+    },
+    updateDot: {
+      position: 'absolute',
+      top: 6,
+      right: 6,
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: m3.error,
+      pointerEvents: 'none',
+      animation: `$badgeIn 500ms ${BADGE_SPRING} both`,
+      '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+    },
+    '@keyframes badgeIn': {
+      from: { transform: 'scale(0)' },
+      to: { transform: 'none' },
+    },
+    srOnly: {
+      position: 'absolute',
+      width: 1,
+      height: 1,
+      overflow: 'hidden',
+      clip: 'rect(0 0 0 0)',
+      whiteSpace: 'nowrap',
     },
     // Thin, non-blocking progress bar under the pane toolbar.
     loadingBarSlot: {

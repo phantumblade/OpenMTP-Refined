@@ -106,6 +106,21 @@ const italian = {
   'Change folder': 'Cambia cartella',
   'Back up now': 'Avvia il backup',
   'How it works': 'Come funziona',
+  'OpenMTP {version} is available': 'È disponibile OpenMTP {version}',
+  'Downloading OpenMTP {version}': 'Sto scaricando OpenMTP {version}',
+  'OpenMTP {version} is ready': 'OpenMTP {version} è pronto',
+  'New version': 'Nuova versione',
+  "What's new": 'Novità',
+  'Update badge in the side menu':
+    'Avviso degli aggiornamenti nel menu laterale',
+  'Download progress': 'Avanzamento del download',
+  'It takes a few seconds: OpenMTP closes and opens again, up to date.':
+    'Bastano pochi secondi: OpenMTP si chiude e si riapre aggiornato.',
+  'New features and fixes are waiting for you.':
+    'Ti aspettano nuove funzioni e correzioni.',
+  Update: 'Aggiorna',
+  'A new version of OpenMTP is available':
+    'È disponibile una nuova versione di OpenMTP',
   'Connect the phone to start': 'Collega il telefono per iniziare',
   'Interface size': 'Dimensione dell’interfaccia',
   'Makes icons and text larger or smaller throughout the app.':

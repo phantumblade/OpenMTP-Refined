@@ -13,6 +13,7 @@ import { translate } from '../../../i18n';
 import { APP_NAME, APP_VERSION } from '../../../constants/meta';
 import { fileExistsSync } from '../../../helpers/fileOps';
 import GithubBadge from '../../../components/GithubBadge';
+import AppUpdateCard from './AppUpdateCard';
 import { imgsrc } from '../../../utils/imgsrc';
 import { FAVORITE_FOLDERS_MAX } from '../../../helpers/favoriteFolders';
 import { formatStorageSize, getDiskSpace } from '../../../helpers/diskSpace';
@@ -428,23 +429,28 @@ class SidebarAreaPaneLists extends PureComponent {
           </div>
         </div>
 
-        {/* Footer Block */}
-        <div className={styles.footerBlock}>
-          <img
-            className={styles.footerAppIcon}
-            src={imgsrc('app-icon.png')}
-            alt=""
-          />
-          <div className={styles.footerMeta}>
-            <span className={styles.footerAppName}>
-              {APP_NAME}
-              <span className={styles.footerVersion}>{`v${APP_VERSION}`}</span>
-            </span>
-            <span className={styles.footerAppSub}>
-              {isItalian ? 'Ottimizzato per macOS' : 'Crafted for macOS'}
-            </span>
+        {/* Footer: a waiting app update, then the app's own card */}
+        <div className={styles.footerArea}>
+          <AppUpdateCard appLanguage={appLanguage} />
+          <div className={styles.footerBlock}>
+            <img
+              className={styles.footerAppIcon}
+              src={imgsrc('app-icon.png')}
+              alt=""
+            />
+            <div className={styles.footerMeta}>
+              <span className={styles.footerAppName}>
+                {APP_NAME}
+                <span
+                  className={styles.footerVersion}
+                >{`v${APP_VERSION}`}</span>
+              </span>
+              <span className={styles.footerAppSub}>
+                {isItalian ? 'Ottimizzato per macOS' : 'Crafted for macOS'}
+              </span>
+            </div>
+            <GithubBadge appLanguage={appLanguage} />
           </div>
-          <GithubBadge appLanguage={appLanguage} />
         </div>
       </nav>
     );

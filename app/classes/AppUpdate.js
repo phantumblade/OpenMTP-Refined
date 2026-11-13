@@ -15,6 +15,7 @@ import {
 import { appUpdateAvailableWindow } from '../helpers/createWindows';
 import { UPDATER_STATUS } from '../enums/appUpdater';
 import { getRemoteWindow } from '../helpers/remoteWindowHelpers';
+import { IpcEvents } from '../services/ipc-events/IpcEventType';
 
 let progressbarWindow = null;
 let isFileTransferActiveFlag = false;
@@ -118,6 +119,22 @@ export default class AppUpdate {
 
     this.updateStatus = UPDATER_STATUS.inactive;
     this.disableAutoUpdateCheck = false;
+    // what the side menu shows (badge and update card)
+    this.publicStatus = { state: 'idle', version: null, percent: 0 };
+  }
+
+  publishStatus(patch) {
+    this.publicStatus = { ...this.publicStatus, ...patch };
+
+    try {
+      this.setMainWindow();
+      mainWindow?.webContents.send(
+        IpcEvents.APP_UPDATE_STATUS,
+        this.publicStatus
+      );
+    } catch (e) {
+      log.error(e, `AppUpdate -> publishStatus`);
+    }
   }
 
   init() {
@@ -126,12 +143,38 @@ export default class AppUpdate {
         return;
       }
 
+      ipcMain.handle(IpcEvents.APP_UPDATE_STATUS_GET, () => this.publicStatus);
+
+      // "Install and relaunch" in the side menu; when the update isn't
+      // downloaded yet, the usual check shows what's new and downloads it
+      ipcMain.on(IpcEvents.APP_UPDATE_INSTALL, () => {
+        if (this.autoUpdater.preparedUpdate) {
+          try {
+            this.autoUpdater.quitAndInstall();
+          } catch (e) {
+            log.error(e, `AppUpdate -> install from the side menu`);
+            dialog.showErrorBox(
+              tr('Update Error'),
+              e instanceof UpdateError ? e.message : `${e?.message || e}`
+            );
+          }
+
+          return;
+        }
+
+        this.forceCheck();
+      });
+
       this.autoUpdater.on('error', (error) => {
         if (progressbarWindow !== null) {
           progressbarWindow.close();
         }
 
         this.closeActiveUpdates();
+
+        if (this.publicStatus.state === 'downloading') {
+          this.publishStatus({ state: 'available', percent: 0 });
+        }
 
         // a failed check at launch (offline, GitHub busy...) is retried next
         // time; it must not interrupt the user with a dialog
@@ -176,6 +219,15 @@ export default class AppUpdate {
         ) {
           progressbarWindow.close();
         }
+
+        this.publishStatus({
+          state:
+            this.backgroundDownload && !this.interactive
+              ? 'downloading'
+              : 'available',
+          version: info?.version || null,
+          percent: 0,
+        });
 
         // the automatic check at launch downloads in the background and asks
         // only once the update is ready; a manual check shows what's new first
@@ -224,6 +276,11 @@ export default class AppUpdate {
       });
 
       this.autoUpdater.on('download-progress', (progress) => {
+        this.publishStatus({
+          state: 'downloading',
+          percent: Math.round(progress?.percent || 0),
+        });
+
         if (progressbarWindow === null) {
           return null;
         }
@@ -232,6 +289,7 @@ export default class AppUpdate {
       });
 
       this.autoUpdater.on('update-downloaded', ({ version }) => {
+        this.publishStatus({ state: 'ready', version, percent: 100 });
         this.closeActiveUpdates();
         if (progressbarWindow !== null) {
           progressbarWindow.close();

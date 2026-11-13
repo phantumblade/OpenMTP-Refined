@@ -57,6 +57,7 @@ export const WHATS_NEW = {
     { icon: 'summarize', title: 'Summary at the end of a copy' },
     { icon: 'donut_large', title: 'Free space next to the device' },
     { icon: 'format_size', title: 'Adjustable interface size' },
+    { icon: 'notifications', title: 'Update badge in the side menu' },
     { icon: 'view_column', title: 'Two-column Settings' },
     { icon: 'ads_click', title: 'Panels close with a click outside' },
   ],

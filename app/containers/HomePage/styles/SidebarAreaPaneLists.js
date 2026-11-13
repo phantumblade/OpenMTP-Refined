@@ -271,8 +271,11 @@ export const styles = (theme) => {
       backgroundColor: m3.outlineVariant,
     },
     // M3 filled card holding the app identity and the GitHub link
+    footerArea: {
+      marginTop: 'auto',
+    },
     footerBlock: {
-      margin: 'auto 12px 12px',
+      margin: '0 12px 12px',
       padding: '10px 6px 10px 12px',
       display: 'flex',
       alignItems: 'center',

@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, useEffect, useState } from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Drawer from '@material-ui/core/Drawer';
@@ -11,6 +11,11 @@ import {
   faTerminal,
 } from '@fortawesome/free-solid-svg-icons';
 import SidebarAreaPaneLists from './SidebarAreaPaneLists';
+import {
+  getAppUpdateStatus,
+  hasAppUpdateNews,
+  subscribeToAppUpdateStatus,
+} from '../../../helpers/appUpdateStatus';
 import {
   Confirm as ConfirmDialog,
   Selection as SelectionDialog,
@@ -29,6 +34,29 @@ import { formatStorageSize, getDiskSpace } from '../../../helpers/diskSpace';
 import { getSelectedStorage } from '../actions';
 
 // Free space as a small ring: the filled arc is the used share.
+// Android-style badge on the menu button: "1" when a new version of the app
+// is waiting in the side menu, a small dot while it downloads.
+function UpdateBadge({ styles, label }) {
+  const [update, setUpdate] = useState(getAppUpdateStatus);
+
+  useEffect(() => subscribeToAppUpdateStatus(setUpdate), []);
+
+  if (hasAppUpdateNews(update)) {
+    return (
+      <>
+        <span className={styles.updateBadge} aria-hidden="true">
+          1
+        </span>
+        <span className={styles.srOnly}>{label}</span>
+      </>
+    );
+  }
+
+  return update.state === 'downloading' ? (
+    <span className={styles.updateDot} aria-hidden="true" />
+  ) : null;
+}
+
 function StorageRing({ used, className }) {
   const radius = 7;
   const length = 2 * Math.PI * radius;
@@ -394,6 +422,10 @@ export default class ToolbarAreaPane extends PureComponent {
                 onClick={onToggleDrawer(true)}
               >
                 <AnimatedActionIcon name="menu" />
+                <UpdateBadge
+                  styles={styles}
+                  label={t('A new version of OpenMTP is available')}
+                />
               </IconButton>
             )}
 
