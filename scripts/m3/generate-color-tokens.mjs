@@ -121,6 +121,42 @@ const styles = Object.fromEntries(
     buildStyle(spec),
   ])
 );
+
+// Green, built like the other colours, comes out loud: unlike blue it can
+// be very saturated at light tones, and the schemes pick the most saturated
+// tone they can, so surfaces turn mint and the dark theme's primary lime.
+// Green therefore copies the brand blue role by role: blue's tone (so every
+// contrast pair stays exactly as tested) and blue's chroma, in green's own
+// hue for that role.
+const NEUTRAL_HUE_FALLBACK_CHROMA = 2;
+const likeBrandBlue = (accentTokens, blueTokens, fallbackHue) =>
+  Object.fromEntries(
+    Object.entries(accentTokens).map(([role, hex]) => {
+      const own = Hct.fromInt(argbFromHex(hex));
+      const blue = Hct.fromInt(argbFromHex(blueTokens[role]));
+      const hue =
+        own.chroma < NEUTRAL_HUE_FALLBACK_CHROMA ? fallbackHue : own.hue;
+
+      return [role, hexFromArgb(Hct.from(hue, blue.chroma, blue.tone).toInt())];
+    })
+  );
+const SOFTENED_ACCENTS = ['green'];
+
+SOFTENED_ACCENTS.forEach((name) => {
+  const fallbackHue = Hct.fromInt(argbFromHex(ACCENTS[name].seed)).hue;
+
+  Object.keys(SPEC_VERSIONS).forEach((style) => {
+    ['standard', 'highContrast'].forEach((contrast) => {
+      ['light', 'dark'].forEach((theme) => {
+        accents[name][style][contrast][theme] = likeBrandBlue(
+          accents[name][style][contrast][theme],
+          styles[style][contrast][theme],
+          fallbackHue
+        );
+      });
+    });
+  });
+});
 const format = (value) =>
   JSON.stringify(value, null, 2)
     .replace(/"([^"]+)":/g, '$1:')

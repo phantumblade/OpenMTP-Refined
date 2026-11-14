@@ -108,6 +108,9 @@ const italian = {
   'Back up now': 'Avvia il backup',
   'How it works': 'Come funziona',
   'A lighter Sort by bar': 'Barra Ordina per più leggera',
+  'A calmer green': 'Un verde più equilibrato',
+  'The green app colour is now as balanced as the blue one, in both the light and the dark theme.':
+    'Il colore verde dell’app ora è equilibrato come il blu, sia nel tema chiaro sia in quello scuro.',
   'Permissions that stay': 'Permessi che restano',
   'The folders and disks you allow stay allowed after an update: macOS no longer asks again each time.':
     'Le cartelle e i dischi che consenti restano consentiti dopo un aggiornamento: macOS non li richiede più ogni volta.',

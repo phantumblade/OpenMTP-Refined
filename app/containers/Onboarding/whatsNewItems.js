@@ -8,6 +8,16 @@ import semver from 'semver';
 // - description: shown when the item is the featured one or a card
 // - action: 'backupGuide' adds "How it works" (photo backup)
 export const WHATS_NEW_ITEMS = [
+  // 4.1.6
+  {
+    since: '4.1.6',
+    weight: 15,
+    icon: 'palette',
+    title: 'A calmer green',
+    chip: 'A calmer green',
+    description:
+      'The green app colour is now as balanced as the blue one, in both the light and the dark theme.',
+  },
   // 4.1.5
   {
     since: '4.1.5',

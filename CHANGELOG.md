@@ -7,6 +7,12 @@ Version 4.0.0 is the first release of the fork with its own version number.
 
 ## Unreleased
 
+### Changed
+
+- The green app colour is as calm as the blue one: it takes the blue
+  palette's tones and intensity, role by role, in its own green. No more
+  mint-tinted window in the light theme or lime buttons in the dark one.
+
 ### Fixed
 
 - "Like macOS" follows a new accent colour right away: OpenMTP listens to
