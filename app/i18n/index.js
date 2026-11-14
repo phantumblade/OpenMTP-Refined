@@ -106,6 +106,15 @@ const italian = {
   'Change folder': 'Cambia cartella',
   'Back up now': 'Avvia il backup',
   'How it works': 'Come funziona',
+  'Counters that filter': 'Contatori che filtrano',
+  'The bottom of each pane is now one row: where you are, and the counts of folders and files. Press a count to see only folders or only files.':
+    'La parte bassa di ogni pannello ora è una riga sola: dove ti trovi e quante cartelle e file ci sono. Premi un contatore per vedere solo le cartelle o solo i file.',
+  all: 'tutti',
+  'Show folders and files': 'Mostra cartelle e file',
+  'Show only folders': 'Mostra solo le cartelle',
+  'Show only files': 'Mostra solo i file',
+  Show: 'Mostra',
+  'Hidden folders': 'Cartelle nascoste nel percorso',
   'What’s new, made for you': 'Novità su misura',
   'What’s new made for you': 'Novità su misura',
   'This panel now shows only what changed since the version you had, laid out to fit: one card or a whole grid.':

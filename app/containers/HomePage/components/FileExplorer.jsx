@@ -2632,7 +2632,6 @@ class FileExplorer extends Component {
           onSearchResultOpen={this._handleSearchResultOpen}
           onPaste={this._handlePaste}
         />
-        ;
       </Fragment>
     );
   }

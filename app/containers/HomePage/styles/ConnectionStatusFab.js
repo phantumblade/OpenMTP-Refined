@@ -55,9 +55,10 @@ export const styles = (theme) => {
 
   return {
     // zero-height sticky strip at the bottom of the scrolling pane
+    // above the pane footer, which floats over the bottom of the files
     dock: {
       position: 'sticky',
-      bottom: 0,
+      bottom: 'var(--pane-footer-height, 0px)',
       zIndex: 5,
       display: 'flex',
       justifyContent: 'center',

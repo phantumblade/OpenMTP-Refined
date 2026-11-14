@@ -24,6 +24,7 @@ import {
   filterFileNodesByType,
   getFileTypeOptions,
 } from '../../../helpers/fileTypeFilter';
+import { FILE_KIND_FILTER } from '../../../helpers/fileKindFilter';
 
 class FileExplorerBodyRender extends PureComponent {
   constructor(props) {
@@ -38,7 +39,10 @@ class FileExplorerBodyRender extends PureComponent {
     this.state = {
       dateFilter: { ...EMPTY_FILE_DATE_FILTER },
       fileTypeFilter: [],
+      // the counters in the footer: 'all', 'dirs' or 'files'
+      kindFilter: FILE_KIND_FILTER.all,
     };
+    this.kindFilteredCache = null;
     this.filteredNodesCache = null;
   }
 
@@ -49,6 +53,21 @@ class FileExplorerBodyRender extends PureComponent {
     this.fileExplorerBodyWrapper = document.getElementById(
       this.fileExplorerBodyWrapperId
     );
+  }
+
+  componentDidUpdate(prevProps) {
+    const { currentBrowsePath, deviceType } = this.props;
+    const { kindFilter } = this.state;
+
+    // another folder starts with everything shown: with "files only" its
+    // sub-folders could not be opened
+    if (
+      kindFilter !== FILE_KIND_FILTER.all &&
+      prevProps.currentBrowsePath[deviceType] !== currentBrowsePath[deviceType]
+    ) {
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({ kindFilter: FILE_KIND_FILTER.all });
+    }
   }
 
   componentWillUnmount() {
@@ -215,7 +234,8 @@ class FileExplorerBodyRender extends PureComponent {
     };
   };
 
-  getFilteredNodes = (sourceNodes) => {
+  // what the date and type filters let through: the counters show these
+  getBaseFilteredNodes = (sourceNodes) => {
     const { directoryLists, deviceType } = this.props;
     const { dateFilter, fileTypeFilter } = this.state;
     const nodes = sourceNodes || directoryLists[deviceType].nodes;
@@ -246,6 +266,40 @@ class FileExplorerBodyRender extends PureComponent {
     return result;
   };
 
+  // and then only folders or only files, as chosen in the footer
+  getFilteredNodes = (sourceNodes) => {
+    const { kindFilter } = this.state;
+    const base = this.getBaseFilteredNodes(sourceNodes);
+
+    if (kindFilter === FILE_KIND_FILTER.all) {
+      return base;
+    }
+
+    if (
+      this.kindFilteredCache?.base === base &&
+      this.kindFilteredCache?.kindFilter === kindFilter
+    ) {
+      return this.kindFilteredCache.result;
+    }
+
+    const wantFolders = kindFilter === FILE_KIND_FILTER.dirs;
+    const result = base.filter(
+      (node) => Boolean(node.isFolder) === wantFolders
+    );
+
+    this.kindFilteredCache = { base, kindFilter, result };
+
+    return result;
+  };
+
+  handleKindFilterChange = (kindFilter) => {
+    const { kindFilter: current } = this.state;
+
+    if (kindFilter !== current) {
+      this.applyViewFilter({ kindFilter });
+    }
+  };
+
   getFilteredDirectoryList = (directoryList) => ({
     ...directoryList,
     nodes: this.getFilteredNodes(directoryList.nodes),
@@ -272,6 +326,7 @@ class FileExplorerBodyRender extends PureComponent {
     const { deviceType, onSelectAllClick } = this.props;
 
     this.filteredNodesCache = null;
+    this.kindFilteredCache = null;
     this.setState(nextFilterState, () => {
       // A hidden selection must never be transferred or deleted by surprise.
       onSelectAllClick(deviceType, { target: { checked: false } }, []);
@@ -429,7 +484,7 @@ class FileExplorerBodyRender extends PureComponent {
       ...parentProps
     } = this.props;
     const { directoryLists } = this.props;
-    const { dateFilter, fileTypeFilter } = this.state;
+    const { dateFilter, fileTypeFilter, kindFilter } = this.state;
     const filteredDirectoryLists = this.getFilteredDirectoryLists();
 
     const _eventTarget = 'tableWrapperTarget';
@@ -479,7 +534,6 @@ class FileExplorerBodyRender extends PureComponent {
           id={this.fileExplorerBodyWrapperId}
           className={classNames(styles.tableWrapper, {
             [`onHoverDropZone`]: onHoverDropZoneActivate(deviceType),
-            [`statusBarActive`]: isStatusBarEnabled,
           })}
           onContextMenu={(event) =>
             onContextMenuClick(event, {}, { ...this.tableData() }, _eventTarget)
@@ -509,7 +563,11 @@ class FileExplorerBodyRender extends PureComponent {
           currentBrowsePath={currentBrowsePath}
           onBreadcrumbPathClick={onBreadcrumbPathClick}
           isStatusBarEnabled={isStatusBarEnabled}
-          directoryLists={filteredDirectoryLists[deviceType]}
+          countedNodes={this.getBaseFilteredNodes(
+            directoryLists[deviceType].nodes
+          )}
+          kindFilter={kindFilter}
+          onKindFilterChange={this.handleKindFilterChange}
           fileTransferClipboard={fileTransferClipboard}
           fileTransferProgress={fileTransferProgress}
           mtpDevice={mtpDevice}

@@ -54,8 +54,13 @@ colours, radii or easings.
   groups; 16-28px for cards, sheets and dialogs.
 - Shape shows state: a pressed control gets squarer, a toggled icon button
   becomes a filled rounded square, a selected tile grows its corners.
-- Connected groups (toolbar pills, sort buttons, summary cells, history rows,
-  menu groups): 2px gaps, small inner corners, large outer corners. A
+- Connected groups (toolbar pills, sort buttons, footer counters, summary
+  cells, history rows, menu groups): 2px gaps, small inner corners, large
+  outer corners. Every connected button group comes from
+  `styles/m3/connectedButtonGroup.js`, so they all press the same way.
+- Bars that float over content (the pane footer) use a translucent surface
+  with a light backdrop blur instead of a divider line, and the content
+  keeps their room at its end. A
   pressed button in a connected group pinches its inner corners and widens
   while its neighbours make room (as in AnalogIA); the chosen one is fully
   round and shows the plain shape while pressed again.

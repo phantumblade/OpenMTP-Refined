@@ -7,7 +7,21 @@ Version 4.0.0 is the first release of the fork with its own version number.
 
 ## Unreleased
 
+### Added
+
+- The bottom of each pane is one row instead of two: the path in a field
+  with the device, the items ready to paste, and the counts of everything,
+  folders and files as a connected button group. Pressing a count shows
+  only the folders or only the files (another folder starts with everything
+  shown again). The row floats over the files on a lightly blurred surface,
+  with no dividing line; the list keeps its room so the last row is never
+  hidden. When the pane is narrow the row drops the labels, then puts the
+  middle folders behind "…" (a menu lists them), never cutting a name.
+
 ### Changed
+
+- "Sort by" and the new counters share one connected button group, so they
+  press exactly the same way.
 
 - The update card in the side menu shows "Install and Relaunch" across the
   card with "What's new" under it, instead of two buttons wrapping unevenly.

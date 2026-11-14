@@ -8,6 +8,16 @@ import semver from 'semver';
 // - description: shown when the item is the featured one or a card
 // - action: 'backupGuide' adds "How it works" (photo backup)
 export const WHATS_NEW_ITEMS = [
+  // 4.1.3
+  {
+    since: '4.1.3',
+    weight: 65,
+    icon: 'filter_alt',
+    title: 'Counters that filter',
+    chip: 'Counters that filter',
+    description:
+      'The bottom of each pane is now one row: where you are, and the counts of folders and files. Press a count to see only folders or only files.',
+  },
   // 4.1.2
   {
     since: '4.1.2',
