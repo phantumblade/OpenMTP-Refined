@@ -20,7 +20,9 @@
   overflow-x: visible !important;
   overflow-y: clip !important;
   line-height: 1.3 !important;
-  min-width: 0.5em;
+
+  /* no minimum width: a digit that goes away must shrink all the way, or
+     the number (and the button around it) jumps when it is removed */
 }
 
 .char-slot.is-resizing {

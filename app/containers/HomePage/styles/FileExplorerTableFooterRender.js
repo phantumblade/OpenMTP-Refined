@@ -215,11 +215,6 @@ export const styles = (theme) => {
       fontWeight: 600,
       opacity: 0.88,
     },
-    slot: {
-      display: 'inline-flex',
-      alignItems: 'center',
-      minWidth: '0.6em',
-    },
 
     // Steps the row takes, measured, until the path fits: the counters drop
     // their labels, the middle folders step behind "…", "Root" too, and as

@@ -5,6 +5,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import MaterialSymbol from '../../../components/m3/MaterialSymbol';
 import M3Menu from '../../../components/m3/M3Menu';
 import SlotText from '../../../components/SlotText';
+import AnimatedWidth from '../../../components/m3/AnimatedWidth';
 import { styles } from '../styles/FileExplorerTableFooterRender';
 import { DEVICE_TYPE } from '../../../enums';
 import { DEVICES_LABEL } from '../../../constants';
@@ -50,7 +51,7 @@ class FileExplorerTableFooterRender extends PureComponent {
     this.fit();
     // the rolling digits settle after a moment: measure again then
     clearTimeout(this.fitTimer);
-    this.fitTimer = setTimeout(this.fit, 450);
+    this.fitTimer = setTimeout(this.fit, 600);
 
     if (
       prevProps.currentBrowsePath[deviceType] !== currentBrowsePath[deviceType]
@@ -255,10 +256,12 @@ class FileExplorerTableFooterRender extends PureComponent {
       return (
         <span className={styles.clip}>
           <MaterialSymbol name="content_paste" size={18} />
-          <SlotText text={String(count)} />
-          <span className={styles.clipLabel}>
-            {t(count === 1 ? 'item ready' : 'items ready')}
-          </span>
+          <AnimatedWidth>
+            <SlotText text={String(count)} />
+            <span className={styles.clipLabel}>
+              &nbsp;{t(count === 1 ? 'item ready' : 'items ready')}
+            </span>
+          </AnimatedWidth>
         </span>
       );
     }
@@ -276,10 +279,13 @@ class FileExplorerTableFooterRender extends PureComponent {
         }}
       >
         <MaterialSymbol name="swap_horiz" size={18} />
-        <span className={styles.clipLabel}>
-          {t(transferActive ? 'Transfer in progress' : 'Transfer here')}
-        </span>
-        <SlotText text={String(count)} />
+        <AnimatedWidth>
+          <span className={styles.clipLabel}>
+            {t(transferActive ? 'Transfer in progress' : 'Transfer here')}
+            &nbsp;
+          </span>
+          <SlotText text={String(count)} />
+        </AnimatedWidth>
       </button>
     );
   }
@@ -341,10 +347,14 @@ class FileExplorerTableFooterRender extends PureComponent {
                     [styles.filterAllIcon]: kind === FILE_KIND_FILTER.all,
                   })}
                 />
-                <span className={styles.filterCount}>
-                  <SlotText text={String(counts[kind])} />
-                </span>
-                <span className={styles.filterLabel}>{label}</span>
+                <AnimatedWidth>
+                  <span className={styles.filterCount}>
+                    <SlotText text={String(counts[kind])} />
+                  </span>
+                  <span className={styles.filterLabel}>
+                    <SlotText text={label} />
+                  </span>
+                </AnimatedWidth>
               </button>
             </Tooltip>
           );

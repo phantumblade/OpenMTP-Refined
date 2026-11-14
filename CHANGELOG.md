@@ -22,6 +22,8 @@ Version 4.0.0 is the first release of the fork with its own version number.
 
 - "Sort by" and the new counters share one connected button group, so they
   press exactly the same way.
+- When a count gains or loses digits (opening a folder, going back up), its
+  button resizes smoothly instead of jumping; the items-ready chip does too.
 
 - The update card in the side menu shows "Install and Relaunch" across the
   card with "What's new" under it, instead of two buttons wrapping unevenly.
