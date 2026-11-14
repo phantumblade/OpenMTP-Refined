@@ -18,6 +18,15 @@ export const WHATS_NEW_ITEMS = [
     description:
       'The Sort by bar floats over the files on a soft blur, like the bar at the bottom of each pane.',
   },
+  {
+    since: '4.1.5',
+    weight: 40,
+    icon: 'verified_user',
+    title: 'Permissions that stay',
+    chip: 'Permissions that stay',
+    description:
+      'The folders and disks you allow stay allowed after an update: macOS no longer asks again each time.',
+  },
   // 4.1.4
   {
     since: '4.1.4',

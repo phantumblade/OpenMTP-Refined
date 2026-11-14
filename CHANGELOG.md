@@ -13,6 +13,13 @@ Version 4.0.0 is the first release of the fork with its own version number.
   files on the same progressive blur as the pane footer, fading out
   downwards.
 
+### Fixed
+
+- Updates keep the folders and disks you allowed: releases are now signed
+  with the fork's own certificate instead of an ad-hoc signature, so macOS
+  recognises every version as the same app. (The first update after this
+  change asks once more; later ones don't.)
+
 ## 4.1.4 — 2026-11-14
 
 ### Added

@@ -108,6 +108,9 @@ const italian = {
   'Back up now': 'Avvia il backup',
   'How it works': 'Come funziona',
   'A lighter Sort by bar': 'Barra Ordina per più leggera',
+  'Permissions that stay': 'Permessi che restano',
+  'The folders and disks you allow stay allowed after an update: macOS no longer asks again each time.':
+    'Le cartelle e i dischi che consenti restano consentiti dopo un aggiornamento: macOS non li richiede più ogni volta.',
   'The Sort by bar floats over the files on a soft blur, like the bar at the bottom of each pane.':
     'La barra Ordina per galleggia sopra i file con una sfocatura leggera, come la barra in fondo a ogni pannello.',
   'Every drive in the side menu': 'Tutti i dischi nel menu laterale',

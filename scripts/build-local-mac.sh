@@ -15,8 +15,24 @@ export ELECTRON_NOTARIZE=NO
 yarn build-no-verify
 npx electron-builder --config electron-builder-config.js build --mac --dir --publish never
 
-codesign --force --deep --sign - --entitlements ./build/entitlements.mac.plist "$APP"
+# Sign with the fork's own certificate ("OpenMTP Refined", self-signed, in
+# the login keychain of the Mac that builds the releases). macOS remembers
+# the folders and disks a user allowed by the app's designated requirement:
+# with this certificate it is the bundle id plus the certificate, the same
+# for every version, so updates keep those permissions. An ad-hoc signature
+# ties them to the build's hash instead, and every update asks again.
+# Without the certificate (another Mac), the build falls back to ad-hoc.
+SIGN_IDENTITY="${OPENMTP_SIGN_IDENTITY:-OpenMTP Refined}"
+if security find-identity -p codesigning | grep -q "\"$SIGN_IDENTITY\""; then
+  codesign --force --deep --sign "$SIGN_IDENTITY" \
+    --entitlements ./build/entitlements.mac.plist "$APP"
+else
+  echo "warning: signing identity \"$SIGN_IDENTITY\" not found, signing ad-hoc" \
+    "(permissions will be asked again after each update)" >&2
+  codesign --force --deep --sign - --entitlements ./build/entitlements.mac.plist "$APP"
+fi
 codesign --verify --deep --strict "$APP"
+codesign -d -r- "$APP" 2>&1 | grep designated
 
 # macOS 26 draws bundle icons that don't fill the standard squircle (like our
 # tilted one) inside a grey container, but leaves Finder custom icons alone.
