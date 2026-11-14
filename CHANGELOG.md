@@ -5,6 +5,14 @@ All notable changes to this fork will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Version 4.0.0 is the first release of the fork with its own version number.
 
+## Unreleased
+
+### Changed
+
+- The "Sort by" bar has no band of its own any more: it floats over the
+  files on the same progressive blur as the pane footer, fading out
+  downwards.
+
 ## 4.1.4 — 2026-11-14
 
 ### Added

@@ -107,6 +107,9 @@ const italian = {
   'Change folder': 'Cambia cartella',
   'Back up now': 'Avvia il backup',
   'How it works': 'Come funziona',
+  'A lighter Sort by bar': 'Barra Ordina per più leggera',
+  'The Sort by bar floats over the files on a soft blur, like the bar at the bottom of each pane.':
+    'La barra Ordina per galleggia sopra i file con una sfocatura leggera, come la barra in fondo a ogni pannello.',
   'Every drive in the side menu': 'Tutti i dischi nel menu laterale',
   'Updates in the OpenMTP menu': 'Aggiornamenti nel menu di OpenMTP',
   'When a new version is ready, the OpenMTP menu in the menu bar says so and installs it with one click.':

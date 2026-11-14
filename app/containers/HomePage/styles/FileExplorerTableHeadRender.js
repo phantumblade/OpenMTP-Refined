@@ -1,5 +1,6 @@
 import { m3Type } from '../../../styles/m3/tokens';
 import { connectedButtonGroup } from '../../../styles/m3/connectedButtonGroup';
+import { progressiveBlur } from '../../../styles/m3/progressiveBlur';
 
 // "Sort by" as a Material 3 Expressive connected button group; the press
 // (pinch, widen, spring back) is shared with the other connected groups.
@@ -10,12 +11,16 @@ export const styles = (theme) => {
   const { m3 } = theme.palette;
 
   return {
+    // no band of its own: the bar floats over the files on a progressive
+    // blur that fades out downwards, like the pane footer does upwards
     tableHeadCell: {
       border: `unset`,
-      backgroundColor: theme.palette.tableHeaderFooterBgColor,
+      backgroundColor: 'transparent',
       position: 'sticky',
       top: 0,
       zIndex: 10,
+      isolation: 'isolate',
+      ...progressiveBlur(m3, { edge: 'top', fade: 24 }),
     },
     bar: {
       display: 'flex',

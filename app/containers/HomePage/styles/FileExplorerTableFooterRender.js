@@ -6,6 +6,7 @@ import {
   m3Type,
 } from '../../../styles/m3/tokens';
 import { connectedButtonGroup } from '../../../styles/m3/connectedButtonGroup';
+import { progressiveBlur } from '../../../styles/m3/progressiveBlur';
 
 // The pane footer: one row floating over the bottom of the files, on a
 // lightly blurred translucent surface (the files show through, blurred,
@@ -18,13 +19,6 @@ const FADE = 32;
 
 // room the scroll area keeps under its last row: the row and its fade
 export const PANE_FOOTER_SPACE = PANE_FOOTER_HEIGHT + FADE;
-
-// a band that is fully applied at the bottom and fades to nothing at the top
-const fadeMask = (solidFrom) => {
-  const mask = `linear-gradient(to top, #000 0%, #000 ${solidFrom}%, transparent 100%)`;
-
-  return { maskImage: mask, WebkitMaskImage: mask };
-};
 
 export const styles = (theme) => {
   const { m3 } = theme.palette;
@@ -44,32 +38,8 @@ export const styles = (theme) => {
       boxSizing: 'border-box',
       isolation: 'isolate',
       color: m3.onSurface,
-      // Progressive blur: two blurred layers reaching above the row, each
-      // fading out towards the top, so the files go from sharp to softly
-      // blurred with no edge. The lighter one reaches higher; the stronger
-      // one, with the tint, sits behind the row.
-      '&::before, &::after': {
-        content: '""',
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: -1,
-        pointerEvents: 'none',
-      },
-      '&::before': {
-        top: -FADE,
-        backdropFilter: 'blur(2px)',
-        WebkitBackdropFilter: 'blur(2px)',
-        ...fadeMask(40),
-      },
-      '&::after': {
-        top: -FADE / 2,
-        backdropFilter: 'blur(7px) saturate(1.3)',
-        WebkitBackdropFilter: 'blur(7px) saturate(1.3)',
-        backgroundColor: alphaHex(m3.surfaceContainerLow, 0.62),
-        ...fadeMask(55),
-      },
+      // progressive blur behind the row, fading out towards the top
+      ...progressiveBlur(m3, { edge: 'bottom', fade: FADE }),
     },
 
     // path field: the device, then the folders down to the current one

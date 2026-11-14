@@ -8,6 +8,16 @@ import semver from 'semver';
 // - description: shown when the item is the featured one or a card
 // - action: 'backupGuide' adds "How it works" (photo backup)
 export const WHATS_NEW_ITEMS = [
+  // 4.1.5
+  {
+    since: '4.1.5',
+    weight: 15,
+    icon: 'blur_on',
+    title: 'A lighter Sort by bar',
+    chip: 'A lighter Sort by bar',
+    description:
+      'The Sort by bar floats over the files on a soft blur, like the bar at the bottom of each pane.',
+  },
   // 4.1.4
   {
     since: '4.1.4',
