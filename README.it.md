@@ -43,14 +43,14 @@ OpenMTP Refined è un fork indipendente di [OpenMTP](https://github.com/ganeshrv
 
 ## In breve
 
-|                                 |                                                                                                                                     |
-| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| 📸 **Backup foto**              | Le foto e i video nuovi della fotocamera del telefono in una cartella del Mac, con un clic. Niente viene sovrascritto o cancellato. |
-| 🔁 **Pannello Trasferimenti**   | La copia in corso, i file pronti da incollare e la cronologia divisa per giorno. Le copie lunghe continuano in background.          |
-| 🎨 **Il colore che vuoi**       | Sette colori o il colore di macOS; tema chiaro e scuro; Google Sans Flex; movimenti a molla.                                        |
-| 🔔 **Aggiornamenti automatici** | Le nuove versioni vengono trovate, verificate e installate con un clic; un badge ti avvisa quando sono pronte.                      |
-| 🔌 **Connessione affidabile**   | OpenMTP libera il telefono dai servizi di macOS che lo occupano e spiega ogni problema con parole semplici.                         |
-| ⭐ **Strumenti di ogni giorno** | Cartelle preferite, filtri per data e tipo, menu del tasto destro a gruppi, dimensione dell'interfaccia regolabile.                 |
+|                                 |                                                                                                                                                                       |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 📸 **Backup foto**              | Le foto e i video nuovi della fotocamera del telefono in una cartella del Mac, con un clic. Niente viene sovrascritto o cancellato.                                   |
+| 🔁 **Pannello Trasferimenti**   | La copia in corso, i file pronti da incollare e la cronologia divisa per giorno. Le copie lunghe continuano in background.                                            |
+| 🎨 **Il colore che vuoi**       | Sette colori o il colore di macOS; tema chiaro e scuro; Google Sans Flex; movimenti a molla.                                                                          |
+| 🔔 **Aggiornamenti automatici** | Le nuove versioni vengono trovate, verificate e installate con un clic; un badge ti avvisa quando sono pronte.                                                        |
+| 🔌 **Connessione affidabile**   | OpenMTP libera il telefono dai servizi di macOS che lo occupano e spiega ogni problema con parole semplici.                                                           |
+| ⭐ **Strumenti di ogni giorno** | Cartelle preferite, filtri per data e tipo, contatori che mostrano solo cartelle o solo file, menu del tasto destro a gruppi, dimensione dell'interfaccia regolabile. |
 
 ## Backup delle foto in un clic
 

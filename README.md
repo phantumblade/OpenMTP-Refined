@@ -43,14 +43,14 @@ OpenMTP Refined is an independent fork of [OpenMTP](https://github.com/ganeshrve
 
 ## Highlights
 
-|                            |                                                                                                                  |
-| -------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| 📸 **Photo backup**        | New photos and videos from the phone's camera to a Mac folder, in one click. Nothing is overwritten or deleted.  |
-| 🔁 **Transfers panel**     | The copy in progress, files ready to paste and a history grouped by day. Long copies continue in the background. |
-| 🎨 **Your app colour**     | Seven colours or the macOS accent colour; light and dark themes; Google Sans Flex; spring motion.                |
-| 🔔 **Automatic updates**   | New versions are found, verified and installed with one click; a badge tells you when one is ready.              |
-| 🔌 **Reliable connection** | OpenMTP frees the phone from macOS services that grab it, and explains every problem in plain words.             |
-| ⭐ **Everyday tools**      | Favourite folders, filters by date and type, a grouped right-click menu, adjustable interface size.              |
+|                            |                                                                                                                                                    |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 📸 **Photo backup**        | New photos and videos from the phone's camera to a Mac folder, in one click. Nothing is overwritten or deleted.                                    |
+| 🔁 **Transfers panel**     | The copy in progress, files ready to paste and a history grouped by day. Long copies continue in the background.                                   |
+| 🎨 **Your app colour**     | Seven colours or the macOS accent colour; light and dark themes; Google Sans Flex; spring motion.                                                  |
+| 🔔 **Automatic updates**   | New versions are found, verified and installed with one click; a badge tells you when one is ready.                                                |
+| 🔌 **Reliable connection** | OpenMTP frees the phone from macOS services that grab it, and explains every problem in plain words.                                               |
+| ⭐ **Everyday tools**      | Favourite folders, filters by date and type, counters that show only folders or only files, a grouped right-click menu, adjustable interface size. |
 
 ## Photo backup in one click
 
