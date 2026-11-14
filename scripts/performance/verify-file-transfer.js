@@ -6,6 +6,7 @@ const {
   isTransferPhaseTerminal,
   isFatalMtpTransportError,
   normalizeTransferError,
+  progressUpdate,
   resetTransferProgress,
   transferStepStates,
 } = require('../../app/helpers/fileTransfer');
@@ -143,6 +144,24 @@ function main() {
   assert.strictEqual(resetState.clipboard.sessionId, sessionId);
   assert.strictEqual(resetState.progress.phase, FILE_TRANSFER_PHASE.idle);
   assert.strictEqual(resetState.progress.toggle, false);
+
+  // "Continue in the background" survives the progress updates that follow
+  // (the reducer merges each update into the current progress)
+  const minimizedProgress = {
+    toggle: true,
+    minimized: true,
+    phase: FILE_TRANSFER_PHASE.transferring,
+  };
+  const update = progressUpdate({
+    toggle: true,
+    minimized: false,
+    phase: FILE_TRANSFER_PHASE.transferring,
+    filesSent: 3,
+  });
+
+  assert.strictEqual('minimized' in update, false);
+  assert.strictEqual({ ...minimizedProgress, ...update }.minimized, true);
+  assert.strictEqual({ ...minimizedProgress, ...update }.filesSent, 3);
 
   // eslint-disable-next-line no-console
   console.info(

@@ -110,6 +110,7 @@ import {
   isTransferPhaseActive,
   isTransferPhaseTerminal,
   normalizeTransferError,
+  progressUpdate,
 } from '../../../helpers/fileTransfer';
 import { logTransferEvent } from '../../../helpers/fileTransferLogger';
 import { isSameUsbDevice } from '../../../helpers/deviceInfo';
@@ -3049,7 +3050,9 @@ const mapDispatchToProps = (dispatch, _) =>
 
               if (force || now - lastProgressDispatchAt >= 120) {
                 lastProgressDispatchAt = now;
-                dispatch(setFileTransferProgress(latestProgress));
+                dispatch(
+                  setFileTransferProgress(progressUpdate(latestProgress))
+                );
               }
             };
 

@@ -15,6 +15,8 @@ Version 4.0.0 is the first release of the fork with its own version number.
 
 ### Fixed
 
+- "Continue in the background" works again: the copy's progress updates no
+  longer bring its dialog back a moment later (copies and photo backup).
 - "Like macOS" follows a new accent colour right away: OpenMTP listens to
   every notification macOS may send for it, reads the colour again until it
   has really changed, and checks it when its window comes back to the

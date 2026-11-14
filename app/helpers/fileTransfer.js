@@ -123,6 +123,13 @@ export function transferStepStates(phase) {
   }));
 }
 
+// A running transfer's progress update, without the dialog's state: the
+// copy reports its progress several times a second, and carrying the
+// `minimized` it started with would bring the dialog back right after
+// "Continue in the background".
+export const progressUpdate = ({ minimized: _minimized, ...progress }) =>
+  progress;
+
 export function resetTransferProgress(fileTransfer) {
   return {
     ...fileTransfer,

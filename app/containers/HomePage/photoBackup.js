@@ -15,6 +15,7 @@ import {
   initialFileTransferProgress,
   isTransferPhaseActive,
   normalizeTransferError,
+  progressUpdate,
 } from '../../helpers/fileTransfer';
 import {
   PHOTO_BACKUP_SOURCE,
@@ -104,10 +105,14 @@ export function runPhotoBackup({ destinationRoot }) {
       latest = { ...latest, ...updates, lastActivityAt: now };
 
       if (force || now - lastDispatchAt >= 120) {
+        // the first one opens the dialog; later ones leave it as the user
+        // put it (in the background or not)
+        const payload = lastDispatchAt === 0 ? latest : progressUpdate(latest);
+
         lastDispatchAt = now;
         dispatch({
           type: actionTypes.SET_FILE_TRANSFER_PROGRESS,
-          payload: latest,
+          payload,
         });
       }
     };
