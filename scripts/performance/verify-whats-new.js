@@ -53,6 +53,12 @@ function main() {
   assert.strictEqual(next.count, 1);
   assert.strictEqual(next.featured.since, '4.1.2');
 
+  // from 4.1.2 to 4.1.3: the 4.1.3 change only
+  const latest = selectWhatsNew({ from: '4.1.2', to: '4.1.3' });
+
+  assert.strictEqual(latest.count, 1);
+  assert.strictEqual(latest.featured.since, '4.1.3');
+
   // first install: a welcome with the best of every version
   const welcome = selectWhatsNew({ from: null, to: '4.1.1' });
 
