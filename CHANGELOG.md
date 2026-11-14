@@ -13,8 +13,8 @@ Version 4.0.0 is the first release of the fork with its own version number.
   with the device, the items ready to paste, and the counts of everything,
   folders and files as a connected button group. Pressing a count shows
   only the folders or only the files (another folder starts with everything
-  shown again). The row floats over the files on a lightly blurred surface,
-  with no dividing line; the list keeps its room so the last row is never
+  shown again). The row floats over the files on a blur that fades in from
+  the top, with no edge or dividing line; the list keeps its room so the last row is never
   hidden. When the pane is narrow the row drops the labels, then puts the
   middle folders behind "…" (a menu lists them), never cutting a name.
 

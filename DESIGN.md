@@ -58,9 +58,10 @@ colours, radii or easings.
   cells, history rows, menu groups): 2px gaps, small inner corners, large
   outer corners. Every connected button group comes from
   `styles/m3/connectedButtonGroup.js`, so they all press the same way.
-- Bars that float over content (the pane footer) use a translucent surface
-  with a light backdrop blur instead of a divider line, and the content
-  keeps their room at its end. A
+- Bars that float over content (the pane footer) sit on a progressive blur
+  instead of a divider line: light, fading in from nothing at the top to
+  full behind the bar, never a hard edge. The content keeps the bar and
+  its fade as room at its end. A
   pressed button in a connected group pinches its inner corners and widens
   while its neighbours make room (as in AnalogIA); the chosen one is fully
   round and shows the plain shape while pressed again.
