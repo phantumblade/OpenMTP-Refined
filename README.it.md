@@ -151,7 +151,7 @@ Quando qualcosa non va ricevi un messaggio chiaro e cosa fare: il cavo, la modal
 
 **Requisiti:** Mac con Apple Silicon (M1 o successivo). Sviluppata e provata su macOS 26 Tahoe.
 
-1. Scarica **`OpenMTP-Refined-4.1.3-arm64.dmg`** dall'[ultima release](https://github.com/phantumblade/OpenMTP-Refined/releases/latest).
+1. Scarica **`OpenMTP-Refined-4.1.4-arm64.dmg`** dall'[ultima release](https://github.com/phantumblade/OpenMTP-Refined/releases/latest).
 2. Aprilo e trascina **OpenMTP** in **Applicazioni**.
 3. Apri OpenMTP. La prima volta macOS mostra un avviso: premi **Fine**.
 4. Apri **Impostazioni di Sistema → Privacy e sicurezza** e premi **Apri comunque** accanto al messaggio di OpenMTP.

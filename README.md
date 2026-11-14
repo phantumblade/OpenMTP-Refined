@@ -151,7 +151,7 @@ When something goes wrong you get a plain message and what to do next: cable, _F
 
 **Requirements:** a Mac with Apple Silicon (M1 or newer). Developed and tested on macOS 26 Tahoe.
 
-1. Download **`OpenMTP-Refined-4.1.3-arm64.dmg`** from the [latest release](https://github.com/phantumblade/OpenMTP-Refined/releases/latest).
+1. Download **`OpenMTP-Refined-4.1.4-arm64.dmg`** from the [latest release](https://github.com/phantumblade/OpenMTP-Refined/releases/latest).
 2. Open it and drag **OpenMTP** into **Applications**.
 3. Open OpenMTP. The first time macOS shows a warning: click **Done**.
 4. Open **System Settings → Privacy & Security** and click **Open Anyway** next to the OpenMTP message.
