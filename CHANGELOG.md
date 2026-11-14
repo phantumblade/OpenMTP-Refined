@@ -5,6 +5,15 @@ All notable changes to this fork will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Version 4.0.0 is the first release of the fork with its own version number.
 
+## Unreleased
+
+### Fixed
+
+- "Like macOS" follows a new accent colour right away: OpenMTP listens to
+  every notification macOS may send for it, reads the colour again until it
+  has really changed, and checks it when its window comes back to the
+  front.
+
 ## 4.1.5 — 2026-11-14
 
 ### Changed

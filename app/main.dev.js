@@ -139,17 +139,60 @@ async function installExtensions() {
 }
 
 // The app colour "Like macOS" follows the system accent colour: repaint when
-// it changes in System Settings.
+// it changes in System Settings. macOS announces the change with one of a
+// few distributed notifications (which one depends on the version), and
+// the new colour can reach this process a moment after the notification,
+// so the colour is read again a few times until it actually differs. It is
+// also checked when the window comes back to the front.
+const ACCENT_RECHECK_MS = [0, 150, 500, 1200, 2500];
+
 function followSystemAccentColor() {
-  try {
-    systemPreferences.subscribeNotification(
-      'AppleColorPreferencesChangedNotification',
-      () => {
-        mainWindow?.webContents?.send('nativeThemeUpdated', {
-          shouldUseDarkColors: nativeTheme.shouldUseDarkColors,
-        });
-      }
+  let lastAccent = null;
+  let timers = [];
+
+  const readAccent = () => {
+    try {
+      return systemPreferences.getAccentColor();
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const repaintIfChanged = () => {
+    const accent = readAccent();
+
+    if (!accent || accent === lastAccent) {
+      return false;
+    }
+
+    lastAccent = accent;
+    mainWindow?.webContents?.send('nativeThemeUpdated', {
+      shouldUseDarkColors: nativeTheme.shouldUseDarkColors,
+    });
+
+    return true;
+  };
+
+  const recheck = () => {
+    timers.forEach(clearTimeout);
+    timers = ACCENT_RECHECK_MS.map((delay) =>
+      setTimeout(repaintIfChanged, delay)
     );
+  };
+
+  lastAccent = readAccent();
+
+  try {
+    [
+      'AppleColorPreferencesChangedNotification',
+      'AppleAquaColorVariantChanged',
+      'AppleInterfaceThemeChangedNotification',
+    ].forEach((name) => systemPreferences.subscribeNotification(name, recheck));
+    systemPreferences.subscribeLocalNotification(
+      'NSSystemColorsDidChangeNotification',
+      recheck
+    );
+    app.on('browser-window-focus', recheck);
   } catch (e) {
     log.error(e, `main.dev -> followSystemAccentColor`);
   }
