@@ -121,10 +121,31 @@ export default class AppUpdate {
     this.disableAutoUpdateCheck = false;
     // what the side menu shows (badge and update card)
     this.publicStatus = { state: 'idle', version: null, percent: 0 };
+    // told when the state or the version changes (the app menu)
+    this.statusListeners = [];
+  }
+
+  onStatusChange(listener) {
+    this.statusListeners.push(listener);
   }
 
   publishStatus(patch) {
+    const previous = this.publicStatus;
+
     this.publicStatus = { ...this.publicStatus, ...patch };
+
+    if (
+      previous.state !== this.publicStatus.state ||
+      previous.version !== this.publicStatus.version
+    ) {
+      this.statusListeners.forEach((listener) => {
+        try {
+          listener(this.publicStatus);
+        } catch (e) {
+          log.error(e, `AppUpdate -> publishStatus -> listener`);
+        }
+      });
+    }
 
     try {
       this.setMainWindow();
@@ -147,23 +168,7 @@ export default class AppUpdate {
 
       // "Install and relaunch" in the side menu; when the update isn't
       // downloaded yet, the usual check shows what's new and downloads it
-      ipcMain.on(IpcEvents.APP_UPDATE_INSTALL, () => {
-        if (this.autoUpdater.preparedUpdate) {
-          try {
-            this.autoUpdater.quitAndInstall();
-          } catch (e) {
-            log.error(e, `AppUpdate -> install from the side menu`);
-            dialog.showErrorBox(
-              tr('Update Error'),
-              e instanceof UpdateError ? e.message : `${e?.message || e}`
-            );
-          }
-
-          return;
-        }
-
-        this.forceCheck();
-      });
+      ipcMain.on(IpcEvents.APP_UPDATE_INSTALL, () => this.installNow());
 
       this.autoUpdater.on('error', (error) => {
         if (progressbarWindow !== null) {
@@ -363,6 +368,27 @@ export default class AppUpdate {
       this.interactive = false;
       this.checkForUpdates();
     }, intervalMs);
+  }
+
+  // "Install and relaunch" (side menu, app menu): installs the downloaded
+  // update; when it isn't downloaded yet, the usual check shows what's new
+  // and downloads it
+  installNow() {
+    if (this.autoUpdater.preparedUpdate) {
+      try {
+        this.autoUpdater.quitAndInstall();
+      } catch (e) {
+        log.error(e, `AppUpdate -> installNow`);
+        dialog.showErrorBox(
+          tr('Update Error'),
+          e instanceof UpdateError ? e.message : `${e?.message || e}`
+        );
+      }
+
+      return;
+    }
+
+    this.forceCheck();
   }
 
   async forceCheck() {

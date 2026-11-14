@@ -18,6 +18,15 @@ export const WHATS_NEW_ITEMS = [
     description:
       'The side menu lists the Mac’s own disk and every drive plugged in, with the free space exactly as Finder shows it. Click one to open it.',
   },
+  {
+    since: '4.1.4',
+    weight: 20,
+    icon: 'system_update_alt',
+    title: 'Updates in the OpenMTP menu',
+    chip: 'Updates in the OpenMTP menu',
+    description:
+      'When a new version is ready, the OpenMTP menu in the menu bar says so and installs it with one click.',
+  },
   // 4.1.3
   {
     since: '4.1.3',

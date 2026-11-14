@@ -14,6 +14,12 @@ Version 4.0.0 is the first release of the fork with its own version number.
   each with how full it is and its free space. A click opens the drive; the
   drive of the open folder is highlighted.
 
+### Changed
+
+- The update item in the OpenMTP menu follows the updater: "Check For
+  Updates", then "Update to version X…" once one is found, "Downloading
+  version X…" and "Install version X and relaunch" when it's ready.
+
 ### Fixed
 
 - Free space is read as Finder reads it (purgeable space included) and shown

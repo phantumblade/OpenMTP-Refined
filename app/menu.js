@@ -53,6 +53,44 @@ export default class MenuBuilder {
     this.mainWindow.openDevTools();
   }
 
+  // The update item follows the updater: "Check For Updates", then
+  // "Update to version X…" once one is found, its download, and "Install
+  // version X and relaunch" when it is ready
+  updateMenuItem(t) {
+    const { state, version } = this.autoAppUpdate?.publicStatus || {};
+    const item = { visible: this.appUpdaterEnable };
+
+    if (version && state === 'ready') {
+      return {
+        ...item,
+        label: t('Install version {version} and relaunch', { version }),
+        click: () => this.autoAppUpdate.installNow(),
+      };
+    }
+
+    if (version && state === 'downloading') {
+      return {
+        ...item,
+        label: t('Downloading version {version}…', { version }),
+        enabled: false,
+      };
+    }
+
+    if (version && state === 'available') {
+      return {
+        ...item,
+        label: t('Update to version {version}…', { version }),
+        click: () => this.autoAppUpdate.installNow(),
+      };
+    }
+
+    return {
+      ...item,
+      label: t('Check For Updates'),
+      click: () => this.autoAppUpdate.forceCheck(),
+    };
+  }
+
   buildDarwinTemplate() {
     // translated when built; main.dev rebuilds the menu when the language changes
     const t = translateWithSetting;
@@ -64,13 +102,7 @@ export default class MenuBuilder {
           selector: 'orderFrontStandardAboutPanel:',
         },
         { type: 'separator' },
-        {
-          visible: this.appUpdaterEnable,
-          label: t('Check For Updates'),
-          click: () => {
-            this.autoAppUpdate.forceCheck();
-          },
-        },
+        this.updateMenuItem(t),
         {
           visible: this.appUpdaterEnable,
           label: t('Install Update from File…'),
@@ -313,13 +345,7 @@ export default class MenuBuilder {
       {
         label: 'Help',
         submenu: [
-          {
-            visible: this.appUpdaterEnable,
-            label: 'Check For Updates',
-            click: () => {
-              this.autoAppUpdate.forceCheck();
-            },
-          },
+          this.updateMenuItem(translateWithSetting),
           {
             label: 'Report Bugs',
             click: () => {

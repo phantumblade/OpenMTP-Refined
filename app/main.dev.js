@@ -383,6 +383,9 @@ if (!isDeviceBootable) {
 
         menuBuilder.buildMenu();
 
+        // the update item says what the updater is doing
+        autoAppUpdate.onStatusChange(() => menuBuilder.buildMenu());
+
         // the menu is translated when built: rebuild it in the new language
         ipcMain.on(IpcEvents.APP_LANGUAGE_CHANGED, () => {
           menuBuilder.buildMenu();

@@ -108,6 +108,9 @@ const italian = {
   'Back up now': 'Avvia il backup',
   'How it works': 'Come funziona',
   'Every drive in the side menu': 'Tutti i dischi nel menu laterale',
+  'Updates in the OpenMTP menu': 'Aggiornamenti nel menu di OpenMTP',
+  'When a new version is ready, the OpenMTP menu in the menu bar says so and installs it with one click.':
+    'Quando una nuova versione è pronta, il menu OpenMTP nella barra dei menu lo dice e la installa con un clic.',
   'The side menu lists the Mac’s own disk and every drive plugged in, with the free space exactly as Finder shows it. Click one to open it.':
     'Il menu laterale elenca il disco del Mac e ogni disco collegato, con lo spazio libero esatto come nel Finder. Fai clic su uno per aprirlo.',
   'Counters that filter': 'Contatori che filtrano',
@@ -602,6 +605,10 @@ const italian = {
   // app menu and updates (main process, update windows)
   'About {app}': 'Informazioni su {app}',
   'Check For Updates': 'Controlla aggiornamenti',
+  'Update to version {version}…': 'Aggiorna alla versione {version}…',
+  'Downloading version {version}…': 'Download della versione {version}…',
+  'Install version {version} and relaunch':
+    'Installa la versione {version} e riavvia',
   'Install Update from File…': 'Installa aggiornamento da file…',
   'Hide {app}': 'Nascondi {app}',
   'Hide Others': 'Nascondi gli altri',
