@@ -5,6 +5,21 @@ All notable changes to this fork will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Version 4.0.0 is the first release of the fork with its own version number.
 
+## Unreleased
+
+### Added
+
+- The side menu lists "This Mac" with its own disk, then every other drive
+  plugged in (external SSDs and hard disks, USB sticks, network volumes),
+  each with how full it is and its free space. A click opens the drive; the
+  drive of the open folder is highlighted.
+
+### Fixed
+
+- Free space is read as Finder reads it (purgeable space included) and shown
+  with two decimals in the side menu: the startup disk read a few GB low
+  and an external drive showed "1.5 TB" for 1.49 TB.
+
 ## 4.1.3 — 2026-11-14
 
 ### Added

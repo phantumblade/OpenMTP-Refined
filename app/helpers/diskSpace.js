@@ -1,10 +1,12 @@
 import { execFileSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+import { cachedVolumes, loadVolumes, volumeForPath } from './volumes';
 
-// Free and total space of the volume holding a local folder, for the side
-// menu. On APFS the "used" column only counts one volume of a shared
-// container, so used space is derived as total - available, like Finder.
+// Free and total space of the volume holding a local folder. Read like
+// Finder (see volumes.js) once the volume list is in; until then `df`,
+// where used space is derived as total - available because on APFS the
+// "used" column only counts one volume of a shared container.
 
 const CACHE_MS = 15000;
 const cache = new Map();
@@ -56,8 +58,13 @@ export const volumeNameFor = (mountPoint) =>
     : path.basename(mountPoint);
 
 // Sizes as Finder shows them: decimal units (1 GB = 1000^3 bytes) in the
-// app language's number format.
-export const formatStorageSize = (bytes, language = 'en') => {
+// app language's number format; `precise` keeps two decimals from GB up,
+// like Finder's "94,65 GB available".
+export const formatStorageSize = (
+  bytes,
+  language = 'en',
+  { precise = false } = {}
+) => {
   const units = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
   let value = Math.max(0, Number(bytes) || 0);
   let unit = 0;
@@ -68,7 +75,8 @@ export const formatStorageSize = (bytes, language = 'en') => {
   }
 
   const number = new Intl.NumberFormat(language, {
-    maximumFractionDigits: unit < 3 ? 0 : 1,
+    // eslint-disable-next-line no-nested-ternary
+    maximumFractionDigits: unit < 3 ? 0 : precise ? 2 : 1,
   }).format(value);
 
   return `${number} ${units[unit]}`;
@@ -76,6 +84,22 @@ export const formatStorageSize = (bytes, language = 'en') => {
 
 export function getDiskSpace(folderPath) {
   const target = folderPath || '/';
+  const volumes = cachedVolumes();
+
+  // keep the Finder figures fresh for the next render
+  loadVolumes().catch(() => {});
+
+  const volume = volumes && volumeForPath(volumes, target);
+
+  if (volume) {
+    return {
+      totalBytes: volume.totalBytes,
+      freeBytes: volume.freeBytes,
+      mountPoint: volume.path,
+      volumeName: volume.name,
+    };
+  }
+
   const cached = cache.get(target);
 
   if (cached && Date.now() - cached.at < CACHE_MS) {

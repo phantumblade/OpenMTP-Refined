@@ -23,17 +23,17 @@ export const styles = (theme) => {
       color: m3.onSurface,
       userSelect: 'none',
     },
-    // M3 filled card for "This Mac", matching the footer card
-    macCard: {
-      margin: '8px 12px 4px',
-      padding: '16px 16px 14px',
-      borderRadius: m3Shape.large,
-      backgroundColor: m3.surfaceContainerHighest,
+    // "This Mac" and the other drives: a header, then each group as an
+    // M3 Expressive segmented list (2dp gaps, large outer corners, small
+    // inner ones; hovered and pressed items round up)
+    storage: {
+      padding: '8px 12px 6px',
     },
-    macCardHeader: {
+    macHeader: {
       display: 'flex',
       alignItems: 'center',
       gap: 14,
+      padding: '0 4px 12px',
     },
     headerShape: {
       color: m3.primaryContainer,
@@ -55,12 +55,156 @@ export const styles = (theme) => {
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',
     },
+    storageHeadline: {
+      ...m3Type.titleSmall,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      height: 40,
+      margin: '6px 0 0',
+      padding: '4px 12px 0 16px',
+      color: m3.onSurfaceVariant,
+    },
+    volumeList: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 2,
+      margin: 0,
+      padding: 0,
+      listStyle: 'none',
+    },
+    volumeRow: {
+      display: 'flex',
+      '&:first-child $volume': {
+        borderTopLeftRadius: m3Shape.largeIncreased,
+        borderTopRightRadius: m3Shape.largeIncreased,
+      },
+      '&:last-child $volume': {
+        borderBottomLeftRadius: m3Shape.largeIncreased,
+        borderBottomRightRadius: m3Shape.largeIncreased,
+      },
+    },
+    volume: {
+      position: 'relative',
+      isolation: 'isolate',
+      overflow: 'hidden',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 14,
+      width: '100%',
+      minHeight: 72,
+      padding: '10px 16px 10px 12px',
+      boxSizing: 'border-box',
+      border: 'none',
+      borderRadius: m3Shape.extraSmall,
+      backgroundColor: m3.surfaceContainerHigh,
+      color: m3.onSurface,
+      fontFamily: 'inherit',
+      textAlign: 'left',
+      cursor: 'pointer',
+      outline: 'none',
+      transition: `border-radius ${m3Motion.fastSpatial}, background-color ${m3Motion.defaultEffects}`,
+      // state layer in the content colour
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        inset: 0,
+        zIndex: -1,
+        backgroundColor: 'currentColor',
+        opacity: 0,
+        transition: `opacity ${m3Motion.fastEffects}`,
+      },
+      '&:hover::before': { opacity: m3State.hover },
+      '&:active::before': { opacity: m3State.pressed },
+      '&:hover, &:focus-visible': {
+        borderRadius: `${m3Shape.largeIncreased}px !important`,
+      },
+      '&:active': {
+        borderRadius: `${m3Shape.medium}px !important`,
+      },
+      '&:hover $volumeGo': {
+        transform: 'translateX(2px)',
+      },
+      '&:focus-visible': {
+        outline: `3px solid ${m3.secondary}`,
+        outlineOffset: -3,
+      },
+      '@media (prefers-reduced-motion: reduce)': {
+        transition: `background-color ${m3Motion.defaultEffects}`,
+      },
+    },
+    // the drive of the open folder
+    volumeActive: {
+      backgroundColor: m3.secondaryContainer,
+      color: m3.onSecondaryContainer,
+      '& $volumeAvatar': {
+        backgroundColor: m3.primary,
+        color: m3.onPrimary,
+      },
+      '& $volumeSpace': {
+        color: m3.onSecondaryContainer,
+      },
+      '& $diskFree': {
+        backgroundColor: alphaHex(m3.onSecondaryContainer, 0.16),
+      },
+    },
+    volumeAlmostFull: {
+      '& $diskUsed, & $diskStop': {
+        backgroundColor: m3.error,
+      },
+    },
+    volumeAvatar: {
+      flexShrink: 0,
+      display: 'grid',
+      placeItems: 'center',
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: m3.secondaryContainer,
+      color: m3.onSecondaryContainer,
+      transition: `background-color ${m3Motion.defaultEffects}, color ${m3Motion.defaultEffects}`,
+    },
+    volumeText: {
+      flex: 1,
+      minWidth: 0,
+      display: 'flex',
+      flexDirection: 'column',
+    },
+    volumeName: {
+      ...m3Type.bodyLarge,
+      display: 'flex',
+      alignItems: 'center',
+      gap: 4,
+      // room for the "open" arrow
+      paddingRight: 24,
+      fontWeight: 500,
+    },
+    volumeNameText: {
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+    },
+    volumeSpace: {
+      ...m3Type.bodySmall,
+      marginTop: 6,
+      color: m3.onSurfaceVariant,
+      whiteSpace: 'nowrap',
+    },
+    // "open", beside the name so the meter runs the whole width; it nudges
+    // forward on hover
+    volumeGo: {
+      position: 'absolute',
+      top: 14,
+      right: 12,
+      opacity: 0.8,
+      transition: `transform ${m3Motion.fastSpatial}`,
+    },
     // M3 linear progress: 4dp active and track, 4dp gap, stop indicator
     diskTrack: {
       display: 'flex',
       gap: 4,
       height: 4,
-      marginTop: 16,
+      marginTop: 8,
     },
     diskUsed: {
       flexShrink: 0,
@@ -82,11 +226,6 @@ export const styles = (theme) => {
       height: 4,
       borderRadius: 2,
       backgroundColor: m3.primary,
-    },
-    diskLabel: {
-      ...m3Type.bodySmall,
-      marginTop: 8,
-      color: m3.onSurfaceVariant,
     },
     // room for the macOS window buttons when the drawer covers them
     windowControlsInset: {

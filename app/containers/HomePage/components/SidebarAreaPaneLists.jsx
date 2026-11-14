@@ -18,6 +18,14 @@ import { imgsrc } from '../../../utils/imgsrc';
 import { FAVORITE_FOLDERS_MAX } from '../../../helpers/favoriteFolders';
 import { formatStorageSize, getDiskSpace } from '../../../helpers/diskSpace';
 import {
+  cachedMacName,
+  cachedVolumes,
+  groupVolumes,
+  loadMacName,
+  loadVolumes,
+  volumeForPath,
+} from '../../../helpers/volumes';
+import {
   canReadWithoutAsking,
   isFolderLocked,
 } from '../../../helpers/folderAccess';
@@ -31,12 +39,81 @@ const LOCATION_ICONS = {
   Root: 'computer',
 };
 
+const VOLUME_ICONS = {
+  internal: 'hard_drive',
+  external: 'hard_drive_2',
+  removable: 'usb',
+  network: 'lan',
+};
+
+// how often the drives are read again while the menu is open (a disk
+// plugged in or ejected shows up within this time)
+const VOLUMES_REFRESH_MS = 8000;
+
+// the volume of the open folder, read with `df` when the list of volumes
+// can't be read
+const fallbackVolumes = (folderPath) => {
+  const disk = getDiskSpace(folderPath);
+
+  return disk
+    ? [
+        {
+          path: disk.mountPoint,
+          name: disk.volumeName,
+          totalBytes: disk.totalBytes,
+          freeBytes: disk.freeBytes,
+          isRoot: disk.mountPoint === '/',
+          kind: 'internal',
+        },
+      ]
+    : [];
+};
+
 // Material 3 navigation drawer (Compose NavigationDrawerTokens): pill items
 // inset by 12dp, secondary container active indicator, titleSmall section
 // headlines and labelLarge labels. It belongs to the Mac pane, so it only
 // lists Mac locations and actions; phone actions live on the phone pane.
 class SidebarAreaPaneLists extends PureComponent {
-  hoverRef = React.createRef();
+  constructor(props) {
+    super(props);
+
+    this.hoverRef = React.createRef();
+    this.state = {
+      volumes: cachedVolumes() || [],
+      macName: cachedMacName(),
+    };
+  }
+
+  componentDidMount() {
+    this.refreshVolumes();
+    this.volumesTimer = setInterval(this.refreshVolumes, VOLUMES_REFRESH_MS);
+    loadMacName()
+      .then((macName) => {
+        if (!this.unmounted && macName) {
+          this.setState({ macName });
+        }
+
+        return macName;
+      })
+      .catch(() => {});
+  }
+
+  componentWillUnmount() {
+    this.unmounted = true;
+    clearInterval(this.volumesTimer);
+  }
+
+  refreshVolumes = () => {
+    loadVolumes()
+      .then((volumes) => {
+        if (!this.unmounted && volumes.length > 0) {
+          this.setState({ volumes });
+        }
+
+        return volumes;
+      })
+      .catch(() => {});
+  };
 
   // One hover highlight for the whole menu that glides to the item under the
   // pointer (M3 standard easing), instead of each item flashing on and off.
@@ -284,19 +361,109 @@ class SidebarAreaPaneLists extends PureComponent {
     );
   };
 
-  // "This Mac": the volume of the open folder and its free space, as an M3
-  // filled card with a linear progress indicator.
-  renderMacCard = () => {
-    const { classes: styles, currentBrowsePath, appLanguage } = this.props;
+  // One drive as an M3 Expressive segmented list item: its name, how full
+  // it is (linear progress) and the exact free space, like Finder. The
+  // drive holding the open folder is selected; a click opens the drive.
+  renderVolume = (volume, activePath) => {
+    const {
+      classes: styles,
+      appLanguage,
+      deviceType,
+      folderAccess,
+    } = this.props;
     const t = (key, values) => translate(appLanguage, key, values);
-    const disk = getDiskSpace(currentBrowsePath);
-    const usedRatio = disk
-      ? Math.min(1, Math.max(0, 1 - disk.freeBytes / disk.totalBytes))
-      : 0;
+    const size = (bytes) =>
+      formatStorageSize(bytes, appLanguage, { precise: true });
+    const active = volume.path === activePath;
+    const usedRatio = Math.min(
+      1,
+      Math.max(0, 1 - volume.freeBytes / volume.totalBytes)
+    );
 
     return (
-      <div className={styles.macCard}>
-        <div className={styles.macCardHeader}>
+      <li key={volume.path} className={styles.volumeRow}>
+        <Tooltip title={volume.path} placement="right" enterDelay={600}>
+          <button
+            type="button"
+            className={classNames(styles.volume, {
+              [styles.volumeActive]: active,
+              [styles.volumeAlmostFull]: usedRatio >= 0.9,
+            })}
+            aria-current={active ? 'location' : undefined}
+            onClick={() =>
+              this._handleListDirectory({
+                filePath: volume.path,
+                deviceType,
+                isSidemenu: true,
+              })
+            }
+          >
+            <span className={styles.volumeAvatar}>
+              <MaterialSymbol
+                name={VOLUME_ICONS[volume.kind] || 'hard_drive'}
+                size={22}
+                fill={active ? 1 : 0}
+              />
+            </span>
+            <span className={styles.volumeText}>
+              <span className={styles.volumeName}>
+                <span className={styles.volumeNameText}>{volume.name}</span>
+                {isFolderLocked(volume.path, folderAccess) && (
+                  <MaterialSymbol
+                    name="lock"
+                    size={16}
+                    className={styles.itemLock}
+                  />
+                )}
+              </span>
+              <span
+                className={styles.diskTrack}
+                role="meter"
+                aria-label={t('Used space')}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={Math.round(usedRatio * 100)}
+              >
+                <span
+                  className={styles.diskUsed}
+                  style={{ width: `${usedRatio * 100}%` }}
+                />
+                <span className={styles.diskFree}>
+                  <span className={styles.diskStop} />
+                </span>
+              </span>
+              <span className={styles.volumeSpace}>
+                {t('{free} free of {total}', {
+                  free: size(volume.freeBytes),
+                  total: size(volume.totalBytes),
+                })}
+              </span>
+            </span>
+            <MaterialSymbol
+              name="chevron_right"
+              size={20}
+              className={styles.volumeGo}
+            />
+          </button>
+        </Tooltip>
+      </li>
+    );
+  };
+
+  // "This Mac" with its own disks, then every other drive plugged in
+  renderStorage = () => {
+    const { classes: styles, currentBrowsePath, appLanguage } = this.props;
+    const { volumes: loaded, macName } = this.state;
+    const t = (key) => translate(appLanguage, key);
+    const volumes =
+      loaded.length > 0 ? loaded : fallbackVolumes(currentBrowsePath);
+    const { mac, other } = groupVolumes(volumes);
+    const activePath = volumeForPath(volumes, currentBrowsePath)?.path;
+    const isLaptop = /book/i.test(macName || 'MacBook');
+
+    return (
+      <div className={styles.storage}>
+        <div className={styles.macHeader}>
           <M3Shape
             shape="Cookie9Sided"
             size={48}
@@ -304,7 +471,7 @@ class SidebarAreaPaneLists extends PureComponent {
             className={styles.headerShape}
           >
             <MaterialSymbol
-              name="laptop_mac"
+              name={isLaptop ? 'laptop_mac' : 'desktop_mac'}
               size={26}
               fill={1}
               className={styles.headerIcon}
@@ -313,34 +480,24 @@ class SidebarAreaPaneLists extends PureComponent {
           <div className={styles.headerText}>
             <div className={styles.headerTitle}>{t('This Mac')}</div>
             <div className={styles.headerSubtitle}>
-              {disk ? disk.volumeName : t('Local files')}
+              {macName || t('Local files')}
             </div>
           </div>
         </div>
-        {disk && (
+        {mac.length > 0 && (
+          <ul className={styles.volumeList}>
+            {mac.map((volume) => this.renderVolume(volume, activePath))}
+          </ul>
+        )}
+        {other.length > 0 && (
           <>
-            <div
-              className={styles.diskTrack}
-              role="meter"
-              aria-label={t('Used space')}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={Math.round(usedRatio * 100)}
-            >
-              <span
-                className={styles.diskUsed}
-                style={{ width: `${usedRatio * 100}%` }}
-              />
-              <span className={styles.diskFree}>
-                <span className={styles.diskStop} />
-              </span>
-            </div>
-            <div className={styles.diskLabel}>
-              {t('{free} free of {total}', {
-                free: formatStorageSize(disk.freeBytes, appLanguage),
-                total: formatStorageSize(disk.totalBytes, appLanguage),
-              })}
-            </div>
+            <h3 className={styles.storageHeadline}>
+              <span>{t('Other drives')}</span>
+              <span className={styles.sectionBadge}>{other.length}</span>
+            </h3>
+            <ul className={styles.volumeList}>
+              {other.map((volume) => this.renderVolume(volume, activePath))}
+            </ul>
           </>
         )}
       </div>
@@ -379,9 +536,9 @@ class SidebarAreaPaneLists extends PureComponent {
         {insetForWindowControls && (
           <div className={styles.windowControlsInset} />
         )}
-        {this.renderMacCard()}
-
         <div className={styles.contentScrollArea}>
+          {this.renderStorage()}
+
           <div className={styles.navContent} onMouseLeave={this.hideHover}>
             <span
               ref={this.hoverRef}

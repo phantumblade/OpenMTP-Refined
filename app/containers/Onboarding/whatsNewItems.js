@@ -8,6 +8,16 @@ import semver from 'semver';
 // - description: shown when the item is the featured one or a card
 // - action: 'backupGuide' adds "How it works" (photo backup)
 export const WHATS_NEW_ITEMS = [
+  // 4.1.4
+  {
+    since: '4.1.4',
+    weight: 60,
+    icon: 'hard_drive',
+    title: 'Every drive in the side menu',
+    chip: 'Every drive in the side menu',
+    description:
+      'The side menu lists the Mac’s own disk and every drive plugged in, with the free space exactly as Finder shows it. Click one to open it.',
+  },
   // 4.1.3
   {
     since: '4.1.3',

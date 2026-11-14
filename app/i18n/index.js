@@ -72,6 +72,7 @@ const italian = {
     '{count} risultati in “{folder}” e sottocartelle',
   'This Mac': 'Questo Mac',
   'Local files': 'File locali',
+  'Other drives': 'Altri dischi',
   'Used space': 'Spazio usato',
   '{free} free of {total}': '{free} liberi su {total}',
   '{free} free': '{free} liberi',
@@ -106,6 +107,9 @@ const italian = {
   'Change folder': 'Cambia cartella',
   'Back up now': 'Avvia il backup',
   'How it works': 'Come funziona',
+  'Every drive in the side menu': 'Tutti i dischi nel menu laterale',
+  'The side menu lists the Mac’s own disk and every drive plugged in, with the free space exactly as Finder shows it. Click one to open it.':
+    'Il menu laterale elenca il disco del Mac e ogni disco collegato, con lo spazio libero esatto come nel Finder. Fai clic su uno per aprirlo.',
   'Counters that filter': 'Contatori che filtrano',
   'The bottom of each pane is now one row: where you are, and the counts of folders and files. Press a count to see only folders or only files.':
     'La parte bassa di ogni pannello ora è una riga sola: dove ti trovi e quante cartelle e file ci sono. Premi un contatore per vedere solo le cartelle o solo i file.',
