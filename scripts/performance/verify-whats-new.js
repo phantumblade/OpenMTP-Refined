@@ -63,6 +63,12 @@ function main() {
   const drives = selectWhatsNew({ from: '4.1.3', to: '4.1.4' });
 
   assert.strictEqual(drives.count, 2);
+
+  // from 4.1.4 to 4.1.5: the two 4.1.5 changes
+  const signed = selectWhatsNew({ from: '4.1.4', to: '4.1.5' });
+
+  assert.strictEqual(signed.count, 2);
+  assert.strictEqual(signed.featured.since, '4.1.5');
   assert.strictEqual(drives.featured.since, '4.1.4');
 
   // first install: a welcome with the best of every version
