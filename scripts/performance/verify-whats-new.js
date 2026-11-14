@@ -69,6 +69,12 @@ function main() {
 
   assert.strictEqual(signed.count, 2);
   assert.strictEqual(signed.featured.since, '4.1.5');
+
+  // from 4.1.5 to 4.1.6: the calmer green
+  const green = selectWhatsNew({ from: '4.1.5', to: '4.1.6' });
+
+  assert.strictEqual(green.count, 1);
+  assert.strictEqual(green.featured.since, '4.1.6');
   assert.strictEqual(drives.featured.since, '4.1.4');
 
   // first install: a welcome with the best of every version
