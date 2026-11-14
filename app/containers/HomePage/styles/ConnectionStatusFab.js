@@ -54,11 +54,17 @@ export const styles = (theme) => {
   };
 
   return {
-    // zero-height sticky strip at the bottom of the scrolling pane
-    // above the pane footer, which floats over the bottom of the files
+    // zero-height sticky strip at the bottom of the scrolling pane, just
+    // above the pane footer, which floats over the bottom of the files.
+    // The files keep room under them for the footer and its fade (padding
+    // of the scroll area), and a sticky box already stops above that
+    // padding: it sticks there and is moved down by the fade, so it sits
+    // right on the footer row.
     dock: {
       position: 'sticky',
-      bottom: 'var(--pane-footer-height, 0px)',
+      bottom: 0,
+      transform:
+        'translateY(calc(var(--pane-footer-space, 0px) - var(--pane-footer-height, 0px)))',
       zIndex: 5,
       display: 'flex',
       justifyContent: 'center',

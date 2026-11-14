@@ -27,6 +27,7 @@ export const styles = (theme) => ({
     overflowY: 'auto',
     overflowX: 'auto',
     '--pane-footer-height': `${PANE_FOOTER_HEIGHT}px`,
+    '--pane-footer-space': `${PANE_FOOTER_SPACE}px`,
     // the scrollbar runs only beside the files: not over the sticky sort bar
     // and not under the footer
     '&::-webkit-scrollbar-track:vertical': {
