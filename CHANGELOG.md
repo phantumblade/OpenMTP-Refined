@@ -5,6 +5,26 @@ All notable changes to this fork will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Version 4.0.0 is the first release of the fork with its own version number.
 
+## Unreleased
+
+### Added
+
+- Connected selection in the grid: selected items next to each other read
+  as one shape, like the app's connected button groups. Corners facing
+  another selected item turn nearly square, outer ones stay round, with a
+  2px gap between items; the shape springs when the selection changes.
+- Dragging files shows a stack of what you're moving (their own icons, how
+  many, and their size for files) that follows the pointer, leans into the
+  motion and says what a drop will do ("Copy 3 items to the phone", or
+  "Already here" over the pane they come from). Without a useful drop it
+  goes back to the selection.
+- On a drop the stack flies into the transfer dialog, which opens out of
+  its status indicator; the items being copied appear right away in the
+  destination folder, faded, each with an M3 Expressive progress ring that
+  fills while it arrives.
+- "Continue in the background" shrinks the dialog into the transfer pill,
+  and the pill grows back into the dialog.
+
 ## 4.1.7 — 2026-11-15
 
 ### Fixed

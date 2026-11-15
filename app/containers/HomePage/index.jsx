@@ -8,6 +8,7 @@ import { styles } from './styles';
 import Onboarding from '../Onboarding';
 import FolderAccessDialog from './components/FolderAccessDialog';
 import TransferCenter from './components/TransferCenter';
+import DragStack from '../../components/DragStack';
 import { DEVICE_TYPE, MTP_MODE } from '../../enums';
 import {
   makeMtpMode,
@@ -71,6 +72,7 @@ class Home extends PureComponent {
         <Onboarding />
         <FolderAccessDialog />
         <TransferCenter />
+        <DragStack />
         <div className={styles.root}>
           <div className={styles.grid}>{panes}</div>
         </div>

@@ -109,6 +109,12 @@ const italian = {
   'How it works': 'Come funziona',
   'A lighter Sort by bar': 'Barra Ordina per più leggera',
   'A calmer green': 'Un verde più equilibrato',
+  'Drag and watch them arrive': 'Trascina e guardali arrivare',
+  'Dragging files shows a stack of what you move and where it goes. Drop it and the copy opens from it, while the items appear in the other pane and fill up as they arrive.':
+    'Trascinando i file vedi una pila di ciò che sposti e dove va. Rilasciala e la copia si apre da lì, mentre gli elementi compaiono nell’altro pannello e si riempiono man mano che arrivano.',
+  'Connected selection': 'Selezione collegata',
+  'Selected items next to each other join into one shape, like the button groups of the app.':
+    'Gli elementi selezionati vicini si uniscono in un’unica forma, come i gruppi di pulsanti dell’app.',
   'Faster copies from the phone': 'Copie dal telefono più veloci',
   'Copying many photos and videos to the Mac starts right away and goes much faster, without long waits while preparing.':
     'Copiare tante foto e video sul Mac parte subito ed è molto più veloce, senza lunghe attese di preparazione.',
@@ -498,6 +504,9 @@ const italian = {
   'Free of': 'liberi su',
   selected: 'selezionati',
   item: 'elemento',
+  'Copy {items} to the phone': 'Copia {items} sul telefono',
+  'Copy {items} to the Mac': 'Copia {items} sul Mac',
+  'Already here': 'Sono già qui',
   items: 'elementi',
   folder: 'cartella',
   folders: 'cartelle',

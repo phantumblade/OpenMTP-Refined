@@ -18,6 +18,17 @@ import {
 import { baseName } from '../../../utils/files';
 import { formatStorageSize } from '../../../helpers/diskSpace';
 import { translate } from '../../../i18n';
+import { handOffDragStack } from '../../../helpers/dragStack';
+import {
+  plainRect,
+  setMorphOrigin,
+  takeMorphOrigin,
+} from '../../../helpers/sharedMorph';
+
+// where the background pill sits (see TransferCenter's pill style)
+const PILL_BOTTOM = 76;
+const PILL_HEIGHT = 56;
+const PILL_WIDTH = 300;
 
 // 54 s, 3 min 05 s, 1 h 12 min
 export const formatDuration = (ms) => {
@@ -175,6 +186,39 @@ class FileTransferDialog extends PureComponent {
     );
   };
 
+  // Opening: out of the background pill when coming back from it, else out
+  // of the status indicator, where the dropped stack of files flies in
+  getMorphOrigin = () => {
+    const fromPill = takeMorphOrigin('transferDialog');
+
+    if (fromPill) {
+      return { rect: fromPill.rect };
+    }
+
+    return { into: '[data-morph-target]', handOff: handOffDragStack };
+  };
+
+  // "Continue in the background": shrink towards the pill, which then grows
+  // out of where the dialog was
+  getMorphTarget = () => {
+    const { transfer } = this.props;
+
+    if (!transfer.minimized) {
+      return null;
+    }
+
+    return {
+      rect: {
+        left: window.innerWidth / 2 - PILL_WIDTH / 2,
+        top: window.innerHeight - PILL_BOTTOM - PILL_HEIGHT,
+        width: PILL_WIDTH,
+        height: PILL_HEIGHT,
+      },
+      onLeave: (box) =>
+        setMorphOrigin('transferPill', { rect: plainRect(box) }),
+    };
+  };
+
   render() {
     const {
       appLanguage,
@@ -246,9 +290,15 @@ class FileTransferDialog extends PureComponent {
         maxWidth="sm"
         aria-labelledby="file-transfer-dialog-title"
         aria-describedby="file-transfer-dialog-status"
+        TransitionProps={{
+          getMorphOrigin: this.getMorphOrigin,
+          getMorphTarget: this.getMorphTarget,
+        }}
       >
         <div className={styles.header}>
-          <div className={styles.visual}>{this.renderStatusVisual()}</div>
+          <div className={styles.visual} data-morph-target>
+            {this.renderStatusVisual()}
+          </div>
           <div>
             <h2 id="file-transfer-dialog-title" className={styles.title}>
               {this.getTitle()}

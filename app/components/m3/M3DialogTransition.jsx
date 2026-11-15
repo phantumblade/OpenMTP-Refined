@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { Transition } from 'react-transition-group';
 import { useForkRef } from '@material-ui/core/utils';
+import { flipTransform } from '../../helpers/sharedMorph';
 
 // Material 3 dialog motion, as implemented by Material Web
 // (dialog/internal/animations.ts): the dialog slides down 50px while its
@@ -21,6 +22,141 @@ const prefersReducedMotion = () =>
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const sectionsOf = (paper) => (paper ? Array.from(paper.children) : []);
+
+const SPATIAL_SPRING = 'cubic-bezier(0.38, 1.21, 0.22, 1)';
+const MORPH_ENTER_MS = 520;
+
+const flip = flipTransform;
+
+const fadeInSections = (paper, delay) => {
+  const sections = sectionsOf(paper);
+
+  sections.forEach((section, index) => {
+    const isActions = index === sections.length - 1 && sections.length > 1;
+
+    section.animate(
+      [
+        { opacity: 0 },
+        { opacity: 0, offset: isActions ? 0.5 : 0.3 },
+        { opacity: 1 },
+      ],
+      {
+        delay,
+        duration: isActions ? 380 : 320,
+        easing: 'linear',
+        fill: 'backwards',
+      }
+    );
+  });
+};
+
+// Shared-element entrance: the dialog grows out of something already on
+// screen. [origin.rect]: a rect to grow from (e.g. the transfer pill).
+// [origin.into]: a selector inside the dialog; [origin.handOff(rect)] is
+// given that element's rect (something flies into it) and returns false to
+// fall back to the standard motion. The dialog then grows from that element.
+const animateMorphIn = (node, origin) => {
+  const paper = node.firstElementChild;
+
+  if (!paper || typeof paper.animate !== 'function') {
+    return false;
+  }
+
+  const box = paper.getBoundingClientRect();
+  let from = origin.rect;
+  let delay = 0;
+
+  if (origin.into) {
+    const target = paper.querySelector(origin.into);
+    const rect = target?.getBoundingClientRect();
+
+    if (!rect || !origin.handOff || !origin.handOff(rect)) {
+      return false;
+    }
+
+    // grow out of that element, keeping its proportions
+    const scale = rect.width / box.width;
+
+    from = {
+      left: rect.left + rect.width / 2 - (box.width * scale) / 2,
+      top: rect.top + rect.height / 2 - (box.height * scale) / 2,
+      width: box.width * scale,
+      height: box.height * scale,
+    };
+    paper.style.transformOrigin = `${rect.left + rect.width / 2 - box.left}px ${
+      rect.top + rect.height / 2 - box.top
+    }px`;
+    // the stack lands first
+    delay = 300;
+  }
+
+  if (!from) {
+    return false;
+  }
+
+  if (origin.into) {
+    const scale = from.width / box.width;
+
+    const grow = paper.animate(
+      [
+        { transform: `scale(${scale})`, opacity: 0, borderRadius: '50%' },
+        { transform: `scale(${scale})`, opacity: 1, offset: 0.06 },
+        { transform: 'none', opacity: 1, borderRadius: '28px' },
+      ],
+      {
+        delay,
+        duration: MORPH_ENTER_MS,
+        easing: SPATIAL_SPRING,
+        fill: 'backwards',
+      }
+    );
+
+    grow.onfinish = () => {
+      paper.style.transformOrigin = '';
+    };
+
+    grow.oncancel = grow.onfinish;
+  } else {
+    paper.animate(
+      [
+        { transform: flip(from, box), opacity: 0.2, borderRadius: '28px' },
+        { transform: 'none', opacity: 1, borderRadius: '28px' },
+      ],
+      { duration: MORPH_ENTER_MS, easing: SPATIAL_SPRING }
+    );
+  }
+
+  fadeInSections(paper, delay);
+
+  return true;
+};
+
+// Shared-element exit: the dialog shrinks towards [target.rect] (e.g. where
+// the transfer pill appears) and tells [target.onLeave] where it was.
+const animateMorphOut = (node, target) => {
+  const paper = node.firstElementChild;
+
+  if (!paper || typeof paper.animate !== 'function') {
+    return false;
+  }
+
+  const box = paper.getBoundingClientRect();
+
+  target.onLeave?.(box);
+  paper.animate(
+    [
+      { transform: 'none', opacity: 1 },
+      { transform: flip(target.rect, box), opacity: 0 },
+    ],
+    {
+      duration: DIALOG_EXIT_MS,
+      easing: EMPHASIZED_ACCELERATE,
+      fill: 'forwards',
+    }
+  );
+
+  return true;
+};
 
 const animateIn = (node) => {
   const paper = node.firstElementChild;
@@ -120,6 +256,9 @@ const M3DialogTransition = React.forwardRef(function M3DialogTransition(
     style,
     // MUI passes its own durations; the motion spec fixes them
     timeout: _timeout,
+    // optional shared-element motion (see animateMorphIn/Out)
+    getMorphOrigin,
+    getMorphTarget,
     ...other
   } = props;
   const nodeRef = useRef(null);
@@ -141,13 +280,23 @@ const M3DialogTransition = React.forwardRef(function M3DialogTransition(
         nodeRef.current
           ?.getAnimations?.({ subtree: true })
           .forEach((animation) => animation.cancel());
-        animateIn(nodeRef.current);
+        const origin = !prefersReducedMotion() && getMorphOrigin?.();
+
+        if (!origin || !animateMorphIn(nodeRef.current, origin)) {
+          animateIn(nodeRef.current);
+        }
+
         call(onEnter)(isAppearing);
       }}
       onEntering={call(onEntering)}
       onEntered={call(onEntered)}
       onExit={() => {
-        animateOut(nodeRef.current);
+        const target = !prefersReducedMotion() && getMorphTarget?.();
+
+        if (!target || !animateMorphOut(nodeRef.current, target)) {
+          animateOut(nodeRef.current);
+        }
+
         call(onExit)();
       }}
       onExiting={call(onExiting)}

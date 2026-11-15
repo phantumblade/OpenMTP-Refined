@@ -8,6 +8,25 @@ import semver from 'semver';
 // - description: shown when the item is the featured one or a card
 // - action: 'backupGuide' adds "How it works" (photo backup)
 export const WHATS_NEW_ITEMS = [
+  // 4.1.8
+  {
+    since: '4.1.8',
+    weight: 62,
+    icon: 'stacks',
+    title: 'Drag and watch them arrive',
+    chip: 'Drag and watch them arrive',
+    description:
+      'Dragging files shows a stack of what you move and where it goes. Drop it and the copy opens from it, while the items appear in the other pane and fill up as they arrive.',
+  },
+  {
+    since: '4.1.8',
+    weight: 45,
+    icon: 'join',
+    title: 'Connected selection',
+    chip: 'Connected selection',
+    description:
+      'Selected items next to each other join into one shape, like the button groups of the app.',
+  },
   // 4.1.7
   {
     since: '4.1.7',

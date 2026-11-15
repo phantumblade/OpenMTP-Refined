@@ -24,6 +24,12 @@ import { calculateGridWindow } from '../../../utils/virtualWindow';
 import { getFileCategory } from '../../../helpers/fileExplorerIcons';
 import { isFolderLocked } from '../../../helpers/folderAccess';
 import { DEVICE_TYPE } from '../../../enums';
+import { joinedCorners } from '../../../helpers/selectionShape';
+import {
+  getIncomingTransfer,
+  subscribeIncomingTransfer,
+} from '../../../helpers/incomingTransfer';
+import FileExplorerTableBodyIncomingTile from './FileExplorerTableBodyIncomingTile';
 
 const ITEM_WIDTH = 118;
 const ITEM_HEIGHT = 155;
@@ -72,7 +78,11 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
       endIndex: Math.min(props.tableSort.length, 50),
       beforeSize: 0,
       afterSize: 0,
+      // tiles per row, so a selected tile knows its selected neighbours
+      columns: 1,
       collapsedSections: {},
+      // what a running copy is bringing into a folder (helpers/incomingTransfer)
+      incoming: getIncomingTransfer(),
     };
   }
 
@@ -116,6 +126,9 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
 
     this.scheduleWindowUpdate();
     this.endEnteringLater();
+    this.unsubscribeIncoming = subscribeIncomingTransfer((incoming) => {
+      this.setState({ incoming }, this.scheduleWindowUpdate);
+    });
   }
 
   componentDidUpdate(prevProps) {
@@ -150,6 +163,7 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
 
   componentWillUnmount() {
     clearTimeout(this.enterTimer);
+    this.unsubscribeIncoming?.();
 
     if (this.animationFrame) {
       window.cancelAnimationFrame(this.animationFrame);
@@ -232,7 +246,7 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
     }
 
     const nextWindow = calculateGridWindow({
-      itemCount: tableSort.length,
+      itemCount: tableSort.length + this.incomingItems().length,
       scrollOffset: Math.max(
         0,
         this.scrollContainer.scrollTop - this.getWrapperOffset()
@@ -244,17 +258,23 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
       overscanRows: OVERSCAN_ROWS,
     });
 
+    const columns = Math.max(
+      1,
+      Math.floor(this.wrapper.clientWidth / ITEM_WIDTH)
+    );
+
     this.setState((state) => {
       if (
         state.startIndex === nextWindow.startIndex &&
         state.endIndex === nextWindow.endIndex &&
         state.beforeSize === nextWindow.beforeSize &&
-        state.afterSize === nextWindow.afterSize
+        state.afterSize === nextWindow.afterSize &&
+        state.columns === columns
       ) {
         return null;
       }
 
-      return nextWindow;
+      return { ...nextWindow, columns };
     });
   };
 
@@ -285,6 +305,51 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
 
   setWrapper = (element) => {
     this.wrapper = element;
+  };
+
+  // the items a copy is bringing into the folder this pane shows (not the
+  // ones already listed), shown first
+  incomingItems = () => {
+    const { deviceType, tableSort } = this.props;
+    const { incoming } = this.state;
+
+    if (
+      !incoming ||
+      incoming.destinationDeviceType !== deviceType ||
+      incoming.destinationFolder !== this.browsePath()
+    ) {
+      return [];
+    }
+
+    const listed = new Set(tableSort.map((item) => item.name));
+
+    return incoming.items.filter((item) => !listed.has(item.name));
+  };
+
+  // the incoming items, then the folder's own
+  displayItems = () => {
+    const { tableSort } = this.props;
+    const incomingItems = this.incomingItems();
+
+    return incomingItems.length > 0
+      ? [
+          ...incomingItems.map((item) => ({ ...item, incoming: true })),
+          ...tableSort,
+        ]
+      : tableSort;
+  };
+
+  // which corners of the tile at [index] of [items] face another selected
+  // tile (connected selection)
+  joinedCornersAt = (items, index, selectedSet) => {
+    const { columns } = this.state;
+
+    return joinedCorners({
+      index,
+      columns,
+      count: items.length,
+      isSelectedAt: (i) => selectedSet.has(items[i].path),
+    });
   };
 
   renderGroupedSections = () => {
@@ -349,11 +414,16 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
           </div>
 
           {!isCollapsed &&
-            group.items.map((item) => (
+            group.items.map((item, index) => (
               <FileExplorerTableGridRender
                 key={item.path}
                 item={item}
                 isSelected={selectedSet.has(item.path)}
+                joinedCorners={this.joinedCornersAt(
+                  group.items,
+                  index,
+                  selectedSet
+                )}
                 isFavorite={!!favoritePaths && favoritePaths.has(item.path)}
                 deviceType={deviceType}
                 _eventTarget={_eventTarget}
@@ -401,7 +471,6 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
   render() {
     const {
       classes: styles,
-      tableSort,
       deviceType,
       _eventTarget,
       getTableData,
@@ -436,9 +505,11 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
       );
     }
 
-    const { startIndex, endIndex, beforeSize, afterSize } = this.state;
+    const { startIndex, endIndex, beforeSize, afterSize, incoming } =
+      this.state;
     const selectedSet = this.getSelectedPathsSet();
-    const visibleItems = tableSort.slice(startIndex, endIndex);
+    const items = this.displayItems();
+    const visibleItems = items.slice(startIndex, endIndex);
 
     return (
       <TableRow>
@@ -459,24 +530,43 @@ class FileExplorerTableBodyGridWrapperRender extends PureComponent {
                 aria-hidden="true"
               />
             )}
-            {visibleItems.map((item) => (
-              <FileExplorerTableGridRender
-                key={item.path}
-                item={item}
-                isSelected={selectedSet.has(item.path)}
-                isFavorite={!!favoritePaths && favoritePaths.has(item.path)}
-                deviceType={deviceType}
-                _eventTarget={_eventTarget}
-                getTableData={getTableData}
-                onContextMenuClick={onContextMenuClick}
-                onTableClick={onTableClick}
-                onTableDoubleClick={onTableDoubleClick}
-                multiSelectMode={multiSelectMode}
-                appThemeMode={appThemeMode}
-                isLocked={this.isLocked(item)}
-                currentBrowsePath={currentBrowsePath}
-              />
-            ))}
+            {visibleItems.map((item, offset) =>
+              item.incoming ? (
+                <FileExplorerTableBodyIncomingTile
+                  key={`incoming:${item.path}`}
+                  item={item}
+                  index={incoming.items.findIndex(
+                    (it) => it.path === item.path
+                  )}
+                  items={incoming.items}
+                  deviceType={deviceType}
+                  currentBrowsePath={currentBrowsePath}
+                  appThemeMode={appThemeMode}
+                />
+              ) : (
+                <FileExplorerTableGridRender
+                  key={item.path}
+                  item={item}
+                  isSelected={selectedSet.has(item.path)}
+                  joinedCorners={this.joinedCornersAt(
+                    items,
+                    startIndex + offset,
+                    selectedSet
+                  )}
+                  isFavorite={!!favoritePaths && favoritePaths.has(item.path)}
+                  deviceType={deviceType}
+                  _eventTarget={_eventTarget}
+                  getTableData={getTableData}
+                  onContextMenuClick={onContextMenuClick}
+                  onTableClick={onTableClick}
+                  onTableDoubleClick={onTableDoubleClick}
+                  multiSelectMode={multiSelectMode}
+                  appThemeMode={appThemeMode}
+                  isLocked={this.isLocked(item)}
+                  currentBrowsePath={currentBrowsePath}
+                />
+              )
+            )}
             {afterSize > 0 && (
               <div
                 className={styles.virtualSpacer}

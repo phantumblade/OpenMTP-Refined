@@ -9,6 +9,9 @@ import { springTruncate } from '../../../utils/funcs';
 import { FILE_EXPLORER_GRID_TRUNCATE_MAX_CHARS } from '../../../constants';
 import FavoriteStar from '../../../components/FavoriteStar';
 import MaterialSymbol from '../../../components/m3/MaterialSymbol';
+import { cornerRadiusVars } from '../../../helpers/selectionShape';
+import { CONNECTED_GROUP_INNER } from '../../../styles/m3/connectedButtonGroup';
+import { m3Shape } from '../../../styles/m3/tokens';
 import { styles } from '../styles/FileExplorerTableBodyGridRender';
 import { imgsrc } from '../../../utils/imgsrc';
 import {
@@ -393,6 +396,7 @@ class FileExplorerTableBodyGridRender extends PureComponent {
       onTableDoubleClick,
       multiSelectMode,
       isFavorite,
+      joinedCorners = 0,
     } = this.props;
     const { RenderFileIcon, RenderFolderIcon } = this;
 
@@ -416,6 +420,17 @@ class FileExplorerTableBodyGridRender extends PureComponent {
           [styles.itemSelected]: isSelected && !isMultiSelectMode,
           [styles.itemSelectedMulti]: isSelected && isMultiSelectMode,
         })}
+        // connected selection: corners facing another selected tile square
+        // off, like a connected button group
+        style={
+          isSelected
+            ? cornerRadiusVars(
+                joinedCorners,
+                m3Shape.extraLarge,
+                CONNECTED_GROUP_INNER
+              )
+            : undefined
+        }
         onClick={(event) => onTableClick(item.path, deviceType, event, 'row')}
         onDoubleClick={(event) => onTableDoubleClick(item, deviceType, event)}
         onContextMenu={(event) =>

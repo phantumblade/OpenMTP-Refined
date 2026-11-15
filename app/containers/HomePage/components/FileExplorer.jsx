@@ -82,7 +82,6 @@ import {
 } from '../../../utils/funcs';
 import { getMainWindowRendererProcess } from '../../../helpers/windowHelper';
 import { throwAlert } from '../../Alerts/actions';
-import { imgsrc } from '../../../utils/imgsrc';
 import FileExplorerBodyRender from './FileExplorerBodyRender';
 import { baseName, pathInfo, pathUp, sanitizePath } from '../../../utils/files';
 import {
@@ -113,6 +112,16 @@ import {
   progressUpdate,
 } from '../../../helpers/fileTransfer';
 import { logTransferEvent } from '../../../helpers/fileTransferLogger';
+import {
+  beginDragStack,
+  dropDragStack,
+  endDragStack,
+} from '../../../helpers/dragStack';
+import { plainRect } from '../../../helpers/sharedMorph';
+import {
+  clearIncomingTransfer,
+  setIncomingTransfer,
+} from '../../../helpers/incomingTransfer';
 import { isSameUsbDevice } from '../../../helpers/deviceInfo';
 import M3Menu from '../../../components/m3/M3Menu';
 
@@ -241,7 +250,28 @@ class FileExplorer extends Component {
     }
   }
 
+  componentDidUpdate(prevProps) {
+    const { fileTransferProgess } = this.props;
+    const phase = fileTransferProgess?.phase;
+
+    // the copy is over: let the last item light up, then the folder's own
+    // listing takes over from the incoming items
+    if (
+      phase !== prevProps.fileTransferProgess?.phase &&
+      isTransferPhaseTerminal(phase)
+    ) {
+      const { sessionId } = fileTransferProgess;
+
+      clearTimeout(this.incomingTimer);
+      this.incomingTimer = setTimeout(
+        () => clearIncomingTransfer(sessionId),
+        phase === FILE_TRANSFER_PHASE.completed ? 1500 : 0
+      );
+    }
+  }
+
   componentWillUnmount() {
+    clearTimeout(this.incomingTimer);
     const { actionCreatedDisposeMtp, deviceType } = this.props;
 
     this.deregisterAccelerators();
@@ -264,6 +294,33 @@ class FileExplorer extends Component {
 
     actionCreatedDisposeMtp({ deviceType });
   }
+
+  // what this copy brings into [destinationFolder], so the pane showing it
+  // lists the items right away (helpers/incomingTransfer)
+  _announceIncomingItems = ({ sessionId, queue, destinationFolder }) => {
+    const { deviceType, directoryLists, fileTransferClipboard } = this.props;
+    const sourceNodes = new Map(
+      (directoryLists[fileTransferClipboard.source]?.nodes ?? []).map(
+        (node) => [node.path, node]
+      )
+    );
+
+    setIncomingTransfer({
+      sessionId,
+      destinationDeviceType: deviceType,
+      destinationFolder,
+      items: queue.map((path) => {
+        const node = sourceNodes.get(path);
+
+        return {
+          path,
+          name: node?.name ?? baseName(path),
+          isFolder: Boolean(node?.isFolder),
+          size: node?.size ?? 0,
+        };
+      }),
+    });
+  };
 
   registerAccelerators = () => {
     document.addEventListener('keydown', this._boundAcceleratorKeyDown);
@@ -1574,22 +1631,69 @@ class FileExplorer extends Component {
     }
   };
 
+  // The browser's own drag image is replaced by an empty one: the app draws
+  // the dragged selection itself (components/DragStack).
   _createDragIcon() {
-    const dragIcon = document.createElement('img');
-
-    dragIcon.src = imgsrc(`FileExplorer/files-archive.svg`);
-    dragIcon.style.width = '100px';
-
     const div = document.createElement('div');
 
-    div.appendChild(dragIcon);
     div.style.position = 'absolute';
     div.style.top = '0px';
     div.style.left = '-500px';
+    div.style.width = '1px';
+    div.style.height = '1px';
     document.querySelector('body').appendChild(div);
 
     return div;
   }
+
+  // what the stack that follows the pointer shows: the icons of the first
+  // selected items (taken from the pane, so they're the very same), how many
+  // there are and, for files, their size
+  _dragStackPayload = (e, sourceDeviceType) => {
+    const { directoryLists } = this.props;
+    const pane = e.currentTarget instanceof Element ? e.currentTarget : null;
+    const dragged =
+      e.target instanceof Element
+        ? e.target.closest('[role="option"], tr[data-file-explorer-row]')
+        : null;
+    const draggedIsSelected =
+      dragged?.getAttribute('aria-selected') === 'true' ||
+      dragged?.getAttribute('aria-checked') === 'true';
+    const selectedElements = draggedIsSelected
+      ? [
+          dragged,
+          ...Array.from(
+            pane?.querySelectorAll(
+              '[role="option"][aria-selected="true"], tr[data-file-explorer-row][aria-checked="true"]'
+            ) || []
+          ).filter((element) => element !== dragged),
+        ]
+      : [dragged].filter(Boolean);
+    const icons = selectedElements
+      .map((element) => element.querySelector('img')?.src)
+      .filter(Boolean)
+      .slice(0, 3);
+    const selectedPaths = draggedIsSelected
+      ? directoryLists[sourceDeviceType]?.queue?.selected ?? []
+      : [];
+    const selectedSet = new Set(selectedPaths);
+    const selectedNodes = (
+      directoryLists[sourceDeviceType]?.nodes ?? []
+    ).filter((node) => selectedSet.has(node.path));
+    const onlyFiles =
+      selectedNodes.length > 0 && selectedNodes.every((node) => !node.isFolder);
+
+    return {
+      icons,
+      count: Math.max(1, selectedPaths.length || selectedElements.length),
+      bytes: onlyFiles
+        ? selectedNodes.reduce((total, node) => total + (node.size || 0), 0)
+        : 0,
+      from: plainRect(dragged?.getBoundingClientRect()),
+      x: e.clientX,
+      y: e.clientY,
+    };
+  };
 
   _handleFilesDragStart = (e, { sourceDeviceType }) => {
     const sourceDeviceTypeUpperCase = sourceDeviceType?.toUpperCase();
@@ -1607,6 +1711,7 @@ class FileExplorer extends Component {
     );
 
     e.dataTransfer.setDragImage(this.filesDragGhostImg, 0, 0);
+    beginDragStack(this._dragStackPayload(e, sourceDeviceType));
   };
 
   _handleExternalFileDragLeave = (_) => {
@@ -1653,6 +1758,7 @@ class FileExplorer extends Component {
   };
 
   _handleFilesDragEnd = () => {
+    endDragStack();
     this._handleClearFilesDrag();
   };
 
@@ -1712,6 +1818,11 @@ class FileExplorer extends Component {
     const selected = this._handleFilesDrop({
       externalFiles,
     });
+
+    // the stack folds and waits for the transfer dialog to take it over
+    if (isEmpty(externalFiles)) {
+      dropDragStack();
+    }
 
     actionCreateCopy({ selected, deviceType: sourceDeviceType });
 
@@ -1972,6 +2083,11 @@ class FileExplorer extends Component {
 
     this.pendingTransferSession = transferSession;
     actionCreateSetFileTransferProgress(transferSession);
+    this._announceIncomingItems({
+      sessionId,
+      queue,
+      destinationFolder,
+    });
     logTransferEvent({
       sessionId,
       event: 'destination_check_started',

@@ -6,6 +6,16 @@ import {
   m3State,
 } from '../../../styles/m3/tokens';
 
+// Connected selection: each corner of a selected tile reads its radius from
+// a CSS variable the tile sets (round outside, nearly square towards another
+// selected tile, see helpers/selectionShape.js)
+const SELECTED_SHAPE = [
+  'var(--sel-tl, 28px)',
+  'var(--sel-tr, 28px)',
+  'var(--sel-br, 28px)',
+  'var(--sel-bl, 28px)',
+].join(' ');
+
 export const styles = (theme) => ({
   wrapper: {},
   itemWrapper: {
@@ -14,6 +24,10 @@ export const styles = (theme) => ({
     width: 118,
     height: 155,
     padding: 5,
+    // the fill stops 1px inside the tile, so two selected tiles side by
+    // side keep a 2px gap like the buttons of a connected group
+    border: '1px solid transparent',
+    backgroundClip: 'padding-box',
     borderRadius: m3Shape.large,
     // M3 Expressive: selection morphs the shape with the spatial spring,
     // colours change with the effects spring
@@ -98,7 +112,7 @@ export const styles = (theme) => ({
     textAlign: 'center',
   },
   itemSelected: {
-    borderRadius: m3Shape.extraLarge,
+    borderRadius: SELECTED_SHAPE,
     backgroundColor: `${theme.palette.m3.secondaryContainer} !important`,
     '& $itemFileName': {
       color: theme.palette.m3.onSecondaryContainer,
@@ -121,7 +135,7 @@ export const styles = (theme) => ({
     },
   },
   itemSelectedMulti: {
-    borderRadius: m3Shape.extraLarge,
+    borderRadius: SELECTED_SHAPE,
     backgroundColor: `${theme.palette.m3.secondaryContainer} !important`,
     '& $itemFileName': {
       color: theme.palette.m3.onSecondaryContainer,

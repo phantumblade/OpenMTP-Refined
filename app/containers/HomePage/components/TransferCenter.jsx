@@ -41,6 +41,12 @@ import { DEVICES_LABEL } from '../../../constants';
 import { DEVICE_TYPE } from '../../../enums';
 import { formatStorageSize } from '../../../helpers/diskSpace';
 import { translate } from '../../../i18n';
+import {
+  flipTransform,
+  plainRect,
+  setMorphOrigin,
+  takeMorphOrigin,
+} from '../../../helpers/sharedMorph';
 import PhotoBackupGuide from './PhotoBackupGuide';
 import M3Shape from '../../../components/m3/M3Shape';
 
@@ -121,9 +127,48 @@ class TransferCenter extends PureComponent {
     actionSetTransferCenter({ open: false });
   };
 
-  // back to the transfer dialog
+  // the pill grows out of the transfer dialog it replaces
+  setPill = (element) => {
+    if (!element || element === this.pill) {
+      this.pill = element;
+
+      return;
+    }
+
+    this.pill = element;
+
+    const origin = takeMorphOrigin('transferPill');
+
+    if (!origin || typeof element.animate !== 'function') {
+      return;
+    }
+
+    const pill = element;
+    const box = pill.getBoundingClientRect();
+
+    // replaces the pill's own entrance
+    pill.style.animation = 'none';
+    pill.animate(
+      [
+        {
+          transform: `translateX(-50%) ${flipTransform(origin.rect, box)}`,
+          opacity: 0.2,
+        },
+        { transform: 'translateX(-50%)', opacity: 1 },
+      ],
+      { duration: 480, easing: 'cubic-bezier(0.38, 1.21, 0.22, 1)' }
+    );
+  };
+
+  // back to the transfer dialog, which grows out of the pill
   expand = () => {
     const { actionSetFileTransferProgress } = this.props;
+
+    if (this.pill) {
+      setMorphOrigin('transferDialog', {
+        rect: plainRect(this.pill.getBoundingClientRect()),
+      });
+    }
 
     this.close();
     actionSetFileTransferProgress({ minimized: false });
@@ -186,6 +231,7 @@ class TransferCenter extends PureComponent {
 
     return (
       <button
+        ref={this.setPill}
         type="button"
         className={classNames(classes.pill, {
           [classes.pillDone]: !active && !failed,
