@@ -75,6 +75,12 @@ function main() {
 
   assert.strictEqual(green.count, 1);
   assert.strictEqual(green.featured.since, '4.1.6');
+
+  // from 4.1.6 to 4.1.7: faster copies from the phone
+  const faster = selectWhatsNew({ from: '4.1.6', to: '4.1.7' });
+
+  assert.strictEqual(faster.count, 1);
+  assert.strictEqual(faster.featured.since, '4.1.7');
   assert.strictEqual(drives.featured.since, '4.1.4');
 
   // first install: a welcome with the best of every version
