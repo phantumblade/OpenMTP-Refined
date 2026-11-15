@@ -81,6 +81,12 @@ function main() {
 
   assert.strictEqual(faster.count, 1);
   assert.strictEqual(faster.featured.since, '4.1.7');
+
+  // from 4.1.7 to 4.1.8: drag stack and connected selection
+  const drag = selectWhatsNew({ from: '4.1.7', to: '4.1.8' });
+
+  assert.strictEqual(drag.count, 2);
+  assert.strictEqual(drag.featured.since, '4.1.8');
   assert.strictEqual(drives.featured.since, '4.1.4');
 
   // first install: a welcome with the best of every version
