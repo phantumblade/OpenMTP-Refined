@@ -8,6 +8,16 @@ import semver from 'semver';
 // - description: shown when the item is the featured one or a card
 // - action: 'backupGuide' adds "How it works" (photo backup)
 export const WHATS_NEW_ITEMS = [
+  // 4.1.7
+  {
+    since: '4.1.7',
+    weight: 70,
+    icon: 'bolt',
+    title: 'Faster copies from the phone',
+    chip: 'Faster copies from the phone',
+    description:
+      'Copying many photos and videos to the Mac starts right away and goes much faster, without long waits while preparing.',
+  },
   // 4.1.6
   {
     since: '4.1.6',

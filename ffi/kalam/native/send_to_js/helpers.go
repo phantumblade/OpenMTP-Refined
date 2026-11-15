@@ -69,6 +69,18 @@ func processError(e error) (errorType ErrorType, errorMsg string) {
 		errorType = ErrorSendObject
 		errorMsg = v.Error()
 
+	case FileObjectReadError:
+		errorType = ErrorFileObjectRead
+		errorMsg = v.Error()
+
+	case LocalFileWriteError:
+		if v.Permission {
+			errorType = ErrorFilePermission
+		} else {
+			errorType = ErrorLocalFileRead
+		}
+		errorMsg = v.Error()
+
 	}
 
 	// this is a fallthrough case while processing errors

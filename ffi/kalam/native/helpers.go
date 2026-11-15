@@ -191,7 +191,8 @@ func _downloadFiles(storageId uint32, sources []string, destination string, prep
 		return err
 	}
 
-	_, _, err = mtpx.DownloadFiles(container.dev, storageId, sources, destination, preprocessFiles, preprocessCb, progressCb)
+	// kalam's own copy: reads each phone folder once (see download.go)
+	err = downloadFilesFast(container.dev, storageId, sources, destination, preprocessFiles, preprocessCb, progressCb)
 	if err != nil {
 		invalidateMtpSessionOnFatalError(err)
 

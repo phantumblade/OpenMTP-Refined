@@ -109,6 +109,9 @@ const italian = {
   'How it works': 'Come funziona',
   'A lighter Sort by bar': 'Barra Ordina per più leggera',
   'A calmer green': 'Un verde più equilibrato',
+  'Faster copies from the phone': 'Copie dal telefono più veloci',
+  'Copying many photos and videos to the Mac starts right away and goes much faster, without long waits while preparing.':
+    'Copiare tante foto e video sul Mac parte subito ed è molto più veloce, senza lunghe attese di preparazione.',
   'The green app colour is now as balanced as the blue one, in both the light and the dark theme.':
     'Il colore verde dell’app ora è equilibrato come il blu, sia nel tema chiaro sia in quello scuro.',
   'Permissions that stay': 'Permessi che restano',

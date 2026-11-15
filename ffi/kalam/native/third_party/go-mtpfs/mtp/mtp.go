@@ -524,6 +524,13 @@ func (d *Device) dataPrint(ep byte, data []byte) {
 // The linux usb stack can send 16kb per call, according to libusb.
 const rwBufSize = 0x4000
 
+// OpenMTP: reads from the phone ask for up to 256 KiB per call. Every call
+// is a full round trip to the phone, and with 16 KiB ones a large file
+// copied at ~17 MB/s whatever the cable and phone could do; macOS hands
+// larger transfers to the controller in one go. A read still ends at the
+// device's short packet, exactly as before.
+const readBufSize = 256 * 1024
+
 // bulkWrite returns the number of non-header bytes written.
 func (d *Device) bulkWrite(hdr *usbBulkHeader, r io.Reader, size int64, req *Container, progressCb ProgressFunc) (n int64, err error) {
 	totalSize := size
@@ -602,7 +609,7 @@ func (d *Device) bulkWrite(hdr *usbBulkHeader, r io.Reader, size int64, req *Con
 }
 
 func (d *Device) bulkRead(w io.Writer, progressCb ProgressFunc) (n int64, lastPacket []byte, err error) {
-	var buf [rwBufSize]byte
+	buf := make([]byte, readBufSize)
 	var lastRead int
 
 	for {

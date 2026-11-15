@@ -5,6 +5,18 @@ All notable changes to this fork will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Version 4.0.0 is the first release of the fork with its own version number.
 
+## Unreleased
+
+### Fixed
+
+- Copies from the phone to the Mac are much faster with many files and no
+  longer fail after minutes of "preparing": each phone folder is read once
+  per copy instead of being searched name by name for every selected file
+  (267 files from one folder meant tens of thousands of requests, and a
+  Samsung phone could give up with a read error).
+- Large files come off the phone faster: data is read from USB in 256 KiB
+  pieces instead of 16 KiB ones, so far fewer round trips per file.
+
 ## 4.1.6 — 2026-11-14
 
 ### Changed
