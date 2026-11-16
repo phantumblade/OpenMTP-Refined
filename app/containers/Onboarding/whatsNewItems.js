@@ -8,6 +8,16 @@ import semver from 'semver';
 // - description: shown when the item is the featured one or a card
 // - action: 'backupGuide' adds "How it works" (photo backup)
 export const WHATS_NEW_ITEMS = [
+  // 4.1.9
+  {
+    since: '4.1.9',
+    weight: 25,
+    icon: 'match_case',
+    title: 'A new typeface: Allo',
+    chip: 'A new typeface: Allo',
+    description:
+      'Allo, a warm and clear typeface made for screens, is now one of the fonts you can pick in Settings.',
+  },
   // 4.1.8
   {
     since: '4.1.8',

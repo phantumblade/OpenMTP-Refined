@@ -1,6 +1,6 @@
 import { variables, mixins } from '../../../styles/js';
 import { commonThemes } from '../../../styles/js/mixins';
-import { getAppFontFamily } from '../../../helpers/fonts';
+import { getAppFontFamily, getAppFontRoundness } from '../../../helpers/fonts';
 import {
   m3ColorTokens,
   m3HighContrastColorTokens,
@@ -478,9 +478,11 @@ export const materialUiTheme = ({ ...args }) => {
             '--app-secondary-main-color': palette.secondary.main,
             '--app-native-system-color': palette.nativeSystemColor,
             '--app-font-family': fontFamily,
-            // Google Sans Flex at full roundness, the Expressive setting;
-            // other fonts ignore the axis
-            fontVariationSettings: '"ROND" 100',
+            // Google Sans Flex at full roundness, the Expressive setting,
+            // Allo at its own default; other fonts ignore the axis
+            fontVariationSettings: `"ROND" ${getAppFontRoundness(
+              appFontFamily
+            )}`,
             ...m3CssVariables(palette.m3),
             ...commonThemes.noselect,
           },

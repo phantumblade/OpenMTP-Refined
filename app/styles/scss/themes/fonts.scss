@@ -30,6 +30,17 @@
     U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+// Allo 1.0 by Josh Puckett, variable (opsz 9-32, wght 100-900, ROND 0-100);
+// SIL Open Font License, see THIRD_PARTY_NOTICES/ALLO_LICENSE.txt. Only the
+// upright variable font: the app doesn't set text in italics.
+@font-face {
+  font-family: 'Allo';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('../fonts/allo/AlloVariable.woff2') format('woff2-variations');
+}
+
 @font-face {
   font-family: 'Faculty Glyphic';
   font-style: normal;

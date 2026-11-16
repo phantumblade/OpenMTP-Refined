@@ -235,6 +235,6 @@ Le regole di design sono in [DESIGN.md](DESIGN.md); ogni modifica è nel [CHANGE
 
 OpenMTP è stato creato da [Ganesh Rathinavel](https://github.com/ganeshrvel) ed è distribuito con licenza MIT. OpenMTP Refined, di [Andrea Perini](https://github.com/phantumblade), mantiene la storia e il copyright originali ed è distribuito con la stessa licenza.
 
-[LICENSE](LICENSE) · [NOTICE](NOTICE.md) · [Note di terze parti](THIRD_PARTY_NOTICES/) (Material Symbols, Google Sans Flex, icone Catppuccin, Phosphor, Lucide, shape-morph, Faculty Glyphic) · [Sicurezza](SECURITY.md)
+[LICENSE](LICENSE) · [NOTICE](NOTICE.md) · [Note di terze parti](THIRD_PARTY_NOTICES/) (Material Symbols, Google Sans Flex, icone Catppuccin, Phosphor, Lucide, shape-morph, Faculty Glyphic, Allo) · [Sicurezza](SECURITY.md)
 
 <sub>OpenMTP Refined non è affiliato a Google, Samsung o Apple. Android è un marchio di Google LLC.</sub>

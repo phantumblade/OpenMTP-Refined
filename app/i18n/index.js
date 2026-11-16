@@ -109,6 +109,9 @@ const italian = {
   'How it works': 'Come funziona',
   'A lighter Sort by bar': 'Barra Ordina per più leggera',
   'A calmer green': 'Un verde più equilibrato',
+  'A new typeface: Allo': 'Un nuovo carattere: Allo',
+  'Allo, a warm and clear typeface made for screens, is now one of the fonts you can pick in Settings.':
+    'Allo, un carattere caldo e leggibile pensato per gli schermi, ora è tra quelli che puoi scegliere nelle Impostazioni.',
   'Drag and watch them arrive': 'Trascina e guardali arrivare',
   'Dragging files shows a stack of what you move and where it goes. Drop it and the copy opens from it, while the items appear in the other pane and fill up as they arrive.':
     'Trascinando i file vedi una pila di ciò che sposti e dove va. Rilasciala e la copia si apre da lì, mentre gli elementi compaiono nell’altro pannello e si riempiono man mano che arrivano.',

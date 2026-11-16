@@ -33,6 +33,7 @@ export const APP_FONT_FAMILY_TYPE = {
   googleSansFlex: 'googleSansFlex',
   system: 'system',
   facultyGlyphic: 'facultyGlyphic',
+  allo: 'allo',
 };
 
 // Colour the Material 3 palette is generated from; "system" follows the

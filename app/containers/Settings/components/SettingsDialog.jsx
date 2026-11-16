@@ -411,6 +411,16 @@ export default class SettingsDialog extends PureComponent {
                             >
                               Faculty Glyphic
                             </MenuItem>
+                            <MenuItem
+                              value={APP_FONT_FAMILY_TYPE.allo}
+                              style={{
+                                fontFamily: getAppFontFamily(
+                                  APP_FONT_FAMILY_TYPE.allo
+                                ),
+                              }}
+                            >
+                              Allo
+                            </MenuItem>
                           </Select>
                         ),
                       })}
